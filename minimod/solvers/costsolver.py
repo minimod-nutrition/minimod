@@ -7,19 +7,33 @@ import mip
 class CostSolver(BaseSolver):
     
     def __init__(self, 
-                 interest_rate = 0.03 , 
-                 va_weight=1):
+                  minimum_benefit = 15958220,
+                  **kwargs):
         
-        super().__init__(interest_rate, va_weight=va_weight)
-        
+        super().__init__(**kwargs)     
     
-    def _objective(self, model):
+        self.minimum_benefit = minimum_benefit
+
+
+
+    def _objective(self, model, x, **kwargs):
         
-        k = self.__df[self.__intervention_col]
-        beta = self.__df['time_discount']
+        cost = self._df[self._cost_col]
+        beta = self._df['time_discount_costs']
         
-        model.objective = mip.xsum(x[i]*k[i]*beta[i] for i in self.__N)
+        model.objective = mip.xsum(x[i]*cost[i]*beta[i] for i in range(self._N))
         
-    def _constraint(self, model, **kwargs):
+    def _constraint(self, model, x, **kwargs):
         
-        model.add_constr
+        benefit = self._df[self._benefit_col]
+        
+        gamma = self._df['time_discount_benefits']
+        
+        ## Make benefits constraint be at least as large as the one from the minimum benefit intervention
+        
+        model += mip.xsum(x[i]*benefit[i]*gamma[i] for i in range(self._N)) >= self.minimum_benefit
+        
+    def fit(self):
+        return self._fit(method = 'min')
+    
+    
