@@ -1,5 +1,5 @@
 ## Imports for local packages
-from minimod.helpers.exceptions import MissingData, NotPandasDataframe, MissingOptimizationMethod
+from minimod.utils.exceptions import MissingData, NotPandasDataframe, MissingOptimizationMethod
 
 import pandas as pd    
 import mip     
@@ -34,10 +34,10 @@ class BaseSolver:
         if data is not None:
             self._data = data  
         else:
-            raise Miss
+            raise MissingData("No data specified.")
         
         self._intervention_col = intervention_col
-        self.__space_col = space_col
+        self._space_col = space_col
         self._time_col = time_col
         
         self._benefit_col = benefit_col
@@ -140,11 +140,40 @@ class BaseSolver:
         max_nodes = kwargs.pop('max_nodes', mip.INF)
         max_solutions = kwargs.pop('max_solutions', mip.INF)
         
-        output = m.optimize(max_seconds, max_nodes, max_solutions)
+        status = m.optimize(max_seconds, max_nodes, max_solutions)
         
-        # m.clear()
         
-        return output, m
+        # if status == mip.OptimizationStatus.OPTIMAL:
+        #     print(f'optimal solution cost {m_copy.objective_value} found')
+        # elif status == mip.OptimizationStatus.FEASIBLE:
+        #     print(f'sol.cost {m_copy.objective_value} found, best possible: {m_copy.objective_bound}')
+        # elif status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
+        #     print(f'no feasible solution found, lower bound is: {m_copy.objective_bound}')
+        # if status == mip.OptimizationStatus.OPTIMAL or status == mip.OptimizationStatus.FEASIBLE:
+        #     print('solution:')
+        #     for v in m_copy.vars:
+        #         print(f'{v.name} : {v.x}')
+        
+        if status == mip.OptimizationStatus.OPTIMAL:
+            print("Optimal Solution Found")
+        elif status == mip.OptimizationStatus.FEASIBLE:
+            print("Feasible Solution Found")
+        elif status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
+            print('[Warning]: No Solution Found')
+            
+        opt_vars = [v.x for v in m.vars]
+
+        df_copy= self._df.copy(deep = True)
+        
+        df_copy['opt_vals'] = opt_vars
+        
+        self._objective_value = m.objective_value
+        self._objective_bound = m.objective_bound
+        self._opt_df = df_copy['opt_vals'].to_frame()
+        
+        m.clear()
+        
+        return df_copy['opt_vals'].to_frame()
         
         
         

@@ -70,7 +70,7 @@ c = mm.CostSolver(data = df)
 
 # %%
 
-output, m = c.fit()
+opt = c.fit()
 
 
 # %%
