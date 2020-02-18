@@ -14,7 +14,7 @@ The problem can be written in terms of a primal and dual. One can either define 
 
 Essentially this entails maximizing discounted effective coverage with respect to a total funds constraint. 
 
-The model allows for maximizing on region-specific basis (in the form of $X_{k,j,t}$) or to take part in a nationwide intervention (with $Y_{k,t}$).
+The model allows for maximizing on region-specific basis (in the form of $X_{k,j,t}$) or to take part in a nationwide intervention (with <a href="https://www.codecogs.com/eqnedit.php?latex=Y_{k,t}" /></a>).
 
 The dual model entails minimizing discounted costs with respect to a minimum amount of effective coverage, or benefits.
 
