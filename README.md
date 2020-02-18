@@ -10,14 +10,7 @@ This solver uses `mip` to find the optimal nutritional programs in a spatio-temp
 
 The problem can be written in terms of a primal and dual. One can either define the problem as a benefit maximization problem:
 
-$$
-\begin{array}{c}{\operatorname{Max} \sum_{k} \sum_{t} Y_{k, t} \sum_{j} \frac{E f C v g_{k j, t}}{(1+r)^{t}}} \\ 
-+\sum_{k} \sum_{j} \sum_{t} X_{k, j, t} \frac{E f C v g_{k, j, t}}{(1+r)^{t}} \\
-s.t. \\
-\begin{array}{l}{\sum_{k} \sum_{t} Y_{k, t} \sum_{j} \frac{\mathrm{TC}_{k, j, t}}{(1+i)^{t}}} \\ 
-{+\sum_{k} \sum_{j} \sum_{t} X_{k, j, t} \frac{\mathrm{TC}_{k, j, t}}{(1+i)^{t}} \leq \mathrm{TF}}\end{array} 
-\end{array}
-$$
+<a href="https://www.codecogs.com/eqnedit.php?latex=\begin{array}{c}{\operatorname{Max}&space;\sum_{k}&space;\sum_{t}&space;Y_{k,&space;t}&space;\sum_{j}&space;\frac{E&space;f&space;C&space;v&space;g_{k&space;j,&space;t}}{(1&plus;r)^{t}}}&space;\\&space;&plus;\sum_{k}&space;\sum_{j}&space;\sum_{t}&space;X_{k,&space;j,&space;t}&space;\frac{E&space;f&space;C&space;v&space;g_{k,&space;j,&space;t}}{(1&plus;r)^{t}}&space;\\&space;s.t.&space;\\&space;\begin{array}{l}{\sum_{k}&space;\sum_{t}&space;Y_{k,&space;t}&space;\sum_{j}&space;\frac{\mathrm{TC}_{k,&space;j,&space;t}}{(1&plus;i)^{t}}}&space;\\&space;{&plus;\sum_{k}&space;\sum_{j}&space;\sum_{t}&space;X_{k,&space;j,&space;t}&space;\frac{\mathrm{TC}_{k,&space;j,&space;t}}{(1&plus;i)^{t}}&space;\leq&space;\mathrm{TF}}\end{array}&space;\end{array}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\begin{array}{c}{\operatorname{Max}&space;\sum_{k}&space;\sum_{t}&space;Y_{k,&space;t}&space;\sum_{j}&space;\frac{E&space;f&space;C&space;v&space;g_{k&space;j,&space;t}}{(1&plus;r)^{t}}}&space;\\&space;&plus;\sum_{k}&space;\sum_{j}&space;\sum_{t}&space;X_{k,&space;j,&space;t}&space;\frac{E&space;f&space;C&space;v&space;g_{k,&space;j,&space;t}}{(1&plus;r)^{t}}&space;\\&space;s.t.&space;\\&space;\begin{array}{l}{\sum_{k}&space;\sum_{t}&space;Y_{k,&space;t}&space;\sum_{j}&space;\frac{\mathrm{TC}_{k,&space;j,&space;t}}{(1&plus;i)^{t}}}&space;\\&space;{&plus;\sum_{k}&space;\sum_{j}&space;\sum_{t}&space;X_{k,&space;j,&space;t}&space;\frac{\mathrm{TC}_{k,&space;j,&space;t}}{(1&plus;i)^{t}}&space;\leq&space;\mathrm{TF}}\end{array}&space;\end{array}" title="\begin{array}{c}{\operatorname{Max} \sum_{k} \sum_{t} Y_{k, t} \sum_{j} \frac{E f C v g_{k j, t}}{(1+r)^{t}}} \\ +\sum_{k} \sum_{j} \sum_{t} X_{k, j, t} \frac{E f C v g_{k, j, t}}{(1+r)^{t}} \\ s.t. \\ \begin{array}{l}{\sum_{k} \sum_{t} Y_{k, t} \sum_{j} \frac{\mathrm{TC}_{k, j, t}}{(1+i)^{t}}} \\ {+\sum_{k} \sum_{j} \sum_{t} X_{k, j, t} \frac{\mathrm{TC}_{k, j, t}}{(1+i)^{t}} \leq \mathrm{TF}}\end{array} \end{array}" /></a>
 
 Essentially this entails maximizing discounted effective coverage with respect to a total funds constraint. 
 
