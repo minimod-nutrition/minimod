@@ -1,6 +1,8 @@
 ## Imports for local packages
 from minimod.utils.exceptions import MissingData, NotPandasDataframe, MissingOptimizationMethod
 
+from minimod.utils.summary import Summary
+
 import pandas as pd    
 import mip     
 
@@ -100,22 +102,26 @@ class BaseSolver:
         """        
         pass
     
-    def _fit(self, method = None, solver_name = mip.CBC, **kwargs):
-        
+    def _fit(self, method = None, solver_name = mip.CBC,
+             **kwargs):
+                
+        self.status = None
         
         if method is None:
             raise MissingOptimizationMethod("Please add an optimization method ('max' or 'min')")
+        else:
+            self._method = method
         
         print(f"""
               Loading MIP Model with:
               Solver = {str(solver_name)}
-              Method = {method}
+              Method = {self._method}
               """)
         
         ## Tell the fitter whether to maximize or minimize
-        if method == 'min':
+        if self._method == 'min':
             m = mip.Model(sense = mip.MINIMIZE, solver_name= solver_name)
-        if method == 'max':
+        if self._method == 'max':
             m = mip.Model(sense = mip.MAXIMIZE, solver_name = solver_name)
             
         ## Now we create the choice variable, x, which is binary and is the size of the dataset. 
@@ -140,25 +146,13 @@ class BaseSolver:
         max_nodes = kwargs.pop('max_nodes', mip.INF)
         max_solutions = kwargs.pop('max_solutions', mip.INF)
         
-        status = m.optimize(max_seconds, max_nodes, max_solutions)
+        self.status = m.optimize(max_seconds, max_nodes, max_solutions)
         
-        
-        # if status == mip.OptimizationStatus.OPTIMAL:
-        #     print(f'optimal solution cost {m_copy.objective_value} found')
-        # elif status == mip.OptimizationStatus.FEASIBLE:
-        #     print(f'sol.cost {m_copy.objective_value} found, best possible: {m_copy.objective_bound}')
-        # elif status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
-        #     print(f'no feasible solution found, lower bound is: {m_copy.objective_bound}')
-        # if status == mip.OptimizationStatus.OPTIMAL or status == mip.OptimizationStatus.FEASIBLE:
-        #     print('solution:')
-        #     for v in m_copy.vars:
-        #         print(f'{v.name} : {v.x}')
-        
-        if status == mip.OptimizationStatus.OPTIMAL:
-            print("Optimal Solution Found")
-        elif status == mip.OptimizationStatus.FEASIBLE:
-            print("Feasible Solution Found")
-        elif status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
+        if self.status == mip.OptimizationStatus.OPTIMAL:
+            print("[Note]: Optimal Solution Found")
+        elif self.status == mip.OptimizationStatus.FEASIBLE:
+            print("[Note]: Feasible Solution Found. This may not be optimal.")
+        elif self.status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
             print('[Warning]: No Solution Found')
             
         opt_vars = [v.x for v in m.vars]
@@ -167,18 +161,24 @@ class BaseSolver:
         
         df_copy['opt_vals'] = opt_vars
         
+        df_copy['opt_benefit'] = df_copy[self._benefit_col] * df_copy['opt_vals']
+        
+        df_copy['opt_costs'] = df_copy[self._cost_col] * df_copy['opt_vals']
+        
         self._objective_value = m.objective_value
         self._objective_bound = m.objective_bound
-        self._opt_df = df_copy['opt_vals'].to_frame()
+        self._opt_df = df_copy[['opt_vals', 'opt_benefit', 'opt_costs']]
         
         m.clear()
         
-        return df_copy['opt_vals'].to_frame()
+        return self._opt_df
+    
+    def report(self):
         
+        s = Summary(self)
         
-        
-        
-        
+        return s._report()
+    
             
         
         

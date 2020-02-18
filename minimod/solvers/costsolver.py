@@ -33,7 +33,7 @@ class CostSolver(BaseSolver):
         
         model += mip.xsum(x[i]*benefit[i]*gamma[i] for i in range(self._N)) >= self.minimum_benefit
         
-    def fit(self):
+    def fit(self, show = False):
         return self._fit(method = 'min')
     
     

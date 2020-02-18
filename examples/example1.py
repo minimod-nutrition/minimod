@@ -39,8 +39,10 @@ df_cost = (pd.read_excel(excel_file,
 
 ## Now we get data into the form we want
 
-df = df_benefit.merge(df_cost, left_index=True, right_index=True).reset_index()
-
+df = (df_benefit
+      .merge(df_cost, left_index=True, right_index=True)
+      
+)
 
 # %%
 #df.to_csv("./data/example1.csv")
@@ -71,6 +73,6 @@ c = mm.CostSolver(data = df)
 # %%
 
 opt = c.fit()
-
+c.report()
 
 # %%
