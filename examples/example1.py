@@ -2,7 +2,6 @@
 import sys
 import pandas as pd
 
-sys.path.append("/home/lordflaron/Documents/minimod")
 import minimod as mm
 
 # %%
