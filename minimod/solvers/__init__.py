@@ -1,9 +1,10 @@
 ## Imports for local packages
-from minimod.utils.exceptions import MissingData, NotPandasDataframe, MissingOptimizationMethod
+from minimod.utils.exceptions import MissingData, NotPandasDataframe, MissingOptimizationMethod, NoVars, NoConstraints, NoObjective
 
 from minimod.utils.summary import Summary
 
 import pandas as pd    
+import numpy as np
 import mip     
 
 class BaseSolver:
@@ -76,77 +77,98 @@ class BaseSolver:
         
         ## First do some sanity checks
         self._is_dataframe()
-        
-        
+
         df = (
             self._data
-            .assign(time_col = lambda df: df[self._time_col].astype(float),
-                    time_rank = lambda df: df[self._time_col].rank(numeric_only=True, method= 'dense') -1 ,
+            .assign(time_col = lambda df: df[self._time_col].astype(int),
+                    time_rank = lambda df: (df[self._time_col].rank(numeric_only=True, method= 'dense') -1).astype(int) ,
                     time_discount_costs = lambda df: self.discount_costs**df['time_rank'],
-                    time_discount_benefits = lambda df: self.discount_benefits**df['time_rank'])
-            .set_index(self._all_columns_list)
-            .sort_index(level = tuple(self._all_columns_list)) 
+                    time_discount_benefits = lambda df: self.discount_benefits**df['time_rank'],
+                    intervention_cat = lambda df: df[self._intervention_col].astype('category').cat.codes,
+                    space_cat = lambda df: df[self._space_col].astype('category').cat.codes)
+            .set_index(['intervention_cat', 'space_cat', 'time_rank'])
+            .sort_index(level = ('intervention_cat', 'space_cat', 'time_rank')) 
             )
+        
+                ## Get different lengths for each index
+        self._K, self._J, self._T = df.index.levshape
+        
+        if len(df['time_discount_costs'].unique()) == 1:
+            self._time_discount_costs = np.repeat(1, self._T)
+        else:
+            self._time_discount_costs = df['time_discount_costs'].unique()
+
+        if len(df['time_discount_benefits'].unique()) == 1:
+            self._time_discount_benefits = np.repeat(1, self._T)
+        else:
+            self._time_discount_benefits = df['time_discount_benefits'].unique()
+        
         return df
                 
     
-    def _constraint(self, model, x , **kwargs):
+    def _constraint(self, model, x):
         """To be overridden by BenefitSolver and CostSolver classes.
         This defines the constraints for the mips model.
         """        
         pass
     
-    def _objective(self, model, x , **kwargs):
+    def _objective(self, model, x):
         """To be overridden by BenefitSolver and CostSolver classes.
         The objective function defines the objective function for a model.
         """        
         pass
     
-    def _fit(self, method = None, solver_name = mip.CBC,
-             **kwargs):
-                
-        self.status = None
+    def _model_create(self, sense, solver_name = mip.CBC):
         
-        if method is None:
-            raise MissingOptimizationMethod("Please add an optimization method ('max' or 'min')")
-        else:
-            self._method = method
+        
+        self._sense = sense
         
         print(f"""
               Loading MIP Model with:
               Solver = {str(solver_name)}
-              Method = {self._method}
+              Method = {self._sense}
               """)
         
         ## Tell the fitter whether to maximize or minimize
-        if self._method == 'min':
-            m = mip.Model(sense = mip.MINIMIZE, solver_name= solver_name)
-        if self._method == 'max':
-            m = mip.Model(sense = mip.MAXIMIZE, solver_name = solver_name)
+        self.model = mip.Model(sense = sense, solver_name= solver_name)
+    
+    def base_model_create(self, sense):
+        
+        self._model_create(sense, solver_name = mip.CBC)
             
         ## Now we create the choice variable, x, which is binary and is the size of the dataset. 
         
         ## In this case, it should just be a column vector with the rows equal to the data:
         
+        x = {(k,j,t): self.model.add_var(name = f'{k} {j} {t}', var_type = mip.BINARY) for k in range(self._K) for j in range(self._J) for t in range(self._T)}
         
-        self._N = len(self._df)
-        
-        x = [m.add_var(var_type= mip.BINARY) for i in range(self._N)]
         
         ## Now write the objective function
-        self._objective(m, x)
+        self._objective(self.model, x)
         
         ## Now add constraints to the model
-        self._constraint(m, x)
+        self._constraint(self.model, x)
+        
+    def optimize(self, **kwargs):
+        
+        self.status = None
 
-            
+        if self.model.num_cols ==0:
+            raise NoVars("No Variables added to the model")
+        if self.model.num_rows == 0:
+            raise NoConstraints("No constraints added to the model.")
+        try:
+            self.model.objective
+        except Exception:
+            raise NoObjective("No Objective added to the model")
+           
         ## Now, allow for arguments to the optimize function to be given:
 
         max_seconds = kwargs.pop('max_seconds', mip.INF)
         max_nodes = kwargs.pop('max_nodes', mip.INF)
         max_solutions = kwargs.pop('max_solutions', mip.INF)
         
-        self.status = m.optimize(max_seconds, max_nodes, max_solutions)
+        self.status = self.model.optimize(max_seconds, max_nodes, max_solutions)
         
         if self.status == mip.OptimizationStatus.OPTIMAL:
             print("[Note]: Optimal Solution Found")
@@ -154,25 +176,58 @@ class BaseSolver:
             print("[Note]: Feasible Solution Found. This may not be optimal.")
         elif self.status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
             print('[Warning]: No Solution Found')
-            
-        opt_vars = [v.x for v in m.vars]
-
-        df_copy= self._df.copy(deep = True)
         
-        df_copy['opt_vals'] = opt_vars
+    
+    def process_results(self):
+        
+        ## First we construct the dataframe based on the name given for the variable `x[0,0,0]` for example, and its value.
+        
+        opt_vars = {}
+        opt_vars['intervention_cat'] = []
+        opt_vars['space_cat'] = []
+        opt_vars['time_rank'] = []
+        opt_vars['opt_vals'] = []
+        
+        for v in self.model.vars:
+            
+            v_cols = v.name.split(' ')
+            opt_vars['intervention_cat'].append(int(v_cols[0]))
+            opt_vars['space_cat'].append(int(v_cols[1]))
+            opt_vars['time_rank'].append(int(v_cols[2]))
+            
+            opt_vars['opt_vals'].append(v.x)
+        
+        opt_var_df = (pd.DataFrame(opt_vars)
+                      .set_index(['intervention_cat', 'space_cat', 'time_rank'])
+                      )
+
+        df_copy_aux= self._df.copy(deep = True)
+        
+        df_copy = df_copy_aux.merge(opt_var_df, left_index=True, right_index=True)
         
         df_copy['opt_benefit'] = df_copy[self._benefit_col] * df_copy['opt_vals']
         
         df_copy['opt_costs'] = df_copy[self._cost_col] * df_copy['opt_vals']
         
-        self._objective_value = m.objective_value
-        self._objective_bound = m.objective_bound
-        self._opt_df = df_copy[['opt_vals', 'opt_benefit', 'opt_costs']]
+        self.objective_value = self.model.objective_value
+        self.objective_bound = self.model.objective_bound
+        self._opt_df = (df_copy
+                        .reset_index()
+                        .set_index([self._intervention_col, self._space_col, self._time_col])[['opt_vals', 'opt_benefit', 'opt_costs']])
         
-        m.clear()
+            
+    def _fit(self, sense, extra_const = None, **kwargs):
         
-        return self._opt_df
-    
+        self.base_model_create(sense)
+        if extra_const is not None:
+            self.model += extra_const(**kwargs)
+        self.optimize()
+        self.process_results()
+        self.clear()
+
+    def clear(self):
+        self.model.clear()
+        
     def report(self):
         
         s = Summary(self)

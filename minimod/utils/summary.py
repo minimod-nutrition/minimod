@@ -85,19 +85,19 @@ class Summary:
         print(f"""
               Optimized Scenario with:
               
-              Method: {self.model._method}
+              Method: {str(self.model._sense)}
               Discount Factor on Costs: {self.model.discount_costs}
               Discount Factor on Benefits: {self.model.discount_benefits}
               """)
         
         print("+-----------------------------+")
         
-        if self.model._method == 'min':
+        if self.model._sense == 'mip.MINIMIZE':
             
             print(f"""
                   With a Minimum Benefit Constraint of: {self.model.minimum_benefit}
                   """)
-        if self.model._method == 'max':
+        if self.model._sense == 'mip.MAXIMIZE':
             print(f"""
                   With a Total Funds Constraint of: {self.model.total_funds}
                   """)
