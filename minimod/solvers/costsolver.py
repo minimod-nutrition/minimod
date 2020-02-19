@@ -47,10 +47,8 @@ class CostSolver(BaseSolver):
         
         ## Also add constraint that only allows one intervention in a time period and region
         
-        
-        
-        
-    def fit(self, show = False):
-        return self._fit(method = 'min')
+    def fit(self, extra_const = None):
+        return self._fit(sense = mip.MINIMIZE, 
+                         extra_const = extra_const)
     
     
