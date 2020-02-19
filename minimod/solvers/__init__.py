@@ -220,7 +220,7 @@ class BaseSolver:
         
         self.base_model_create(sense)
         if extra_const is not None:
-            extra_const(**kwargs)
+            self.model += extra_const(**kwargs)
         self.optimize()
         self.process_results()
         self.clear()
