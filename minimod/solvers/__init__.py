@@ -4,6 +4,7 @@ from minimod.utils.exceptions import MissingData, NotPandasDataframe, MissingOpt
 from minimod.utils.summary import Summary
 
 import pandas as pd    
+import numpy as np
 import mip     
 
 class BaseSolver:
@@ -76,21 +77,33 @@ class BaseSolver:
         
         ## First do some sanity checks
         self._is_dataframe()
-        
-        
+
         df = (
             self._data
-            .assign(time_col = lambda df: df[self._time_col].astype(float),
-                    time_rank = lambda df: df[self._time_col].rank(numeric_only=True, method= 'dense') -1 ,
+            .assign(time_col = lambda df: df[self._time_col].astype(int),
+                    time_rank = lambda df: (df[self._time_col].rank(numeric_only=True, method= 'dense') -1).astype(int) ,
                     time_discount_costs = lambda df: self.discount_costs**df['time_rank'],
-                    time_discount_benefits = lambda df: self.discount_benefits**df['time_rank'])
-            .set_index(self._all_columns_list)
-            .sort_index(level = tuple(self._all_columns_list)) 
+                    time_discount_benefits = lambda df: self.discount_benefits**df['time_rank'],
+                    intervention_cat = lambda df: df[self._intervention_col].astype('category').cat.codes,
+                    space_cat = lambda df: df[self._space_col].astype('category').cat.codes)
+            .set_index(['intervention_cat', 'space_cat', 'time_rank'])
+            .sort_index(level = ('intervention_cat', 'space_cat', 'time_rank')) 
             )
+        
+                ## Get different lengths for each index
+        self._K, self._J, self._T = df.index.levshape
+        
+        if len(df['time_discount_costs'].unique()) == 1 or len(df['time_discount_benefits'].unique()) == 1:
+            self._time_discount_costs = np.repeat(1, self._T)
+            self._time_discount_benefits = np.repeat(1, self._T)
+        else:
+            self._time_discount_costs = df['time_discount_costs'].unique()
+            self._time_discount_benefits = df['time_discount_benefits'].unique()
+        
         return df
                 
     
-    def _constraint(self, model, x , **kwargs):
+    def _constraint(self, model, x ,  **kwargs):
         """To be overridden by BenefitSolver and CostSolver classes.
         This defines the constraints for the mips model.
         """        
@@ -129,9 +142,10 @@ class BaseSolver:
         ## In this case, it should just be a column vector with the rows equal to the data:
         
         
-        self._N = len(self._df)
+
         
-        x = [m.add_var(var_type= mip.BINARY) for i in range(self._N)]
+        x = {(k,j,t): m.add_var(name = f'x[{k}, {j}, {t}]', var_type = mip.BINARY) for k in range(self._K) for j in range(self._J) for t in range(self._T)}
+        
         
         ## Now write the objective function
         self._objective(m, x)
@@ -155,23 +169,23 @@ class BaseSolver:
         elif self.status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
             print('[Warning]: No Solution Found')
             
-        opt_vars = [v.x for v in m.vars]
+        # opt_vars = [v.x for v in m.vars]
 
-        df_copy= self._df.copy(deep = True)
+        # df_copy= self._df.copy(deep = True)
         
-        df_copy['opt_vals'] = opt_vars
+        # df_copy['opt_vals'] = opt_vars
         
-        df_copy['opt_benefit'] = df_copy[self._benefit_col] * df_copy['opt_vals']
+        # df_copy['opt_benefit'] = df_copy[self._benefit_col] * df_copy['opt_vals']
         
-        df_copy['opt_costs'] = df_copy[self._cost_col] * df_copy['opt_vals']
+        # df_copy['opt_costs'] = df_copy[self._cost_col] * df_copy['opt_vals']
         
-        self._objective_value = m.objective_value
-        self._objective_bound = m.objective_bound
-        self._opt_df = df_copy[['opt_vals', 'opt_benefit', 'opt_costs']]
+        # self._objective_value = m.objective_value
+        # self._objective_bound = m.objective_bound
+        # self._opt_df = df_copy[['opt_vals', 'opt_benefit', 'opt_costs']]
         
-        m.clear()
+        # m.clear()
         
-        return self._opt_df
+        return m
     
     def report(self):
         
