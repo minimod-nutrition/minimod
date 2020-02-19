@@ -52,7 +52,7 @@ In order to run the fitter, first get the data into the right form. We'll call t
 
 import minimod as mm
 
-c = mm.CostSolver(df)
+c = mm.CostSolver(data = df)
 
 opt = c.opt()
 
