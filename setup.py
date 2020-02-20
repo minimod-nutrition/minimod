@@ -2,8 +2,7 @@
 import os
 
 from setuptools import setup, find_packages
-
-exec(compile(open("minimod/version.py").read(), "minimod/version.py", "exec"))
+from minimod.version import __version__
 
 with open("reqs/base-requirements.txt") as f:
     REQUIREMENTS = f.read().splitlines()
