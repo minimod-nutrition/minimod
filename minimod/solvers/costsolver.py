@@ -24,11 +24,9 @@ class CostSolver(BaseSolver):
         
         # Discounted costs
         
-        model.objective = mip.xsum(beta[t]*\
-            (mip.xsum(x[k,j,t]*cost.loc[k,j,t] \
+        model.objective = mip.xsum(beta[t]*x[k,j,t]*cost.loc[k,j,t] \
                 for k in range(self._K) \
-                    for j in range(self._J))) \
-                 for t in range(self._T) )
+                    for j in range(self._J) for t in range(self._T))
         
     def _constraint(self, model, x, **kwargs):
         
@@ -47,8 +45,8 @@ class CostSolver(BaseSolver):
         
         ## Also add constraint that only allows one intervention in a time period and region
         
-    def fit(self, extra_const = None):
+    def fit(self, clear = False, extra_const = None):
         return self._fit(sense = mip.MINIMIZE, 
-                         extra_const = extra_const)
+                         extra_const = extra_const,clear=clear)
     
     
