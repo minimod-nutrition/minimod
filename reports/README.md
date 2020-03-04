@@ -19,6 +19,10 @@ conda install codebraid
 
 ## Generating the Report
 
-To generate the report, run:
+To generate the pdf report, run:
+
+```
+codebraid pandoc report.md -f markdown+tex_math_single_backslash -t latex -o report.pdf --overwrite
+```
 
 
