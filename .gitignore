@@ -4,9 +4,11 @@ __pycache__/
 *$py.class
 *.cpython-38.pyc
 
-
+.idea/*
 # C extensions
 *.so
+
+reports/source/_codebraid/
 
 # Distribution / packaging
 .Python
