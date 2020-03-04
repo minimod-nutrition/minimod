@@ -149,25 +149,31 @@ class BaseSolver:
         # primal tol -> infeas
         # dual tol -> opt tol
         # integer  tol -> integer_tol
-        # self.model.opt_tol = 1e-07
-        # self.model.infeas_tol = 1e-07
-        # self.model.integer_tol = 1e-07
+        self.model.opt_tol = 1e-07
+        self.model.infeas_tol = 1e-07
+        self.model.integer_tol = 1e-07
 
         # # allowable gap/ optca -> max_mip_gap_abs
         # # ratioGap/ optcr -> max_mip_gap
 
-        # self.model.max_mip_gap_abs = 0
-        # self.model.max_mip_gap = 0.1
+        self.model.max_mip_gap_abs = 0
+        self.model.max_mip_gap = 0.1
 
-        # self.model.preprocess = 1
+        self.model.preprocess = 0
 
     def _model_var_create(self):
 
+        # x = {
+        #     (k, j, t): self.model.add_var(name=f"{k} {j} {t}", var_type=mip.BINARY)
+        #     for k in range(self._K)
+        #     for j in range(self._J)
+        #     for t in range(self._T)
+        # }
+        
         x = {
             (k, j, t): self.model.add_var(name=f"{k} {j} {t}", var_type=mip.BINARY)
-            for k in range(self._K)
-            for j in range(self._J)
-            for t in range(self._T)
+            for (k,j,t) in self._df.index.values
+
         }
 
         return x
@@ -178,7 +184,7 @@ class BaseSolver:
             for t in range(self._T):
                 self.model += (
                     mip.xsum(x[k, j, t] for k in range(self._K)) <= 1,
-                    f"onesx {j} {t}",
+                    f"onesx {j} {t}"
                 )
 
     def get_constraint(self, name=None):
@@ -211,7 +217,7 @@ class BaseSolver:
         self._objective(self.model, x)
 
         ## First add base constraint, which only allows one intervention per time and space
-        # self._base_constraint(x)
+        self._base_constraint(x)
 
         ## Now add constraints to the model
         self._constraint(self.model, x)
@@ -231,9 +237,7 @@ class BaseSolver:
 
         # Now, allow for arguments to the optimize function to be given:
 
-        max_seconds = kwargs.pop(
-            "max_seconds", 1000
-        )  # 1000 chosen to match GAMS reslim
+        max_seconds = kwargs.pop("max_seconds", mip.INF)  
         max_nodes = kwargs.pop("max_nodes", mip.INF)
         max_solutions = kwargs.pop("max_solutions", mip.INF)
 
@@ -294,6 +298,10 @@ class BaseSolver:
 
     def clear(self):
         self.model.clear()
+        
+    def write(self, filename = 'model.mps'):
+        self.model.write(filename)
+        
 
     def report(self):
 
