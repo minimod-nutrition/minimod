@@ -31,47 +31,32 @@ class BenefitSolver(BaseSolver):
                   total_funds = 35821703,
                   **kwargs):
         
-        super().__init__(**kwargs)     
+        super().__init__(sense = mip.MAXIMIZE, **kwargs)     
     
         self.total_funds = total_funds
 
 
     def _objective(self, model, x, **kwargs):
         
-        benefit = self._df[self._benefit_col]
-        
-        gamma = self._time_discount_benefits
-        
-
-        
+        benefit = self._df[self._benefit_col]     
         # Discounted costs
         
-        model.objective = mip.xsum(gamma[t]*\
-            (mip.xsum(x[k,j,t]*benefit.loc[k,j,t] \
-                for k in range(self._K) \
-                    for j in range(self._J))) \
-                 for t in range(self._T) )
+        model.objective = self._discounted_sum_all(benefit)
         
         
     def _constraint(self, model, x, **kwargs):
         
         cost = self._df[self._cost_col]
-        beta = self._time_discount_costs
         
         ## Make benefits constraint be at least as large as the one from the minimum benefit intervention
+
         
-        
-        model += mip.xsum(beta[t]*\
-            (mip.xsum(x[k,j,t]*cost.loc[k,j,t] \
-                for k in range(self._K) \
-                    for j in range(self._J))) \
-                 for t in range(self._T) ) <= self.total_funds
+        model += self._discounted_sum_all(cost) <= self.total_funds
         
         ## Also add constraint that only allows one intervention in a time period and region
         
     def fit(self, extra_const = None):
-        return self._fit(sense = mip.MAXIMIZE, 
-                         extra_const = extra_const)
+        return self._fit(extra_const = extra_const)
 
 
         

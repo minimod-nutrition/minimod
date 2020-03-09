@@ -1,8 +1,13 @@
+from tabulate import tabulate
+
+
 class Summary:
 
-    def __init__(self, model, **kwargs):
+    def __init__(self, model, table_fmt = "psql", decimals = 3, **kwargs):
 
         self.model = model
+        self.table_fmt = table_fmt
+        self.decimals = decimals
 
         if model.opt_df is not None:
             self.opt_df = model.opt_df
@@ -67,10 +72,10 @@ class Summary:
             intervention_specific = slice(None)
 
         if across_space:
-            grouper.append(self.model._space_col)
+            grouper.append(self.model._space)
 
         if over_time:
-            grouper.append(self.model._time_col)
+            grouper.append(self.model._time)
 
         summary_data = (self.opt_df
                         .loc[(intervention_specific, slice(None), slice(None)), :]
@@ -80,52 +85,48 @@ class Summary:
         return print_style(style, summary_data)
 
     def _report(self):
+        
+        header = [
+            ('MiniMod Solver Results', ""),
+            ("Method:" , str(self.model.sense)),
+            ("Solver:", str(self.model.solver_name)),
+            ("Optimization Status:", str(self.model.status)),
+            ("Number of Solutions Found:", str(self.model.model.num_solutions))
 
-        print(f"""
-              Optimized Scenario with:
-              
-              Method: {str(self.model._sense)}
-              Discount Factor on Costs: {self.model.discount_costs}
-              Discount Factor on Benefits: {self.model.discount_benefits}
-              """)
+        ]
 
-        print("+-----------------------------+")
+        print(tabulate(header, tablefmt=self.table_fmt))
 
-        if self.model._sense == 'mip.MINIMIZE':
-            print(f"""
-                  With a Minimum Benefit Constraint of: {self.model.minimum_benefit}
-                  """)
-        if self.model._sense == 'mip.MAXIMIZE':
-            print(f"""
-                  With a Total Funds Constraint of: {self.model.total_funds}
-                  """)
-        print("+------------------------------+")
-        print("\n")
-        print("Total Costs and Coverage by Year")
-        print("+------------------------------+")
-        print("\n")
+        features = [
+            ("No. of Variables:", str(self.model.model.num_cols)),
+            ("No. of Integer Variables:", str(self.model.model.num_int)),
+            ("No. of Constraints", str(self.model.model.num_rows)),
+            ("No. of Non-zeros in Constr.", str(self.model.model.num_nz))
+            ]
+
+        print(tabulate(features, tablefmt=self.table_fmt))
+
+        if hasattr(self.model, "minimum_benefit"):
+            ms_str = "Minimum Benefit"
+            ms_num = self.model.minimum_benefit
+            total_benefits = self.model.model.objective_value
+            total_costs = self.model.model.objective_bound
+        elif hasattr(self.model, "total_funds"):
+            ms_str = "Total Funds"
+            ms_num = self.model.total_funds
+            total_benefits = self.model.model.objective_bound
+            total_costs = self.model.model.objective_value
+
+        results = [
+            (ms_str, ms_num),
+            ("Total Cost", total_costs ),
+            ("Total Coverage", total_benefits)
+        ]
+
+        print(tabulate(results, tablefmt=self.table_fmt))
+        print(tabulate([("Total Costs and Coverage by Year", "")], tablefmt=self.table_fmt))
         self._group_summarizer(over_time=True, style='markdown')
+        print(tabulate([("Cost per Coverage", total_costs / total_benefits)], tablefmt=self.table_fmt))
 
-        print("\n")
 
-        total_cost = self._sum_of_all(col='opt_costs')
-        total_benefit = self._sum_of_all(col='opt_benefit')
 
-        print("Total Cost")
-        print("+------------------------------+")
-        print("\n")
-        print(str(total_cost))
-
-        print("\n")
-
-        print("Total Coverage")
-        print("+------------------------------+")
-        print("\n")
-        print(str(total_benefit))
-
-        print("\n")
-
-        print("Cost per Coverage")
-        print("+------------------------------+")
-        print("\n")
-        print(f"""{total_cost / total_benefit}""")

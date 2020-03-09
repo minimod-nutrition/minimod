@@ -9,37 +9,28 @@ import numpy as np
 class CostSolver(BaseSolver):
     def __init__(self, minimum_benefit=15958220, **kwargs):
 
-        super().__init__(**kwargs)
+        super().__init__(sense = mip.MINIMIZE, **kwargs)
 
         self.minimum_benefit = minimum_benefit
 
-    def _objective(self, model, x, **kwargs):
+    def _objective(self):
 
-        cost = self._df[self._cost_col]
-        beta = self._time_discount_costs
+        cost = self._df['discounted_costs']
 
         # Discounted costs
-        
-        model.objective = mip.xsum(
-            beta[t] * x[k,j,t] * cost.loc[k,j,t]
-            for (k,j,t) in self._df.index.values
-        )
 
-    def _constraint(self, model, x, **kwargs):
+        self._model.objective = self._discounted_sum_all(cost)
 
-        benefit = self._df[self._benefit_col]
+    def _constraint(self):
 
-        gamma = self._time_discount_benefits
+        benefit = self._df['discounted_benefits']
 
         ## Make benefits constraint be at least as large as the one from the minimum benefit intervention
-        
-        model += mip.xsum(
-            gamma[t] * x[k,j,t] * benefit.loc[k,j,t]
-            for (k,j,t) in self._df.index.values
-        ) >= self.minimum_benefit
+
+        self._model += self._discounted_sum_all(benefit) >= self.minimum_benefit
 
         ## Also add constraint that only allows one intervention in a time period and region
 
-    def fit(self, clear=False, extra_const=None):
-        return self._fit(sense=mip.MINIMIZE, extra_const=extra_const, clear=clear)
+    def fit(self, **kwargs):
+        return self._fit(**kwargs)
 

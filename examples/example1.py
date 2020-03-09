@@ -92,7 +92,7 @@ vasoilold_constraint = (
 
 
 # %%
-df = pd.read_csv("data/example1.csv")
+df = pd.read_csv("examples/data/processed/example1.csv")
 # %% [markdown]
 
 # ## Running the model
@@ -100,12 +100,14 @@ df = pd.read_csv("data/example1.csv")
 # Now we instantiate the model, and then run `fit` and get the report.
 
 # %%
-c = mm.CostSolver(data = df, minimum_benefit = vasoilold_constraint)
+c = mm.CostSolver(minimum_benefit = vasoilold_constraint)
 
 # %%
 
-opt = c.fit()
-
+opt = c.fit(data = df, 
+all_space = ['cube', 'oil', 'maize'], 
+all_time = ['maize', 'cube'],
+time_subset = [1,2,3])
 # %%
 
 c.opt_df.reset_index().to_csv("hello.csv")
