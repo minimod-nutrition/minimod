@@ -1,2 +1,4 @@
-mip==1.6.8
-pandas==1.0.1
+pandas>=0.25.3
+numpy>=1.18.1
+mip>=1.7.2
+tabulate>=0.8.6

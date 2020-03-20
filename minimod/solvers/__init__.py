@@ -137,7 +137,7 @@ class BaseSolver:
                 ** df["time_rank"],
                 discounted_costs=lambda df: df["time_discount_costs"] * df[costs],
                 discounted_benefits=lambda df: df["time_discount_benefits"]
-                * df[benefits],
+                * df[benefits]
             )
             .set_index([intervention, space, time])
             .sort_index(level=(intervention, space, time))
@@ -165,11 +165,19 @@ class BaseSolver:
         )
 
         return eq
+    
+    def _stringify_tuple(self, tup):
+        
+        strings= [str(x) for x in tup]
+        
+        stringified = ''.join(strings)
+        
+        return stringified
 
     def _model_var_create(self):
 
         self._df["mip_vars"] = self._df.apply(
-            lambda x: self.model.add_var(var_type=mip.BINARY), axis=1
+            lambda x: self.model.add_var(var_type=mip.BINARY, name= f"x_{self._stringify_tuple(x.name)}"), axis=1
         )
 
     def _base_constraint(self):
@@ -182,7 +190,9 @@ class BaseSolver:
 
             self.model += constr <= 1
 
-    def _intervention_subset(self, intervention, subset_names=[]):
+    def _intervention_subset(self, intervention, 
+                             subset_names=[],
+                             ):
 
         subset_dict = {}
 
@@ -192,7 +202,78 @@ class BaseSolver:
             ]
 
         return subset_dict
+    
+    def _intervention_xsummed(self,
+                              subset_names = None,
+                              intervention = None,
+                              space = None,
+                              time = None):
+        
+        xsummed_dict = {}
+        
+        for i in subset_names:
+            
+            xsummed_dict[i] = (
+                self._df.loc[
+                    lambda df: df.index.get_level_values(level=intervention).str.contains(i)
+                ]
+                .groupby([space, time])
+                .agg(mip.xsum)
+            )
+                        
+        return xsummed_dict
+    
+    def _all_xsummed_constraint(self,
+                                subset_names = None,
+                                subset_list = slice(None),
+                                group_index = None,
+                                intervention = None,
+                                space = None,
+                                time = None,
+                                over = None):
+        
+        all_indices = group_index + [over]
+        
+        xsummed_dict = self._intervention_xsummed(subset_names = subset_names,
+                                                  intervention = intervention,
+                                                  space = space,
+                                                  time = time)
+                
+        for sub in xsummed_dict.keys():
+            
+            mip_vars_all = xsummed_dict[sub]['mip_vars']
+            
+            mip_vars_subset = (xsummed_dict[sub]["mip_vars"]
+                            .reset_index()
+                            .set_index(over)
+                            .loc[subset_list]
+                            .reset_index()
+                            .set_index([space,time])
+                            )   
+            
+            
+            grouped_mip = (
+                mip_vars_subset.groupby([over])
+                .agg(lambda x: list(x))
+                .rename({"mip_vars": "constraining_var"}, axis="columns")
+            )
 
+            grouped_subset = (
+                mip_vars_all
+                .to_frame()
+                .merge(grouped_mip, left_index=True, right_index=True)[
+                    ["mip_vars", "constraining_var"]
+                ]
+            )
+            
+            for _, mip_var, constraining_var in grouped_subset.itertuples():
+
+                for cv in constraining_var:
+                    print('new')
+                    self.model += mip_var == cv
+        
+        
+        
     def _all_constraint(
         self,
         intervention=None,
@@ -202,9 +283,11 @@ class BaseSolver:
         subset_list=slice(None),
     ):
 
-        subset_dict = self._intervention_subset(intervention, subset_names=subset_names)
+        subset_dict = self._intervention_subset(intervention, 
+                                                subset_names=subset_names)
         
         all_indices = group_index + [over]
+        
 
         for sub in subset_dict.keys():
             
@@ -216,10 +299,7 @@ class BaseSolver:
                             .loc[subset_list]
                             .reset_index()
                             .set_index(all_indices)
-                            )
-
-            # Get mip_vars from each subset
-            
+                            )            
 
             # Now we group by the variables we aren't doing the constraints for
             grouped_mip = (
@@ -235,7 +315,8 @@ class BaseSolver:
                     ["mip_vars", "constraining_var"]
                 ]
             )
-
+            
+                
             for _, mip_var, constraining_var in grouped_subset.itertuples():
 
                 for cv in constraining_var:
@@ -243,27 +324,31 @@ class BaseSolver:
                         self.model += mip_var == cv
 
     def _all_space_constraint(
-        self, intervention=None, time=None, subset_names=None, over = None, subset_list=slice(None)
+        self, intervention=None, time=None, space= None, subset_names=None, over = None, subset_list=slice(None)
     ):
 
-        return self._all_constraint(
+        return self._all_xsummed_constraint(
             intervention=intervention,
             group_index=[intervention, time],
             subset_names=subset_names,
             over = over,
-            subset_list=subset_list
+            subset_list=subset_list,
+            space = space,
+            time = time
         )
 
     def _all_time_constraint(
-        self, intervention=None, space=None, subset_names=None, over = None, subset_list=slice(None)
+        self, intervention=None, space=None, time=None, subset_names=None, over = None, subset_list=slice(None)
     ):
 
-        return self._all_constraint(
+        return self._all_xsummed_constraint(
             intervention=intervention,
             group_index=[intervention, space],
             subset_names=subset_names,
             over = over,
-            subset_list=subset_list
+            subset_list=subset_list,
+            space=space,
+            time = time
         )
 
     def get_constraint(self, name=None):
@@ -313,6 +398,7 @@ class BaseSolver:
                 subset_names=all_time,
                 over = time,
                 subset_list=time_subset,
+                time = time
             )
 
         if all_space is not None:
@@ -331,6 +417,7 @@ class BaseSolver:
                 subset_names=all_space,
                 over = space,
                 subset_list=space_subset,
+                space = space,
             )
 
         ## Now add solver-specific constraints to the model
@@ -443,3 +530,5 @@ class BaseSolver:
         s = Summary(self)
 
         return s._report()
+    
+    

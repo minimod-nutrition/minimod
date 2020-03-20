@@ -48,6 +48,7 @@ vasoilold_constraint = (
     ['discounted_benefits'].sum()
 
 )
+
 # %%
 
 # df_benefit = (pd.read_excel(excel_file,
@@ -100,6 +101,9 @@ df = pd.read_csv("examples/data/processed/example1.csv")
 # Now we instantiate the model, and then run `fit` and get the report.
 
 # %%
+
+# Make subset
+# df = df.set_index(['intervention', 'space', 'time']).loc[(slice(None), slice(None), [1,2,3]),  :]
 c = mm.CostSolver(minimum_benefit = vasoilold_constraint)
 
 # %%
@@ -108,16 +112,23 @@ opt = c.fit(data = df,
 all_space = ['cube', 'oil', 'maize'], 
 all_time = ['maize', 'cube'],
 time_subset = [1,2,3])
+
+c.write('broken.lp')
 # %%
 
-c.opt_df.reset_index().to_csv("hello.csv")
-# %%
+# c.opt_df.reset_index().to_csv("hello.csv")
+# # %%
 
 c.report()
 
-opt_df = c.opt_df
+# opt_df = c.opt_df
 
 
 
 
-# %%
+# # %%
+
+# c.write('model3.lp')
+
+
+# # %%

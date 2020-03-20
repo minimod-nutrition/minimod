@@ -67,6 +67,7 @@ class Summary:
             print_style = self._print_specific_style
 
         grouper = []
+        
 
         if intervention_specific is None:
             intervention_specific = slice(None)
@@ -122,11 +123,16 @@ class Summary:
             ("Total Cost", total_costs ),
             ("Total Coverage", total_benefits)
         ]
+        
+        try:
+            cost_per_coverage = total_costs/total_benefits
+        except TypeError:
+            cost_per_coverage = "NaN"
 
         print(tabulate(results, tablefmt=self.table_fmt))
         print(tabulate([("Total Costs and Coverage by Year", "")], tablefmt=self.table_fmt))
         self._group_summarizer(over_time=True, style='markdown')
-        print(tabulate([("Cost per Coverage", total_costs / total_benefits)], tablefmt=self.table_fmt))
+        print(tabulate([("Cost per Coverage", cost_per_coverage)], tablefmt=self.table_fmt))
 
 
 

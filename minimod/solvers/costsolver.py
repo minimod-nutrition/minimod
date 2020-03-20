@@ -19,7 +19,7 @@ class CostSolver(BaseSolver):
 
         # Discounted costs
 
-        self._model.objective = self._discounted_sum_all(cost)
+        self.model.objective = self._discounted_sum_all(cost)
 
     def _constraint(self):
 
@@ -27,7 +27,7 @@ class CostSolver(BaseSolver):
 
         ## Make benefits constraint be at least as large as the one from the minimum benefit intervention
 
-        self._model += self._discounted_sum_all(benefit) >= self.minimum_benefit
+        self.model += self._discounted_sum_all(benefit) >= self.minimum_benefit
 
         ## Also add constraint that only allows one intervention in a time period and region
 
