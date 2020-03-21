@@ -11,6 +11,7 @@ from minimod.utils.exceptions import (
 from minimod.version import __version__
 
 from minimod.utils.summary import Summary
+from minimod.utils.plotting import Plotter
 
 import pandas as pd
 import numpy as np
@@ -166,10 +167,18 @@ class BaseSolver:
 
         return eq
 
+    def _stringify_tuple(self, tup):
+        
+        strings= [str(x) for x in tup]
+        
+        stringified = ''.join(strings)
+        
+        return stringified
+
     def _model_var_create(self):
 
         self._df["mip_vars"] = self._df.apply(
-            lambda x: self.model.add_var(var_type=mip.BINARY), axis=1
+            lambda x: self.model.add_var(var_type=mip.BINARY, name= f"x_{self._stringify_tuple(x.name)}"), axis=1
         )
 
     def _base_constraint(self):
@@ -443,3 +452,27 @@ class BaseSolver:
         s = Summary(self)
 
         return s._report()
+    
+    def plot_time(self, fig = None, ax = None, save = None):
+        
+        p = Plotter(self)
+        
+        return p._plot_lines(to_plot = ['opt_benefit', 'opt_costs'],
+                             title= "Optima over Time",
+                             xlabel = 'Time',
+                             ylabel = 'Coverage',
+                             twin =True,
+                             twin_ylabel= "Currency",
+                             save = save)
+
+    def plot_opt_val_hist(self, fig = None, ax = None, save = None):
+        
+        p = Plotter(self)
+        
+        return p._plot_hist(to_plot = 'opt_vals',
+                            title = "Optimal Choices",
+                            xlabel = "Time",
+                            ylabel= "",
+                            figure = fig,
+                            axis = ax,
+                            save = save)

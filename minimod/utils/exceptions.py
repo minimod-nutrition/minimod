@@ -30,3 +30,7 @@ class NoConstraints(Exception):
 class NoObjective(Exception):
     """Raise when no objective function is in the model"""
     pass
+
+class OptimizationNotInitialized(Exception):
+    """Riases when fitter hasn't been called yet."""
+    pass

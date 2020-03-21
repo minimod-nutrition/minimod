@@ -14,7 +14,8 @@ import pandas as pd
 
 import minimod as mm
 
-
+import os 
+print(os.getcwd())
 # %% [markdown]
 # ## Data
 
@@ -105,9 +106,9 @@ c = mm.CostSolver(minimum_benefit = vasoilold_constraint)
 # %%
 
 opt = c.fit(data = df, 
-all_space = ['cube', 'oil', 'maize'], 
-all_time = ['maize', 'cube'],
-time_subset = [1,2,3])
+            all_space = ['cube', 'oil', 'maize'], 
+            all_time = ['maize', 'cube'],
+            time_subset = [1,2,3])
 # %%
 
 c.opt_df.reset_index().to_csv("hello.csv")
@@ -118,6 +119,12 @@ c.report()
 opt_df = c.opt_df
 
 
+# %%
+c.write("model.lp")
 
+# %%
+c.plot_opt_val_hist(save = "hello.png")
+
+c.plot_time(save = "hello2.png")
 
 # %%
