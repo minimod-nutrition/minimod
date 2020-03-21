@@ -109,6 +109,60 @@ class Plotter:
             plt.savefig(save, dpi=600)
         
         return fig, ax
+    
+    def _merge_shape_file(self, 
+                          map_df = None, 
+                          merge_key = None):
+        
+        self._check_if_optimization()
+        
+        # Merge with `opt_df`
+        
+        df = (
+            map_df
+            .merge(
+                self.model.opt_df
+                .reset_index(),
+                left_on = [merge_key],
+                right_on = [self.model._space]
+            )
+            .set_index([self.model._intervention,
+                        self.model._space,
+                        self.model._time
+                        ])
+        )
+        
+        return df
+          
+    
+    def _plot_chloropleth(self, 
+                          intervention = None,
+                          time = None,
+                          optimum_interest = None,
+                          map_df = None, 
+                          merge_key = None, 
+                          figure = None, 
+                          axis = None,
+                          title = None, 
+                          save = None):
+        
+        df = (self._merge_shape_file(map_df=map_df,merge_key=merge_key)
+              .loc[(intervention, slice(None), time )]
+              )
+        
+        
+        fig, ax = self._plot_process(figure= figure, axis = axis)
+        
+    
+        df.plot(column = optimum_interest, legend = True)
+        
+        plt.tight_layout()
+        
+        if save is not None:
+            plt.savefig(save, dpi=600)
+            
+        return fig, ax
+        
         
         
     

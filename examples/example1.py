@@ -11,6 +11,7 @@
 #!%autoreload 2
 import sys
 import pandas as pd
+import geopandas as gpd
 
 import minimod as mm
 
@@ -127,4 +128,37 @@ c.plot_opt_val_hist(save = "hello.png")
 
 c.plot_time(save = "hello2.png")
 
+# %% [markdown]
+# ## Plotting a Map
+
+# Now let's create a chloropleth map of the optimal values from the optimization
+
 # %%
+
+# Load data
+geo_df = gpd.read_file("examples/data/maps/cameroon/CAM.shp")
+
+# Now we create the boundaries for North, South and Cities
+# Based on "Measuring Costs of Vitamin A..., Table 2"
+north = r"Adamaoua|Nord|Extreme-Nord"
+south = r"Centre|Est|Nord-Ouest|Ouest|Sud|Sud-Ouest"
+cities= r"Littoral" # Duala
+# Yaounde is in Mfoundi
+geo_df.loc[lambda df: df['ADM1'].str.contains(north), 'space'] = 'North'
+geo_df.loc[lambda df: df['ADM1'].str.contains(south), 'space'] = 'South'
+geo_df.loc[lambda df: df['ADM1'].str.contains(cities), 'space'] = 'Cities'
+geo_df.loc[lambda df: df['ADM2'].str.contains(r"Mfoundi"), 'space'] = 'Cities'
+
+# Now we aggregate the data to the `space` variable
+agg_geo_df = geo_df.dissolve(by = 'space')
+
+# %%
+
+c.plot_chloropleth('vasoil',
+                   5,
+                   'opt_benefit',
+                   agg_geo_df,
+                   'space',
+                   fig = None,
+                   ax = None,
+                   save = "map.png")

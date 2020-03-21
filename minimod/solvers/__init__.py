@@ -411,6 +411,7 @@ class BaseSolver:
         """
 
         self._benefits = benefits
+        self._intervention = intervention
         self._space = space
         self._time = time
 
@@ -476,3 +477,25 @@ class BaseSolver:
                             figure = fig,
                             axis = ax,
                             save = save)
+        
+    def plot_chloropleth(self,
+                         intervention,
+                         time,
+                         optimum_interest,
+                         map_df,
+                         merge_key,
+                         fig, 
+                         ax,
+                         save = None):
+        
+        p = Plotter(self)
+        
+        return p._plot_chloropleth(intervention = intervention,
+                                   time = time,
+                                   optimum_interest = optimum_interest,
+                                   map_df = map_df,
+                                   merge_key = merge_key,
+                                   figure = fig,
+                                   axis =ax,
+                                   title = None,
+                                   save = save)
