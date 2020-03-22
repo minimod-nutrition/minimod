@@ -7,7 +7,6 @@
 # %%
 #!%load_ext autoreload
 # %%
-
 #!%autoreload 2
 import sys
 import pandas as pd
@@ -154,11 +153,15 @@ agg_geo_df = geo_df.dissolve(by = 'space')
 
 # %%
 
-c.plot_chloropleth('vasoil',
-                   5,
-                   'opt_benefit',
-                   agg_geo_df,
-                   'space',
-                   fig = None,
-                   ax = None,
+c.plot_chloropleth(intervention='vasoil',
+                   time = [5],
+                   optimum_interest='b',
+                   map_df = agg_geo_df,
+                   merge_key= 'space',
                    save = "map.png")
+
+# %%
+c.plot_chloropleth(optimum_interest='b',
+                   map_df = agg_geo_df,
+                   merge_key= 'space',
+                   save = "map2.png")

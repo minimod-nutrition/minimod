@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from minimod.utils.exceptions import MissingOptimizationMethod
 
 class Plotter:
@@ -18,14 +19,14 @@ class Plotter:
     
     def _define_axis_object(self, fig = None, ax = None):
         
-        if fig is None or ax is None:
+        if ax is None:
             figure, axis = plt.subplots()
         else:
             figure, axis = fig, ax
         
         return figure, axis
             
-    def _plot_process(self, figure, axis):
+    def _plot_process(self, figure = None, axis = None):
         
         self._check_if_optimization()
         
@@ -42,7 +43,8 @@ class Plotter:
                     axis = None,
                     twin = False,
                     twin_ylabel = None,
-                    save = None):
+                    save = None,
+                    legend = None):
         
         fig, ax = self._plot_process(figure= figure, axis = axis)
         
@@ -71,7 +73,7 @@ class Plotter:
         
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        
+        ax.legend(legend, loc = 'upper left')
         plt.tight_layout()
         
         if save is not None:
@@ -102,7 +104,6 @@ class Plotter:
          )
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        
         plt.tight_layout()
         
         if save is not None:
@@ -136,32 +137,82 @@ class Plotter:
           
     
     def _plot_chloropleth(self, 
-                          intervention = None,
+                          intervention = slice(None),
                           time = None,
                           optimum_interest = None,
                           map_df = None, 
                           merge_key = None, 
-                          figure = None, 
-                          axis = None,
+                          ax = None,
                           title = None, 
                           save = None):
         
+        
+        fig, ax = self._plot_process(axis = ax)
+
+        
         df = (self._merge_shape_file(map_df=map_df,merge_key=merge_key)
-              .loc[(intervention, slice(None), time )]
+              .loc[(intervention, slice(None), time ), :]
               )
         
         
-        fig, ax = self._plot_process(figure= figure, axis = axis)
-        
+                
     
-        df.plot(column = optimum_interest, legend = True)
-        
+        df.plot(column = optimum_interest, ax = ax, legend = True)
+        ax.set_title(title)
+        plt.axis('off')
+
         plt.tight_layout()
         
         if save is not None:
             plt.savefig(save, dpi=600)
             
-        return fig, ax
+        return ax
+
+            
+    def _plot_multi_chloropleth(self, 
+                                t = None, 
+                                intervention = None,
+                                optimum_interest = None,
+                                map_df = None,
+                                merge_key = None,
+                                save = None):
+        
+        if t is None:
+            t = (self.model.opt_df
+                 .index
+                 .get_level_values(level = self.model._time)
+                 .unique()
+                 .values
+                 )
+        
+        mod = len(t) % 2
+                
+        fig, axs = plt.subplots(nrows = int(len(t)/2) + mod , 
+                                ncols=2,
+                                figsize = (10,20))
+        
+        
+        for ax, plot in zip(np.array(axs).flatten(), t):
+            
+            self._plot_chloropleth(intervention = intervention,
+                                   time = plot,
+                                   optimum_interest = optimum_interest,
+                                   map_df = map_df, 
+                                   merge_key = merge_key, 
+                                   ax = ax,
+                                   title = f"T = {plot}")
+            ax.set_xticklabels([])
+            ax.set_xticks([])
+            ax.set_yticklabels([])
+            ax.set_yticks([])
+            
+        plt.tight_layout()
+        plt.savefig(save)
+        
+        return fig, axs
+        
+        
+            
         
         
         

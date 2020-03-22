@@ -454,7 +454,10 @@ class BaseSolver:
 
         return s._report()
     
-    def plot_time(self, fig = None, ax = None, save = None):
+    def plot_time(self, 
+                  fig = None, 
+                  ax = None,
+                  save = None):
         
         p = Plotter(self)
         
@@ -464,9 +467,16 @@ class BaseSolver:
                              ylabel = 'Coverage',
                              twin =True,
                              twin_ylabel= "Currency",
-                             save = save)
+                             save = save,
+                             legend = ['Optimal Coverage',
+                                       'Optimal Costs'],
+                             figure=fig,
+                             axis=ax)
 
-    def plot_opt_val_hist(self, fig = None, ax = None, save = None):
+    def plot_opt_val_hist(self, 
+                          fig = None, 
+                          ax = None, 
+                          save = None):
         
         p = Plotter(self)
         
@@ -479,23 +489,38 @@ class BaseSolver:
                             save = save)
         
     def plot_chloropleth(self,
-                         intervention,
-                         time,
-                         optimum_interest,
-                         map_df,
-                         merge_key,
-                         fig, 
-                         ax,
+                         intervention = slice(None),
+                         time = None,
+                         optimum_interest = 'b',
+                         map_df = None,
+                         merge_key = None,
+                         ax = None,
                          save = None):
         
         p = Plotter(self)
+                
+        if optimum_interest == 'b':
+            opt = 'opt_benefit'
+        elif optimum_interest == 'c':
+            opt = 'opt_costs'
+        elif optimum_interest == 'v':
+            opt = 'opt_vals'
+        else:
+            raise Exception("Not one of the allowed variables for map plotting. Try again.")
         
-        return p._plot_chloropleth(intervention = intervention,
-                                   time = time,
-                                   optimum_interest = optimum_interest,
-                                   map_df = map_df,
-                                   merge_key = merge_key,
-                                   figure = fig,
-                                   axis =ax,
-                                   title = None,
-                                   save = save)
+        if time is not None and len(time) == 1:                
+                return p._plot_chloropleth(intervention = intervention,
+                                        time = time,
+                                        optimum_interest = opt,
+                                        map_df = map_df,
+                                        merge_key = merge_key,
+                                        title = None,
+                                        ax= ax,
+                                        save = save)
+        else:            
+            return p._plot_multi_chloropleth(t= time,
+                                             intervention=intervention,
+                                             optimum_interest=opt,
+                                             map_df=map_df,
+                                             merge_key = merge_key,
+                                             save = save)
