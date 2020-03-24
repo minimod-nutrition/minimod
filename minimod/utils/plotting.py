@@ -73,7 +73,8 @@ class Plotter:
         
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        ax.legend(legend, loc = 'upper left')
+        ax.legend(['Optimal Coverage'], loc= 'upper left')
+        ax2.legend(['Optimal Costs'], loc = 'lower left')
         plt.tight_layout()
         
         if save is not None:
@@ -112,6 +113,7 @@ class Plotter:
         return fig, ax
     
     def _merge_shape_file(self, 
+                          data = None,
                           map_df = None, 
                           merge_key = None):
         
@@ -122,7 +124,7 @@ class Plotter:
         df = (
             map_df
             .merge(
-                self.model.opt_df
+                data
                 .reset_index(),
                 left_on = [merge_key],
                 right_on = [self.model._space]
@@ -134,47 +136,80 @@ class Plotter:
         )
         
         return df
-          
+    
+    def _shape_file_loc(self,
+                        data = None,
+                        intervention = None,
+                        time = None):
+        
+        df = (data
+              .loc[(intervention, slice(None), time ), :]
+              )
+        
+        return df
+    
+    def _dissolve_interventions(self, 
+                                data = None, 
+                                aggfunc = None):
+                
+        return data.dissolve(by = [self.model._space, self.model._time], aggfunc = aggfunc)
+        
     
     def _plot_chloropleth(self, 
-                          intervention = slice(None),
+                          data = None,
+                          intervention = None,
                           time = None,
                           optimum_interest = None,
-                          map_df = None, 
-                          merge_key = None, 
+                          map_df = None,
+                          merge_key = None,
+                          aggfunc = None,
                           ax = None,
                           title = None, 
                           save = None):
         
+        merged_df = (
+            data
+            .pipe(self._merge_shape_file, map_df = map_df, merge_key = merge_key)
+        )
+        
+        if intervention  == slice(None):
+            
+            print(f"Dissolving for T = {time}")
+            df = (
+                merged_df
+                .pipe(self._dissolve_interventions, aggfunc = aggfunc)
+            )
+        else:
+            df = (
+                merged_df
+                .pipe(self._shape_file_loc, intervention = intervention, time = time)
+            )
         
         fig, ax = self._plot_process(axis = ax)
 
-        
-        df = (self._merge_shape_file(map_df=map_df,merge_key=merge_key)
-              .loc[(intervention, slice(None), time ), :]
-              )
-        
-        
-                
-    
         df.plot(column = optimum_interest, ax = ax, legend = True)
         ax.set_title(title)
-        plt.axis('off')
-
+        ax.set_xticklabels([])
+        ax.set_xticks([])
+        ax.set_yticklabels([])
+        ax.set_yticks([])
         plt.tight_layout()
         
         if save is not None:
             plt.savefig(save, dpi=600)
             
-        return ax
+        return ax        
 
             
     def _plot_multi_chloropleth(self, 
+                                data = None,
                                 t = None, 
                                 intervention = None,
                                 optimum_interest = None,
                                 map_df = None,
                                 merge_key = None,
+                                aggfunc = None,
+                                title = None,
                                 save = None):
         
         if t is None:
@@ -194,11 +229,13 @@ class Plotter:
         
         for ax, plot in zip(np.array(axs).flatten(), t):
             
-            self._plot_chloropleth(intervention = intervention,
+            self._plot_chloropleth(data = data,
+                                   intervention = intervention,
                                    time = plot,
                                    optimum_interest = optimum_interest,
                                    map_df = map_df, 
                                    merge_key = merge_key, 
+                                   aggfunc = aggfunc,
                                    ax = ax,
                                    title = f"T = {plot}")
             ax.set_xticklabels([])

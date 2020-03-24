@@ -101,14 +101,16 @@ df = pd.read_csv("examples/data/processed/example1.csv")
 # Now we instantiate the model, and then run `fit` and get the report.
 
 # %%
-c = mm.CostSolver(minimum_benefit = vasoilold_constraint)
+c = mm.Minimod(solver_type = 'costmin', minimum_benefit = vasoilold_constraint)
+#c = mm.CostSolver(minimum_benefit = vasoilold_constraint)
 
 # %%
 
 opt = c.fit(data = df, 
-            all_space = ['cube', 'oil', 'maize'], 
-            all_time = ['maize', 'cube'],
-            time_subset = [1,2,3])
+            # all_space = ['cube', 'oil', 'maize'], 
+            # all_time = ['maize', 'cube'],
+            # time_subset = [1,2,3]
+            )
 # %%
 
 c.opt_df.reset_index().to_csv("hello.csv")
@@ -155,13 +157,16 @@ agg_geo_df = geo_df.dissolve(by = 'space')
 
 c.plot_chloropleth(intervention='vasoil',
                    time = [5],
-                   optimum_interest='b',
+                   optimum_interest='c',
                    map_df = agg_geo_df,
                    merge_key= 'space',
                    save = "map.png")
 
 # %%
-c.plot_chloropleth(optimum_interest='b',
+c.plot_chloropleth(intervention = 'vasoil',
+                   optimum_interest='c',
                    map_df = agg_geo_df,
                    merge_key= 'space',
                    save = "map2.png")
+
+

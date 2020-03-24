@@ -4,6 +4,10 @@ __pycache__/
 *$py.class
 *.cpython-38.pyc
 
+*.png
+reports/source/*.png
+*.csv
+
 .idea/*
 # C extensions
 *.so
