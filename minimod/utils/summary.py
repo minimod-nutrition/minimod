@@ -1,18 +1,22 @@
 from tabulate import tabulate
+import pandas as pd
+
+pd.options.display.float_format = '${:,.2f}'.format
 
 
 class Summary:
 
     def __init__(self, model, table_fmt = "psql", decimals = 3, **kwargs):
 
+        
         self.model = model
         self.table_fmt = table_fmt
         self.decimals = decimals
 
-        if model.opt_df is not None:
-            self.opt_df = model.opt_df
-        else:
-            raise Exception("Results from fit not found. Did you run the fit method before summarizing?")
+        # if model.opt_df is not None:
+        #     self.opt_df = model.opt_df
+        # else:
+        #     raise Exception("Results from fit not found. Did you run the fit method before summarizing?")
 
     def _print_specific_style(self, style, data):
         if style == "html":
@@ -26,35 +30,20 @@ class Summary:
         else:
             raise ValueError("style not available.")
 
-    @staticmethod
-    def html_print(data):
-
+    def html_print(self, data):
         return print(data.to_html())
 
-    @staticmethod
-    def markdown_print(data):
+    def markdown_print(self, data):
         return print(data.to_markdown())
 
-    @staticmethod
-    def latex_print(data):
+    def latex_print(self, data):
         return print(data.to_latex())
 
-    @staticmethod
-    def pandas_show(data):
+    def pandas_show(self, data):
         return print(data)
 
-    def _sum_of_all(self,
-                    intervention_specific=None,
-                    col='costs'):
-
-        if intervention_specific is None:
-            intervention_specific = slice(None)
-
-        sum_ = (self.opt_df[col]
-                    .loc[(intervention_specific, slice(None), slice(None)), :]).sum()
-        return sum_
-
     def _group_summarizer(self,
+                          data = None,
                           intervention_specific=None,
                           over_time=True,
                           across_space=False,
@@ -77,61 +66,50 @@ class Summary:
         if over_time:
             grouper.append(self.model._time)
 
-        summary_data = (self.opt_df
+        summary_data = (data
                         .loc[(intervention_specific, slice(None), slice(None)), :]
                         .groupby(grouper)
                         .sum())
 
         return print_style(style, summary_data)
-
-    def _report(self):
-        
-        header = [
-            ('MiniMod Solver Results', ""),
-            ("Method:" , str(self.model.sense)),
-            ("Solver:", str(self.model.solver_name)),
-            ("Optimization Status:", str(self.model.status)),
-            ("Number of Solutions Found:", str(self.model.model.num_solutions))
-
-        ]
-
-        print(tabulate(header, tablefmt=self.table_fmt))
-
-        features = [
-            ("No. of Variables:", str(self.model.model.num_cols)),
-            ("No. of Integer Variables:", str(self.model.model.num_int)),
-            ("No. of Constraints", str(self.model.model.num_rows)),
-            ("No. of Non-zeros in Constr.", str(self.model.model.num_nz))
-            ]
-
-        print(tabulate(features, tablefmt=self.table_fmt))
-
-        if hasattr(self.model, "minimum_benefit"):
-            ms_str = "Minimum Benefit"
-            ms_num = self.model.minimum_benefit
-            total_benefits = self.model.model.objective_value
-            total_costs = self.model.model.objective_bound
-        elif hasattr(self.model, "total_funds"):
-            ms_str = "Total Funds"
-            ms_num = self.model.total_funds
-            total_benefits = self.model.model.objective_bound
-            total_costs = self.model.model.objective_value
-
-        results = [
-            (ms_str, ms_num),
-            ("Total Cost", total_costs ),
-            ("Total Coverage", total_benefits)
-        ]
+    
+    def print_ratio(self, name, num, denom):
         
         try:
-            cost_per_coverage = total_costs/total_benefits
+            ratio = num/denom
         except TypeError:
-            cost_per_coverage = "NaN"
+            ratio = "NaN"
+            
+        print(tabulate([(name, ratio)], tablefmt=self.table_fmt))
+        
+        return ratio
+    
+    def print_grouper(self, name, show_group = True, **kwargs):
+        
+        print(tabulate([(name, "")], tablefmt=self.table_fmt))
+        
+        if show_group:
+            self._group_summarizer(**kwargs)    
 
-        print(tabulate(results, tablefmt=self.table_fmt))
-        print(tabulate([("Total Costs and Coverage by Year", "")], tablefmt=self.table_fmt))
-        self._group_summarizer(over_time=True, style='markdown')
-        print(tabulate([("Cost per Coverage", cost_per_coverage)], tablefmt=self.table_fmt))
+    def print_generic(self, *args):
+
+        for table in args:
+            
+            print(tabulate(table, tablefmt=self.table_fmt))
+            
+         
+            
+    
+            
+        
+        
+        
+        
+        
+
+
+        
+        
 
 
 

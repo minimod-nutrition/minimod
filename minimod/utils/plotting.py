@@ -247,6 +247,30 @@ class Plotter:
         plt.savefig(save)
         
         return fig, axs
+    
+    def _plot_sim_hist(self, 
+                       data,
+                       benefit_col = None, 
+                       cost_col = None,
+                       objective_title = None,
+                       constraint_title = None,
+                       save = None):
+        
+        fig, ax = plt.subplots(1,2, figsize=(12,6))
+        
+        data[benefit_col].hist(ax = ax[0])
+        data[cost_col].hist(ax = ax[1])
+        
+        ax[0].set_title(objective_title)
+        ax[1].set_title(constraint_title)
+        fig.suptitle("Simulation Distributions")
+        
+        if save is not None:
+            plt.savefig(save, dpi=300)
+        
+        return fig, ax
+        
+        
         
         
             

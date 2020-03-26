@@ -1,5 +1,6 @@
 from minimod.solvers.basesolver import BaseSolver
 from minimod.utils.exceptions import NotPandasDataframe, MissingColumn
+from minimod.utils.summary import Summary
 
 import pandas as pd
 import mip
@@ -32,8 +33,11 @@ class BenefitSolver(BaseSolver):
                   **kwargs):
         
         super().__init__(sense = mip.MAXIMIZE, **kwargs)     
-    
-        self.total_funds = total_funds
+
+        if total_funds is not None:
+            self.total_funds = total_funds
+        else:
+            raise Exception("No total funds constraint specified.")
 
 
     def _objective(self, model, x, **kwargs):
@@ -57,6 +61,31 @@ class BenefitSolver(BaseSolver):
         
     def fit(self, extra_const = None):
         return self._fit(extra_const = extra_const)
+    
+    def report(self):
+        
+        s = Summary(self)
+        
+        super().report()
+        
+        total_costs = self.model.objective_bound
+        total_benefits = self.model.objective_value
+
+        results = [
+            ('Total Funds', self.total_funds),
+            ("Total Cost", total_costs ),
+            ("Total Coverage", total_benefits)
+        ]
+        
+        s.print_generic(results)
+        
+        s.print_ratio(name = "Coverage per Cost",
+                      num = total_benefits,
+                      denom = total_costs)
+        
+        s.print_grouper(name = "Total Cost and Coverage over Time",
+                        data = self.opt_df,
+                        style = 'markdown')
 
 
         

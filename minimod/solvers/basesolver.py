@@ -12,10 +12,13 @@ from minimod.version import __version__
 
 from minimod.utils.summary import Summary
 from minimod.utils.plotting import Plotter
+from minimod.utils.suppress_messages import suppress_stdout_stderr
 
 import pandas as pd
 import numpy as np
 import mip
+
+import sys
 
 
 class BaseSolver:
@@ -39,6 +42,7 @@ class BaseSolver:
         va_weight=1.0,  # VA Weight
         sense=None,  # MIP optimization type (maximization or minimization)
         solver_name=mip.CBC,  # Solver for MIP to use
+        show_output = True
     ):
 
         self.interest_rate_cost = interest_rate_cost
@@ -61,6 +65,12 @@ class BaseSolver:
         ## Tell the fitter whether to maximize or minimize
         self.model = mip.Model(sense=self.sense, solver_name=solver_name)
 
+        self.show_output = show_output
+
+        if self.show_output:
+            self.model.verbose = 1
+        else:
+            self.model.verbose = 0
         ## set tolerances based on GAMS tolerances
         # primal tol -> infeas
         # dual tol -> opt tol
@@ -364,16 +374,20 @@ class BaseSolver:
         max_nodes = kwargs.pop("max_nodes", mip.INF)
         max_solutions = kwargs.pop("max_solutions", mip.INF)
 
-        self.status = self.model.optimize(max_seconds, max_nodes, max_solutions)
-
-        if self.status == mip.OptimizationStatus.OPTIMAL:
-            print("[Note]: Optimal Solution Found")
-        elif self.status == mip.OptimizationStatus.FEASIBLE:
-            print("[Note]: Feasible Solution Found. This may not be optimal.")
-        elif self.status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
-            print("[Warning]: No Solution Found")
-        elif self.status == mip.OptimizationStatus.INFEASIBLE:
-            print("[Warning]: Infeasible Solution Found")
+        if self.show_output:
+            self.status = self.model.optimize(max_seconds, max_nodes, max_solutions)
+        else:
+            with suppress_stdout_stderr():
+                self.status = self.model.optimize(max_seconds, max_nodes, max_solutions)
+        if self.show_output:
+            if self.status == mip.OptimizationStatus.OPTIMAL:
+                print("[Note]: Optimal Solution Found")
+            elif self.status == mip.OptimizationStatus.FEASIBLE:
+                print("[Note]: Feasible Solution Found. This may not be optimal.")
+            elif self.status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
+                print("[Warning]: No Solution Found")
+            elif self.status == mip.OptimizationStatus.INFEASIBLE:
+                print("[Warning]: Infeasible Solution Found")
 
     def process_results(self, benefits, costs):
 
@@ -416,7 +430,11 @@ class BaseSolver:
         self._time = time
 
         # Process Data
-        print("[Note]: Processing Data...")
+        if self.show_output:
+            print("[Note]: Processing Data...")
+            print("[Note]: Creating Base Model with constraints")
+            print("[Note]: Optimizing...")
+
         self._df = self._process_data(
             data=data,
             intervention=intervention,
@@ -426,7 +444,6 @@ class BaseSolver:
             costs=costs,
         )
 
-        print("[Note]: Creating Base Model with constraints")
         self.base_model_create(
             all_space=all_space,
             all_time=all_time,
@@ -436,9 +453,17 @@ class BaseSolver:
             space_subset=space_subset,
             time_subset=time_subset,
         )
-        print("[Note]: Optimizing...")
         self.optimize()
         self.process_results(benefits, costs)
+        
+        self.objective_value = self.model.objective_value
+        self.objective_bound = self.model.objective_bound
+        self.num_solutions = self.model.num_solutions
+        self.num_cols = self.model.num_cols
+        self.num_rows = self.model.num_rows
+        self.num_int = self.model.num_int
+        self.num_nz = self.model.num_nz
+        
         if clear:
             self.clear()
 
@@ -450,9 +475,24 @@ class BaseSolver:
 
     def report(self):
 
+        header = [
+            ('MiniMod Solver Results', ""),
+            ("Method:" , str(self.sense)),
+            ("Solver:", str(self.solver_name)),
+            ("Optimization Status:", str(self.status)),
+            ("Number of Solutions Found:", str(self.model.num_solutions))
+
+        ]
+        
+        features = [
+            ("No. of Variables:", str(self.model.num_cols)),
+            ("No. of Integer Variables:", str(self.model.num_int)),
+            ("No. of Constraints", str(self.model.num_rows)),
+            ("No. of Non-zeros in Constr.", str(self.model.num_nz))
+        ]
         s = Summary(self)
 
-        return s._report()
+        s.print_generic(header, features)
     
     def plot_time(self, 
                   fig = None, 

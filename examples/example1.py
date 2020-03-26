@@ -101,7 +101,9 @@ df = pd.read_csv("examples/data/processed/example1.csv")
 # Now we instantiate the model, and then run `fit` and get the report.
 
 # %%
-c = mm.Minimod(solver_type = 'costmin', minimum_benefit = vasoilold_constraint)
+c = mm.Minimod(solver_type = 'costmin', 
+               show_output = False,
+               minimum_benefit = vasoilold_constraint)
 #c = mm.CostSolver(minimum_benefit = vasoilold_constraint)
 
 # %%
