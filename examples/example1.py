@@ -14,13 +14,11 @@ import geopandas as gpd
 
 import minimod as mm
 
-import os 
-print(os.getcwd())
-# %% [markdown]
-# ## Data
+# %% 
+
+# Data
 
 # This is how the data was processed, assuming we use the Katie_VA_Benefits_and_Costs_1_8_2019.xlsx file.
-# ```python
 excel_file = "/home/lordflaron/Documents/GAMS-Python/Cameroon VA/GAMS_Working/GAMS_R Project/Katie_VA_Benefits_and_Costs_1_8_2019.xlsx"
 
 ## Get "vasoilold" and get discounted benefits for constraint
@@ -28,7 +26,7 @@ excel_file = "/home/lordflaron/Documents/GAMS-Python/Cameroon VA/GAMS_Working/GA
 discount_costs = 1/(1 + 0.03)
 
 
-vasoilold_constraint = (
+vasoilold_df  = (
     pd.read_excel(excel_file,
                   sheet_name = 'Benefits',
                   header = 2)
@@ -46,9 +44,9 @@ vasoilold_constraint = (
         time_discount_costs = lambda df: discount_costs**df['time_rank'],
         discounted_benefits = lambda df: df['time_discount_costs']*df['benefit']
     )
-    ['discounted_benefits'].sum()
-
 )
+
+vasoilold_constraint = vasoilold_df['discounted_benefits'].sum()
 # %%
 
 # df_benefit = (pd.read_excel(excel_file,
@@ -102,25 +100,18 @@ df = pd.read_csv("examples/data/processed/example1.csv")
 
 # %%
 c = mm.Minimod(solver_type = 'costmin', 
-               show_output = False,
                minimum_benefit = vasoilold_constraint)
-#c = mm.CostSolver(minimum_benefit = vasoilold_constraint)
 
 # %%
 
 opt = c.fit(data = df, 
-            # all_space = ['cube', 'oil', 'maize'], 
-            # all_time = ['maize', 'cube'],
-            # time_subset = [1,2,3]
+            all_space = ['cube', 'oil', 'maize'], 
+            all_time = ['maize', 'cube'],
+            time_subset = [1,2,3]
             )
 # %%
 
-c.opt_df.reset_index().to_csv("hello.csv")
-# %%
-
 c.report()
-
-opt_df = c.opt_df
 
 
 # %%
@@ -172,3 +163,20 @@ c.plot_chloropleth(intervention = 'vasoil',
                    save = "map2.png")
 
 
+# %%
+
+c.plot_map_benchmark(intervention = 'vasoil',
+                           time = [5],
+                           optimum_interest = 'b',
+                           data_bench = vasoilold_df,
+                           bench_col = 'discounted_benefits',
+                           bench_merge_key = 'space',
+                           bench_intervention = 'vasoilold',
+                           map_df = agg_geo_df,
+                           merge_key = 'space',
+                           save = "benchmark_map.png")
+
+
+
+
+# %%

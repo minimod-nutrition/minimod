@@ -14,11 +14,15 @@ from minimod.utils.summary import Summary
 from minimod.utils.plotting import Plotter
 from minimod.utils.suppress_messages import suppress_stdout_stderr
 
+import matplotlib.pyplot as plt
+
 import pandas as pd
 import numpy as np
 import mip
 
 import sys
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import matplotlib.gridspec as gridspec
 
 
 class BaseSolver:
@@ -92,7 +96,8 @@ class BaseSolver:
               MiniMod Nutrition Intervention Tool
               Optimization Method: {str(self.sense)}
               Version: {__version__}
-              Solver: {str(self.solver_name)}
+              Solver: {str(self.solver_name)},
+              Show Output: {self.show_output}
               
               """
         )
@@ -534,7 +539,6 @@ class BaseSolver:
                          optimum_interest = 'b',
                          map_df = None,
                          merge_key = None,
-                         ax = None,
                          save = None):
         
         p = Plotter(self)
@@ -551,24 +555,117 @@ class BaseSolver:
         else:
             raise Exception("Not one of the allowed variables for map plotting. Try again.")
         
-        if time is not None and len(time) == 1:                
-            return p._plot_chloropleth(data = self.opt_df,
-                                        intervention = intervention,
-                                        time = time,
-                                        optimum_interest = opt,
-                                        map_df = map_df,
-                                        merge_key = merge_key,
-                                        aggfunc = 'sum',
-                                        ax = ax,
-                                        title = "", 
-                                        save = save)
-        else:            
-            return p._plot_multi_chloropleth(data = self.opt_df,
-                                             t= time,
-                                             intervention=intervention,
-                                             optimum_interest=opt,
-                                             map_df=map_df,
-                                             merge_key = merge_key,
-                                             aggfunc = 'sum',
-                                             title = title,
-                                             save = save)
+        
+        plotter = p._plot_chloropleth_getter(time = time)
+        plot = plotter(data = self.opt_df,
+                                          intervention = intervention,
+                                            time = time,
+                                            optimum_interest=opt,
+                                            map_df = map_df,
+                                            merge_key=merge_key,
+                                            aggfunc = 'sum',
+                                            title = title,
+                                            save = save)
+        return plot
+
+    def plot_grouped_interventions(self, 
+                                data_of_interest = 'benefits', 
+                                title = None,
+                                intervention_subset = slice(None),
+                                save = None):
+        
+        p = Plotter(self)
+            
+        if data_of_interest == 'benefits':
+            col_of_interest = 'opt_benefit'
+        elif data_of_interest == 'costs':
+            col_of_interest = 'opt_costs'
+        
+        p._plot_grouped_bar(intervention_col= self._intervention,
+                            space_col = self._space,
+                            col_of_interest= col_of_interest,
+                            ylabel = "Optimal Level",
+                            intervention_subset= intervention_subset,
+                            save = save)
+        
+        
+    def plot_map_benchmark(self,
+                           intervention = slice(None),
+                           time = None,
+                           optimum_interest = 'b',
+                           data_bench = None,
+                           bench_intervention = None,
+                           bench_col = None,
+                           bench_merge_key = None,
+                           map_df = None,
+                           merge_key = None,
+                           save = None
+                           ):
+        
+        fig = plt.figure()
+        
+        gs = gridspec.GridSpec(2,2, height_ratios = [6,1])
+        optimal = fig.add_subplot(gs[0,0])
+        bench = fig.add_subplot(gs[0,1])
+        cbar = fig.add_subplot(gs[1,:])
+        
+        p = Plotter(self)
+        
+        if optimum_interest == 'b':
+            opt = 'opt_benefit'
+            title = "Effective Coverage"
+        elif optimum_interest == 'c':
+            opt = 'opt_costs'
+            title = "Costs"
+        elif optimum_interest == 'v':
+            opt = 'opt_vals'
+            title = "Interventions"
+        else:
+            raise Exception("Not one of the allowed variables for map plotting. Try again.")
+        
+        fig.suptitle(title, y=1.05)
+        plotter = p._plot_chloropleth_getter(time)
+        
+        # Get min and max values for color map
+        opt_max = self.opt_df[opt].max()
+        opt_min = self.opt_df[opt].min()
+        
+        bench_max = data_bench[bench_col].max()
+        bench_min = data_bench[bench_col].min()
+        
+        vmax = max(opt_max, bench_max)
+        vmin = min(opt_min, bench_min)
+        
+        
+        optimal = plotter(data = self.opt_df,
+                    intervention = intervention,
+                    time = time,
+                    optimum_interest=opt,
+                    map_df = map_df,
+                    merge_key=merge_key,
+                    aggfunc = 'sum',
+                    ax = optimal,
+                    cax = cbar,
+                    title = "Optimal Scenario",
+                    vmin = vmin,
+                    vmax = vmax,
+                    legend_kwds = {'orientation' : 'horizontal'})
+        
+        bench = plotter(data = data_bench,
+                        intervention = bench_intervention,
+                        time = time,
+                        optimum_interest= bench_col,
+                        map_df = map_df,
+                        merge_key=bench_merge_key,
+                        aggfunc = 'sum',
+                        ax = bench,
+                        show_legend = False,
+                        title = f"Benchmark Scenario\n(using {bench_intervention})",
+                         vmin = vmin,
+                        vmax = vmax)
+        
+        plt.tight_layout()
+        
+        if save is not None:
+            plt.savefig(save, dpi = 600)
+        

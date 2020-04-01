@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
+
 import numpy as np
 from minimod.utils.exceptions import MissingOptimizationMethod
+
 
 class Plotter:
     """This class is in charge of plotting the results of the `minimod`. 
@@ -163,9 +165,14 @@ class Plotter:
                           map_df = None,
                           merge_key = None,
                           aggfunc = None,
-                          ax = None,
                           title = None, 
-                          save = None):
+                          ax = None,
+                          save = None,
+                          show_legend = True,
+                          **kwargs):
+        
+        if ax is None:
+            fig, ax = plt.subplots()
         
         merged_df = (
             data
@@ -185,9 +192,12 @@ class Plotter:
                 .pipe(self._shape_file_loc, intervention = intervention, time = time)
             )
         
-        fig, ax = self._plot_process(axis = ax)
-
-        df.plot(column = optimum_interest, ax = ax, legend = True)
+        
+        df.plot(column = optimum_interest, 
+                ax = ax, 
+                legend = show_legend,
+                **kwargs)
+        
         ax.set_title(title)
         ax.set_xticklabels([])
         ax.set_xticks([])
@@ -203,33 +213,36 @@ class Plotter:
             
     def _plot_multi_chloropleth(self, 
                                 data = None,
-                                t = None, 
+                                time = None, 
                                 intervention = None,
                                 optimum_interest = None,
                                 map_df = None,
                                 merge_key = None,
                                 aggfunc = None,
                                 title = None,
-                                save = None):
+                                axs = None,
+                                save = None,
+                                **kwargs):
         
-        if t is None:
-            t = (self.model.opt_df
+        if time is None:
+            time = (self.model.opt_df
                  .index
                  .get_level_values(level = self.model._time)
                  .unique()
                  .values
                  )
         
-        mod = len(t) % 2
-                
-        fig, axs = plt.subplots(nrows = int(len(t)/2) + mod , 
-                                ncols=2,
-                                figsize = (10,20))
+        mod = len(time) % 2
+        
+        if axs is None:
+            fig, axs = plt.subplots(nrows = int(len(time)/2) + mod , 
+                                    ncols=2,
+                                    figsize = (10,20))
         
         
-        for ax, plot in zip(np.array(axs).flatten(), t):
+        for ax, plot in zip(np.array(axs).flatten(), time):
             
-            self._plot_chloropleth(data = data,
+            ax = self._plot_chloropleth(data = data,
                                    intervention = intervention,
                                    time = plot,
                                    optimum_interest = optimum_interest,
@@ -237,7 +250,8 @@ class Plotter:
                                    merge_key = merge_key, 
                                    aggfunc = aggfunc,
                                    ax = ax,
-                                   title = f"T = {plot}")
+                                   title = f"T = {plot}", 
+                                   **kwargs)
             ax.set_xticklabels([])
             ax.set_xticks([])
             ax.set_yticklabels([])
@@ -246,14 +260,14 @@ class Plotter:
         plt.tight_layout()
         plt.savefig(save)
         
-        return fig, axs
+        return axs
     
     def _plot_sim_hist(self, 
                        data,
                        benefit_col = None, 
                        cost_col = None,
-                       objective_title = None,
-                       constraint_title = None,
+                       benefit_title = None,
+                       cost_title = None,
                        save = None):
         
         fig, ax = plt.subplots(1,2, figsize=(12,6))
@@ -261,14 +275,63 @@ class Plotter:
         data[benefit_col].hist(ax = ax[0])
         data[cost_col].hist(ax = ax[1])
         
-        ax[0].set_title(objective_title)
-        ax[1].set_title(constraint_title)
+        ax[0].set_title(benefit_title)
+        ax[1].set_title(cost_title)
         fig.suptitle("Simulation Distributions")
         
         if save is not None:
             plt.savefig(save, dpi=300)
         
         return fig, ax
+    
+    def _plot_grouped_bar(self,
+                          intervention_col = None,
+                          space_col = None,
+                          col_of_interest = None,
+                          ylabel = None,
+                          intervention_subset = None,
+                          save = None,
+                          ):
+        
+        plot = (
+            self.model.opt_df
+            [col_of_interest]
+            .to_frame()
+            .loc[(intervention_subset, slice(None), slice(None)), :]
+            .groupby([intervention_col, space_col])
+            .sum()
+            .reset_index()
+            .pivot(index = space_col, columns = intervention_col, values = col_of_interest)
+            .plot
+            .bar(figsize = (12,6))
+        )
+        
+        plot.legend(bbox_to_anchor = (1,1))
+        
+        if save is not None:
+            plt.savefig(save, dpi=600)
+            
+    def _plot_chloropleth_getter(self, time):
+                
+        _plotter = {
+            'single' : self._plot_chloropleth,
+            'multi' : self._plot_multi_chloropleth
+        }
+        
+        
+        if time is not None and len(time) == 1:
+            number = 'single'
+        else:
+            number = 'multi'
+
+            
+        return _plotter.get(number)
+            
+    
+        
+        
+        
+        
         
         
         

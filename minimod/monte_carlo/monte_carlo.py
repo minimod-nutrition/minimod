@@ -6,6 +6,8 @@ from numpy.random import normal
 import pandas as pd
 from progressbar import progressbar
 
+import matplotlib.pyplot as plt
+
 class MonteCarloMinimod:
     
     def __init__(self, 
@@ -132,7 +134,7 @@ class MonteCarloMinimod:
             
             iteration_dict = {'status' : self.minimod.status,
                               'opt_objective' : self.minimod.objective_value,
-                              'opt_constraint' : self.minimod.objective_bound,
+                              'opt_constraint' : self.minimod.opt_df['opt_benefit'].sum(),
                               'num_vars' : self.minimod.num_cols,
                               'constraints' : self.minimod.num_rows,
                               'solutions' : self.minimod.num_solutions,
@@ -202,7 +204,7 @@ class MonteCarloMinimod:
                 df = (
                     self.sim_results['opt_df']
                     .loc[i]['opt_vals']
-                    .groupby('intervention')
+                    .groupby(self.intervention_col)
                     .sum()
                     .to_frame()
                     .assign(val_appeared = lambda df: (df['opt_vals'] > 0).astype(int))['val_appeared']
@@ -217,7 +219,7 @@ class MonteCarloMinimod:
             print(perc_int.to_markdown())
         
     
-    def plot_opt_hist(self, save = None, vline_mean = False, vline_min_ben = False):
+    def plot_opt_hist(self, save = None):
         
         p = Plotter(self)
         
@@ -234,21 +236,63 @@ class MonteCarloMinimod:
             objective_title = benefits
             constraint_title = costs
                 
-        plot = p._plot_sim_hist(data = self.sim_results,
+        fig, (benefit_plot, cost_plot) = p._plot_sim_hist(data = self.sim_results,
                                 benefit_col='opt_constraint',
                                 cost_col = 'opt_objective',
-                                objective_title=objective_title,
-                                constraint_title=constraint_title,
+                                cost_title=objective_title,
+                                benefit_title=constraint_title,
                                 save = save)
-        fig, ax = plot
         
-        ax[0].axvline(self.minimod.minimum_benefit)
+        benefit_xlims = benefit_plot.get_xlim()
+        benefit_ylims = benefit_plot.get_ylim()
         
+        # Put text at midpoint of y
+        text_y = (benefit_ylims[1] - benefit_ylims[0])/2
         
-        return plot
+        # offset by 10% of length of x-axis 
+        text_x = self.minimod.minimum_benefit + (benefit_xlims[1] - benefit_xlims[0])*.1
         
-            
+        benefit_plot.axvline(self.minimod.minimum_benefit, color='red')
+        benefit_plot.text(text_x, text_y, 'Minimum\nBenefit\nConstraint')
+        
+        return fig, (benefit_plot, cost_plot)
     
+    def plot_sim_trajectories(self, 
+                               data_of_interest = 'benefits',
+                               ):
+        
+        fig, ax  = plt.subplots()
+        
+        if data_of_interest == 'benefits':
+            col_of_interest = 'opt_benefit'
+        elif data_of_interest == 'costs':
+            col_of_interest = 'opt_costs'
+        
+        df_all = pd.DataFrame()
+        
+        # All trajectories
+        for i in range(self.N):
+            
+            iter_df = (
+                self.sim_results
+                .loc[i]['opt_df'][col_of_interest]
+                .groupby(self.minimod._time)
+                .sum()
+            )
+            
+            iter_df.plot(ax = ax, color = 'red', alpha=0.09)
+            
+            df_all = df_all.append(iter_df)
+            
+        # Now get mean trajectory
+        
+        df_all.mean().plot(ax=ax, color = 'red')    
+        
+        plt.figtext(0,0,"Bold line represents mean trajectory.")
+        ax.set_title("Trajectories of all Simulations")
+        
+
+        
         
 
         

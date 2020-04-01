@@ -67,7 +67,7 @@ vasoilold_constraint = 15958219.409955183
 #     )
 
 df = (
-    pd.read_csv("examples/data/processed/example1.csv")
+    pd.read_csv("../examples/data/processed/example1.csv")
     .assign(benefit_sd = lambda df: df['benefit']/2,
             costs_sd = lambda df: df['costs']/2)
     )
@@ -84,7 +84,7 @@ a = mm.MonteCarloMinimod(solver_type = 'costmin',
                         cost_sd_col='costs_sd',
                         minimum_benefit = vasoilold_constraint)
 
-sim = a.fit_all_samples(N = 1000)
+sim = a.fit_all_samples(N = 100)
 
 
 # %%
