@@ -1,6 +1,6 @@
 from minimod.solvers.basesolver import BaseSolver
 from minimod.utils.exceptions import NotPandasDataframe, MissingColumn
-from minimod.utils.summary import Summary
+from minimod.utils.summary import OptimizationSummary
 
 import pandas as pd
 import mip
@@ -64,7 +64,7 @@ class BenefitSolver(BaseSolver):
     
     def report(self):
         
-        s = Summary(self)
+        s = OptimizationSummary(self)
         
         super().report()
         

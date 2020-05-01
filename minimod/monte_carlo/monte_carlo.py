@@ -1,12 +1,15 @@
 from minimod.solvers import Minimod
 from minimod.utils.plotting import Plotter
-from minimod.utils.summary import Summary
+from minimod.utils.summary import OptimizationSummary
 
-from numpy.random import normal
+from numpy.random import normal, uniform
+
 import pandas as pd
 from progressbar import progressbar
 
 import matplotlib.pyplot as plt
+
+from functools import reduce
 
 class MonteCarloMinimod:
     
@@ -18,8 +21,8 @@ class MonteCarloMinimod:
                 space_col = None,
                 benefit_mean_col = None,
                 benefit_sd_col = None,
-                cost_mean_col = None,
-                cost_sd_col = None,
+                cost_col = None,
+                cost_uniform_perc = None,
                 pop_weight_col = None,
                 **kwargs):
                 
@@ -47,8 +50,13 @@ class MonteCarloMinimod:
             
         self.benefit_mean_col = benefit_mean_col
         self.benefit_sd_col = benefit_sd_col
-        self.cost_mean_col = cost_mean_col
-        self.cost_sd_col = cost_sd_col
+
+        if cost_uniform_perc is None:
+            self.cost_uniform_perc = 0.2
+        else:
+            self.cost_uniform_perc = cost_uniform_perc
+            
+        self.cost_col = cost_col
         
         
     
@@ -60,6 +68,7 @@ class MonteCarloMinimod:
         
         df = (
             df_mean_sd
+            .pipe(self._drop_nan_benefits)
             .assign(weight_mean = lambda df: df[self.benefit_mean_col]*df[self.pop_weight_col],
                     weight_sd = lambda df: df[self.benefit_sd_col]*df[self.pop_weight_col],
                     benefit_random_draw = lambda df: self.dist(df['weight_mean'], df['weight_sd'])
@@ -70,18 +79,27 @@ class MonteCarloMinimod:
     
     
     def _construct_cost_sample(self):
+        """For costs we assume uniform and deviate by some percentage."""
         
-        df_mean_sd = self.data[[self.cost_mean_col, self.cost_sd_col, self.pop_weight_col]]
+        df_costs = self.data[self.cost_col]
+        df_costs_low = (1-self.cost_uniform_perc)*self.data[self.cost_col]
+        df_costs_high = (1+self.cost_uniform_perc)*self.data[self.cost_col]
         
         df = (
-            df_mean_sd
-            .assign(weight_mean = lambda df: df[self.cost_mean_col]*df[self.pop_weight_col],
-                    weight_sd = lambda df: df[self.cost_sd_col]*df[self.pop_weight_col],
-                    cost_random_draw = lambda df: self.dist(df['weight_mean'], df['weight_sd'])
-                    )
+            df_costs
+            .to_frame()
+            .assign(cost_random_draw = uniform(df_costs_low, df_costs_high))
         )
-                
+            
         return df['cost_random_draw']
+    
+    def _drop_nan_benefits(self, data):
+        
+        df = (
+            data.dropna(subset = [self.benefit_sd_col])
+        )
+        
+        return df
     
     def _merge_samples(self):
         
@@ -157,8 +175,7 @@ class MonteCarloMinimod:
         perc_opt = self.sim_results['status'].value_counts(normalize=True)[0]*100
         avg = self.sim_results.mean()
         
-        s = Summary(self)
-
+        s = OptimizationSummary(self)
         
         header = [
             ('MiniMod Solver Results', ""),
@@ -194,29 +211,64 @@ class MonteCarloMinimod:
             .to_markdown()
         )
         print(stats_df)
-                    
+        
+        ## Create append opt_df dataset from sim_results
+        opt_df_list = [self.sim_results # Get results
+             .stack() # stack so columns become index
+             .loc[(slice(None), 'opt_df')][i] # Get only opt_df
+             .assign(iteration = i) # Create variable for iteration \
+                 for i in range(self.N)] # Do it for every simulation
+        
+        all_opt_df = reduce(lambda i, j: i.append(j), opt_df_list)
+        
         if perc_intervention_appeared:
             
-            df_int = pd.DataFrame()
-            
-            for i in range(self.N):
-                
-                df = (
-                    self.sim_results['opt_df']
-                    .loc[i]['opt_vals']
-                    .groupby(self.intervention_col)
-                    .sum()
-                    .to_frame()
-                    .assign(val_appeared = lambda df: (df['opt_vals'] > 0).astype(int))['val_appeared']
-                    .to_frame()
-                    .T
-                    )
-                df_int = df_int.append(df)
-                
-            perc_int = (df_int.sum()/self.N)*100
+            perc_int = (
+                all_opt_df
+                .groupby([self.intervention_col, 
+                          'iteration'])
+                .sum()
+                .assign(val_appeared = \
+                    lambda df: (df['opt_vals']>0)
+                    .astype(int))
+                ['val_appeared']
+                .groupby(self.intervention_col)
+                .sum()
+                )
             
             s.print_generic([('Percentage Appeared in Simulations', '')])            
             print(perc_int.to_markdown())
+            
+        if avg_time:
+            
+            time_df= (
+                all_opt_df
+                .groupby([self.time_col, 
+                          'iteration'])
+                .sum()
+                .groupby(self.time_col)
+                .mean()
+                [['opt_benefit', 'opt_costs']]
+                )
+            
+            s.print_generic([('Mean Benefits and Costs across time', '')])            
+            print(time_df.to_markdown())
+            
+        if avg_space:
+            
+            space_df= (
+                all_opt_df
+                .groupby([self.space_col, 
+                          'iteration'])
+                .sum()
+                .groupby(self.space_col)
+                .mean()
+                [['opt_benefit', 'opt_costs']]
+                )
+            
+            s.print_generic([('Mean Benefits and Costs across Regions', '')])            
+            print(space_df.to_markdown())
+            
         
     
     def plot_opt_hist(self, save = None):
@@ -259,6 +311,7 @@ class MonteCarloMinimod:
     
     def plot_sim_trajectories(self, 
                                data_of_interest = 'benefits',
+                               save = None
                                ):
         
         fig, ax  = plt.subplots()
@@ -290,6 +343,9 @@ class MonteCarloMinimod:
         
         plt.figtext(0,0,"Bold line represents mean trajectory.")
         ax.set_title("Trajectories of all Simulations")
+        
+        if save is not None:
+            plt.savefig(save, dpi=600)
         
 
         

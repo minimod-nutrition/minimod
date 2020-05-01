@@ -7,7 +7,10 @@ __pycache__/
 *.png
 reports/source/*.png
 *.csv
-
+*.xls
+*.xlsx
+*.xlsx#
+*.pyc
 .idea/*
 # C extensions
 *.so

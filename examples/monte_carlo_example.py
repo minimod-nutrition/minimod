@@ -65,9 +65,9 @@ vasoilold_constraint = 15958219.409955183
 #     .sort_index()
 #     [['mean', 'sd', 2011]] ## Leaving 2011 as pop_weight
 #     )
-
+import os; print(os.getcwd())
 df = (
-    pd.read_csv("../examples/data/processed/example1.csv")
+    pd.read_csv("examples/data/processed/example1.csv")
     .assign(benefit_sd = lambda df: df['benefit']/2,
             costs_sd = lambda df: df['costs']/2)
     )
@@ -80,8 +80,7 @@ a = mm.MonteCarloMinimod(solver_type = 'costmin',
                         time_col='time',
                         benefit_mean_col = 'benefit',
                         benefit_sd_col= 'benefit_sd',
-                        cost_mean_col='costs',
-                        cost_sd_col='costs_sd',
+                        cost_col='costs',
                         minimum_benefit = vasoilold_constraint)
 
 sim = a.fit_all_samples(N = 100)
@@ -92,3 +91,7 @@ a.plot_opt_hist(save = "sim_results.png")
 
 # %%
 a.report(perc_intervention_appeared=True)
+
+
+# %%
+a.plot_sim_trajectories(save = 'sim_traj.png')

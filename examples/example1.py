@@ -180,3 +180,4 @@ c.plot_map_benchmark(intervention = 'vasoil',
 
 
 # %%
+c.plot_grouped_interventions(save = 'grouped_int.png')

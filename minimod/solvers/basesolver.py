@@ -10,7 +10,7 @@ from minimod.utils.exceptions import (
 
 from minimod.version import __version__
 
-from minimod.utils.summary import Summary
+from minimod.utils.summary import OptimizationSummary
 from minimod.utils.plotting import Plotter
 from minimod.utils.suppress_messages import suppress_stdout_stderr
 
@@ -199,7 +199,7 @@ class BaseSolver:
     def _base_constraint(self):
 
         base_constrs = (
-            self._df["mip_vars"].groupby(["space", "time"]).agg(mip.xsum).values
+            self._df["mip_vars"].groupby([self._space, self._time]).agg(mip.xsum).values
         )
 
         for constr in base_constrs:
@@ -212,8 +212,11 @@ class BaseSolver:
 
         for i in subset_names:
             subset_dict[i] = self._df.loc[
-                lambda df: df.index.get_level_values(level=intervention).str.contains(i)
+                lambda df: df.index.get_level_values(level=intervention).str.contains(i, case = False)
             ]
+            
+            if subset_dict[i].empty:
+                raise Exception(f"'{i}' not found in dataset.")
 
         return subset_dict
 
@@ -240,10 +243,7 @@ class BaseSolver:
                             .loc[subset_list]
                             .reset_index()
                             .set_index(all_indices)
-                            )
-
-            # Get mip_vars from each subset
-            
+                            )            
 
             # Now we group by the variables we aren't doing the constraints for
             grouped_mip = (
@@ -495,7 +495,7 @@ class BaseSolver:
             ("No. of Constraints", str(self.model.num_rows)),
             ("No. of Non-zeros in Constr.", str(self.model.num_nz))
         ]
-        s = Summary(self)
+        s = OptimizationSummary(self)
 
         s.print_generic(header, features)
     
