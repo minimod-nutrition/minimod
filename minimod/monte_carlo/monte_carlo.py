@@ -224,7 +224,7 @@ class MonteCarloMinimod:
         if perc_intervention_appeared:
             
             perc_int = (
-                all_opt_df
+                (all_opt_df
                 .groupby([self.intervention_col, 
                           'iteration'])
                 .sum()
@@ -233,7 +233,7 @@ class MonteCarloMinimod:
                     .astype(int))
                 ['val_appeared']
                 .groupby(self.intervention_col)
-                .sum()
+                .sum()/10)*100
                 )
             
             s.print_generic([('Percentage Appeared in Simulations', '')])            

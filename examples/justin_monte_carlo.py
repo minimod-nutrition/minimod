@@ -323,7 +323,7 @@ a = MonteCarloMinimod(solver_type = 'costmin',
                         minimum_benefit = benefit_constraint)
 
 # %%
-sim = a.fit_all_samples(N = 100,
+sim = a.fit_all_samples(N = 10,
                         all_space = ['oil', 
                                      'cube', 
                                      'maize'
