@@ -2,6 +2,7 @@ from tabulate import tabulate
 import pandas as pd
 import docx
 import progressbar
+import numpy as np
 
 class PreOptimizationDataSummary:
     
@@ -145,6 +146,8 @@ class PreOptimizationDataSummary:
             
         if intervention_specific:
             grouping.append(self.intervention_col)
+            
+        index_order = ['North', 'South', 'Cities', 'National']
         
         df = (
             self.data

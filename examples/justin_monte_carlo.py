@@ -10,8 +10,6 @@ import os
 
 from minimod import MonteCarloMinimod
 
-#%%
-os.chdir("..")
 # %%
 df_costs = (
     pd.read_csv('robustness_data/cost_data.csv')
@@ -289,27 +287,8 @@ df_ready = (
     .reset_index()
 )
 
-# %%
-
-# Now get benefits constraint, which based on GAMS is just 'capdwoil'
-
-discount_costs = 1/(1 + 0.03)
-                         
-benefit_constraint  = (
-    df_ready
-    .loc[lambda df : df['intervention'] == 'capdwoil']
-    .set_index(['intervention', 'region'])
-    .assign(
-        time_rank = lambda df: (df['time'].rank(numeric_only=True, method= 'dense') -1).astype(int) ,
-        time_discount_costs = lambda df: discount_costs**df['time_rank'],
-        discounted_benefits = lambda df: df['time_discount_costs']*df['benefit_mean']
-    )
-    ['benefit_mean']
-    .sum()
-)
 
 # %%
-
 # Run Montecarlo
 
 a = MonteCarloMinimod(solver_type = 'costmin', 
@@ -320,10 +299,10 @@ a = MonteCarloMinimod(solver_type = 'costmin',
                         benefit_mean_col = 'benefit_mean',
                         benefit_sd_col= 'benefit_sd',
                         cost_col='costs',
-                        minimum_benefit = benefit_constraint)
+                        minimum_benefit = 'capdwoil')
 
 # %%
-sim = a.fit_all_samples(N = 10,
+sim = a.fit_all_samples(N = 100,
                         all_space = ['oil', 
                                      'cube', 
                                      'maize'

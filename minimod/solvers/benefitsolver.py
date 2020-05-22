@@ -1,4 +1,4 @@
-from minimod.solvers.basesolver import BaseSolver
+from minimod.base.basesolver import BaseSolver
 from minimod.utils.exceptions import NotPandasDataframe, MissingColumn
 from minimod.utils.summary import OptimizationSummary
 

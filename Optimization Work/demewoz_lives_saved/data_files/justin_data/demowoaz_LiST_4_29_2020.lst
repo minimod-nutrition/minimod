@@ -1,0 +1,378 @@
+GAMS 30.1.0  re01a340 Released Jan 10, 2020 WEX-WEI x86 64bit/MS Windows - 05/21/20 18:06:19 Page 1
+CAMEROON COVERAGE MODEL
+C o m p i l a t i o n
+
+
+   2  * Justin Kagin, June 2014
+   3   
+   4  * The model reads in data from excel spreadsheet in the form of parameter distributions
+   5  * Then it uses them to make a coverage model for Cameroon
+   6   
+   7  * A few useful gams options
+   8  option limrow=30 ;
+   9  option limcol=30 ;
+  10   
+  11   
+  12   
+**** File: Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsaverted.gdx
+**** Msg : No such file or directory
+  40  $gdxin Cameroon_deathsaverted.gdx
+****                                  $510
+**** 510  Unable to open gdx file for $GDXIN
+  41  $load k j DEATHSAVERTED
+****      $502
+**** 502  GDXIN  file not open - ignore rest of line
+  43  display k, j, t, deathsaverted ;
+****          $141,141             $141
+**** 141  Symbol declared but no values have been assigned. Check for missing
+****         data definition, assignment, data loading or implicit assignment
+****         via a solve statement.
+****         A wild shot: You may have spurious commas in the explanatory
+****         text of a declaration. Check symbol reference list.
+**** File: Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsavertedhigh.gdx
+**** Msg : No such file or directory
+  47  $gdxin Cameroon_deathsavertedhigh.gdx
+****                                      $510
+**** 510  Unable to open gdx file for $GDXIN
+  48  $load DEATHSAVERTEDHIGH
+****      $502
+**** 502  GDXIN  file not open - ignore rest of line
+  50  display deathsavertedhigh ;
+****                          $141
+**** 141  Symbol declared but no values have been assigned. Check for missing
+****         data definition, assignment, data loading or implicit assignment
+****         via a solve statement.
+****         A wild shot: You may have spurious commas in the explanatory
+****         text of a declaration. Check symbol reference list.
+**** File: Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsavertedcost.gdx
+**** Msg : No such file or directory
+  54  $gdxin Cameroon_deathsavertedcost.gdx
+****                                      $510
+**** 510  Unable to open gdx file for $GDXIN
+  55  $load DEATHSAVERTEDCOST
+****      $502
+**** 502  GDXIN  file not open - ignore rest of line
+  57  display deathsavertedcost ;
+****                          $141
+**** 141  Symbol declared but no values have been assigned. Check for missing
+****         data definition, assignment, data loading or implicit assignment
+****         via a solve statement.
+****         A wild shot: You may have spurious commas in the explanatory
+****         text of a declaration. Check symbol reference list.
+**** File: Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_folate.gdx
+**** Msg : No such file or directory
+  61  $gdxin Cameroon_folate.gdx
+****                           $510
+**** 510  Unable to open gdx file for $GDXIN
+  62  $load FOLATE
+****      $502
+**** 502  GDXIN  file not open - ignore rest of line
+  64  display folate ;
+****               $141
+**** 141  Symbol declared but no values have been assigned. Check for missing
+****         data definition, assignment, data loading or implicit assignment
+****         via a solve statement.
+****         A wild shot: You may have spurious commas in the explanatory
+****         text of a declaration. Check symbol reference list.
+ 108   cubek(k) /cube,   maxoilcube,
+****                $361
+**** 361  Values for domain 1 are unknown - no checking possible
+ 116   zcubek(k) /zcube, flourzcube, cubezcube, cubeflourzcube, oilvasflourzcube, maxoilcubeflourzcube,
+****                  $361
+**** 361  Values for domain 1 are unknown - no checking possible
+ 121   oilk(k) /oilvas, oil, oilcube, oilcubevas, oilclinic,    oilcubeclinic, oilvasflour, oilflour,
+****                 $361
+**** 361  Values for domain 1 are unknown - no checking possible
+ 125   maxoilk(k) /maxoil, maxoilcube, maxoilvas, maxoilcubevas ,  maxoilclinic, maxoilcubeclinic ,  maxoilflour,
+****                    $361
+**** 361  Values for domain 1 are unknown - no checking possible
+ 130   flourk(k) /flour, flourzcube,    cubeflour, oilvasflour, maxoilflour, maxoilcubeflour, oilflour,
+****                  $361
+**** 361  Values for domain 1 are unknown - no checking possible
+ 138   flouronlyk(k) /flour,  oilvasflour, maxoilflour, oilflour,
+****                      $361
+**** 361  Values for domain 1 are unknown - no checking possible
+ 142   cubeonlyk(k) /cube,   maxoilcube,
+****                    $361
+**** 361  Values for domain 1 are unknown - no checking possible
+ 146   flourcubek(k) /flourzcube,    cubeflour, maxoilcubeflour,
+****                           $361
+**** 361  Values for domain 1 are unknown - no checking possible
+ 155  cov("cube",j,t2)=0                              ;
+****           $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 156  cov("cubezcube",j,t2)=0                         ;
+****                $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 157  cov("maxoilcube",j,t2)=cov("maxoil",j,t2) ;
+****                 $353               $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 158  cov("oilcube",j,t2)=cov("oil",j,t2)       ;
+****              $353            $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 159  cov("oilcubevas",j,t2)=cov("oilvas",j,t2) ;
+****                 $353               $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 160  cov("maxoilcubevas",j,t2)=cov("maxoilvas",j,t2) ;
+****                    $353                  $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 161  cov("cubevas",j,t2)=cov("vas",j,t2) ;
+****              $353            $116,353
+**** 116  Label is unknown
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 162  cov("cubeclinic",j,t2)=cov("clinic",j,t2) ;
+****                 $353               $116,353
+**** 116  Label is unknown
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 163  cov("maxoilcubeclinic",j,t2)=cov("maxoilclinic",j,t2) ;
+****                       $353                     $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 164  cov("oilcubeclinic",j,t2)=cov("oilclinic",j,t2) ;
+****                    $353                  $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 165  cov("cubeflour",j,t2)=cov("flour",j,t2) ;
+****                $353              $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 166  cov("maxoilcubeflour",j,t2)=cov("maxoilflour",j,t2) ;
+****                      $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 167  cov("oilcubeflour",j,t2)=cov("oilflour",j,t2) ;
+****                   $353                 $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 168  cov("oilcubevasflour",j,t2)=cov("oilvasflour",j,t2) ;
+****                      $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 169  cov("cubevasflour",j,t2)=cov("vasflour",j,t2) ;
+****                   $353                 $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 170  cov("maxoilcubevasflour",j,t2)=cov("maxoilvasflour",j,t2) ;
+****                         $353                       $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 171  cov("cliniccubeflour",j,t2)=cov("clinicflour",j,t2) ;
+****                      $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 172  cov("oilcubeclinicflour",j,t2)=cov("oilclinicflour",j,t2) ;
+****                         $353                       $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 173  cov("maxoilcubeclinicflour",j,t2)=cov("maxoilclinicflour",j,t2) ;
+****                            $353                          $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 174  cov("cubeflourzcube",j,t2)=cov("flour",j,t2) ;
+****                     $353              $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 175  cov("maxoilcubeflourzcube",j,t2)=cov("maxoilflour",j,t2) ;
+****                           $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 176  cov("oilcubeflourzcube",j,t2)=cov("oilflour",j,t2) ;
+****                        $353                 $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 177  cov("oilcubevasflourzcube",j,t2)=cov("oilvasflour",j,t2) ;
+****                           $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 178  cov("cliniccubeflourzcube",j,t2)=cov("clinicflour",j,t2) ;
+****                           $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 179  cov("oilcubeclinicflourzcube",j,t2)=cov("oilclinicflour",j,t2) ;
+****                              $353                       $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 180  cov("maxoilcubeclinicflourzcube",j,t2)=cov("maxoilclinicflour",j,t2) ;
+****                                 $353                          $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 182  cov("zcube",j,t2)=0                      ;
+****            $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 183  cov("flourzcube",j,t2)=cov("flour",j,t2) ;
+****                 $353              $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 184  cov("oilvasflourzcube",j,t2)=cov("oilvasflour",j,t2) ;
+****                       $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 185  cov("maxoilcubeflourzcube",j,t2)=cov("maxoilflour",j,t2) ;
+****                           $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 186  cov("oilflourzcube",j,t2)=cov("oilflour",j,t2) ;
+****                    $353                 $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 189  cov("maxoil",j,t4)=cov("oil",j,t4) ;
+****             $353            $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 190  cov("maxoilcube",j,t4)=cov("oilcube",j,t4) ;
+****                 $353                $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 191  cov("maxoilvas",j,t4)=cov("oilvas",j,t4) ;
+****                $353               $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 192  cov("maxoilcubevas",j,t4)=cov("oilcubevas",j,t4) ;
+****                    $353                   $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 193  cov("maxoilclinic",j,t4)=cov("oilclinic",j,t4) ;
+****                   $353                  $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 194  cov("maxoilcubeclinic",j,t4)=cov("oilcubeclinic",j,t4) ;
+****                       $353                      $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 195  cov("maxoilflour",j,t4)=cov("oilflour",j,t4) ;
+****                  $353                 $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 196  cov("maxoilcubeflour",j,t4)=cov("oilcubeflour",j,t4) ;
+****                      $353                     $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 197  cov("maxoilvasflour",j,t4)=cov("oilvasflour",j,t4) ;
+****                     $353                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 198  cov("maxoilclinicflour",j,t4)=cov("oilclinicflour",j,t4) ;
+****                        $353                       $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 199  cov("maxoilcubevasflour",j,t4)=cov("oilcubevasflour",j,t4) ;
+****                         $353                        $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 200  cov("maxoilcubeclinicflour",j,t4)=cov("oilcubeclinicflour",j,t4) ;
+****                            $353                           $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 201  cov("maxoilflourzcube",j,t4)=cov("oilflourzcube",j,t4) ;
+****                       $353                      $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 202  cov("maxoilcubeflourzcube",j,t4)=cov("oilcubeflourzcube",j,t4) ;
+****                           $353                          $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 203  cov("maxoilvasflourzcube",j,t4)=cov("oilvasflourzcube",j,t4) ;
+****                          $353                         $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 204  cov("maxoilclinicflourzcube",j,t4)=cov("oilclinicflourzcube",j,t4) ;
+****                             $353                            $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 205  cov("maxoilcubevasflourzcube",j,t4)=cov("oilcubevasflourzcube",j,t4) ;
+****                              $353                             $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 206  cov("maxoilcubeclinicflourzcube",j,t4)=cov("oilcubeclinicflourzcube",j,t4) ;
+****                                 $353                                $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 211  folate("cube",j,t2)=0;
+****              $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 212  folate("cubeflour",j,t2)=folate("flour",j,t2);
+****                   $353                 $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 213  cov(flouronlyk,j,t)=cov(flouronlyk,j,t)+folate("flour",j,t) ;
+****                                                       $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 214  cov(cubeonlyk,j,t)=cov(cubeonlyk,j,t)+folate("cube",j,t) ;
+****                                                    $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 215  cov(flourcubek,j,t)=cov(flourcubek,j,t)+folate("cubeflour",j,t) ;
+****                                                           $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 221  totalbenefitsbau=sum(t,GAMMA(t)*(sum((j),cov("oilvasflour",j,t))));
+****                                                           $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 322  Solve nutrition using minlp minimizing z ;
+****                                           $257
+**** 257  Solve statement not checked because of previous errors
+ 323  Display  x.l, y.l, z.l, ben.l, xcov.l, xcost.l, totalfunds, totalbenefits;
+****             $141 $141 $141   $141    $141     $141
+**** 141  Symbol declared but no values have been assigned. Check for missing
+****         data definition, assignment, data loading or implicit assignment
+****         via a solve statement.
+****         A wild shot: You may have spurious commas in the explanatory
+****         text of a declaration. Check symbol reference list.
+ 345  covbau(t)                =sum(j,cov("oilvasflour",j,t))  ;
+****                                                  $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 346  costbau(t)               =sum(j,cost("oilvasflour",j,t))  ;
+****                                                   $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 347  covbauspace(j)           =sum(t,cov("oilvasflour",j,t))  ;
+****                                                  $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+ 348  costbauspace(j)          =sum(t,cost("oilvasflour",j,t))  ;
+****                                                   $353
+**** 353  The domain for this index position is unknown and the element
+****         cannot be checked at this point. Missing data statement.
+
+**** 137 ERROR(S)   0 WARNING(S)
+GAMS 30.1.0  re01a340 Released Jan 10, 2020 WEX-WEI x86 64bit/MS Windows - 05/21/20 18:06:19 Page 2
+CAMEROON COVERAGE MODEL
+Include File Summary
+
+
+   SEQ   GLOBAL TYPE      PARENT   LOCAL  FILENAME
+
+     1        1 INPUT          0       0  Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+     2       39 CALL           1      39  gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsaverted.gdx index=Indexdeathsaverted!A2
+     3       46 CALL           1      46  gdxxrw input=benefits_zincVAfolate_demwoaz_high.xlsx output=Cameroon_deathsavertedhigh.gdx index=Indexdeathsavertedhigh!A2
+     4       53 CALL           1      53  gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsavertedcost.gdx index=Indexdeathsavertedcost!A2
+     5       60 CALL           1      60  gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_folate.gdx index=Indexfolate!A2
+
+
+COMPILATION TIME     =        2.480 SECONDS      3 MB  30.1.0 re01a340 WEX-WEI
+
+
+USER: Small MUD - 5 User License                     G190305:1227AO-WIN
+      University of California, Davis, Agricultural and Resource DC9668
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+Output     Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.lst
+
+**** USER ERROR(S) ENCOUNTERED

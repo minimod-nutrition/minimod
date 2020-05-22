@@ -19,7 +19,7 @@ import minimod as mm
 # Data
 
 # This is how the data was processed, assuming we use the Katie_VA_Benefits_and_Costs_1_8_2019.xlsx file.
-excel_file = "/home/lordflaron/Documents/GAMS-Python/Cameroon VA/GAMS_Working/GAMS_R Project/Katie_VA_Benefits_and_Costs_1_8_2019.xlsx"
+excel_file = "examples/data/raw/Katie_VA_Benefits_and_Costs_1_8_2019.xlsx"
 
 ## Get "vasoilold" and get discounted benefits for constraint
 # %%
@@ -181,3 +181,5 @@ c.plot_map_benchmark(intervention = 'vasoil',
 
 # %%
 c.plot_grouped_interventions(save = 'grouped_int.png')
+
+# %%

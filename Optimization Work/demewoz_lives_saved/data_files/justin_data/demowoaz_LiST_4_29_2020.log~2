@@ -1,0 +1,576 @@
+--- Job demowoaz_LiST_4_29_2020.gms Start 05/21/20 18:04:51 30.1.0 re01a340 WEX-WEI x86 64bit/MS Windows
+--- GAMS Parameters defined
+    Input Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    PageSize 0
+    ScrDir Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\225a\
+    SysDir C:\GAMS\win64\30.1\
+    LogOption 3
+    ErrMsg 1
+    ErrorLog 99
+    IDE 1
+    LstTitleLeftAligned 1
+GAMS 30.1.0   Copyright (C) 1987-2020 GAMS Development. All rights reserved
+Licensee: Small MUD - 5 User License                     G190305:1227AO-WIN
+          University of California, Davis, Agricultural and Resource DC9668
+--- Starting compilation
+--- demowoaz_LiST_4_29_2020.gms(39) 3 Mb
+--- call gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsaverted.gdx index=Indexdeathsaverted!A2
+GDXXRW           30.1.0 re01a340 Released Jan 10, 2020 WEI x86 64bit/MS Window
+Cannot create an instance of Excel: Error = OLE error 800401F3, ProgID: "Excel.Application"
+Check that Excel is installed correctly.
+In case you use the "Click-to-Run" version of Excel, uninstall
+this version and install the regular version.
+**** Problem opening Excel: Cannot create an instance of Excel: Error = OLE error 800401F3, ProgID: "Excel.Application"
+Total time = 301 Ms
+--- demowoaz_LiST_4_29_2020.gms(40) 3 Mb
+*** GDXIN failed Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsaverted.gdx
+*** Msg: No such file or directory
+--- demowoaz_LiST_4_29_2020.gms(40) 3 Mb 1 Error
+*** Error 510 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Unable to open gdx file for $GDXIN
+--- demowoaz_LiST_4_29_2020.gms(41) 3 Mb 2 Errors
+*** Error 502 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    GDXIN  file not open - ignore rest of line
+--- demowoaz_LiST_4_29_2020.gms(43) 3 Mb 5 Errors
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+--- demowoaz_LiST_4_29_2020.gms(46) 3 Mb
+--- call gdxxrw input=benefits_zincVAfolate_demwoaz_high.xlsx output=Cameroon_deathsavertedhigh.gdx index=Indexdeathsavertedhigh!A2
+GDXXRW           30.1.0 re01a340 Released Jan 10, 2020 WEI x86 64bit/MS Window
+Cannot create an instance of Excel: Error = OLE error 800401F3, ProgID: "Excel.Application"
+Check that Excel is installed correctly.
+In case you use the "Click-to-Run" version of Excel, uninstall
+this version and install the regular version.
+**** Problem opening Excel: Cannot create an instance of Excel: Error = OLE error 800401F3, ProgID: "Excel.Application"
+Total time = 243 Ms
+--- demowoaz_LiST_4_29_2020.gms(47) 3 Mb
+*** GDXIN failed Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsavertedhigh.gdx
+*** Msg: No such file or directory
+--- demowoaz_LiST_4_29_2020.gms(47) 3 Mb 6 Errors
+*** Error 510 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Unable to open gdx file for $GDXIN
+--- demowoaz_LiST_4_29_2020.gms(48) 3 Mb 7 Errors
+*** Error 502 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    GDXIN  file not open - ignore rest of line
+--- demowoaz_LiST_4_29_2020.gms(50) 3 Mb 8 Errors
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+--- demowoaz_LiST_4_29_2020.gms(53) 3 Mb
+--- call gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsavertedcost.gdx index=Indexdeathsavertedcost!A2
+GDXXRW           30.1.0 re01a340 Released Jan 10, 2020 WEI x86 64bit/MS Window
+Cannot create an instance of Excel: Error = OLE error 800401F3, ProgID: "Excel.Application"
+Check that Excel is installed correctly.
+In case you use the "Click-to-Run" version of Excel, uninstall
+this version and install the regular version.
+**** Problem opening Excel: Cannot create an instance of Excel: Error = OLE error 800401F3, ProgID: "Excel.Application"
+Total time = 234 Ms
+--- demowoaz_LiST_4_29_2020.gms(54) 3 Mb
+*** GDXIN failed Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsavertedcost.gdx
+*** Msg: No such file or directory
+--- demowoaz_LiST_4_29_2020.gms(54) 3 Mb 9 Errors
+*** Error 510 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Unable to open gdx file for $GDXIN
+--- demowoaz_LiST_4_29_2020.gms(55) 3 Mb 10 Errors
+*** Error 502 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    GDXIN  file not open - ignore rest of line
+--- demowoaz_LiST_4_29_2020.gms(57) 3 Mb 11 Errors
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+--- demowoaz_LiST_4_29_2020.gms(60) 3 Mb
+--- call gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_folate.gdx index=Indexfolate!A2
+GDXXRW           30.1.0 re01a340 Released Jan 10, 2020 WEI x86 64bit/MS Window
+Cannot create an instance of Excel: Error = OLE error 800401F3, ProgID: "Excel.Application"
+Check that Excel is installed correctly.
+In case you use the "Click-to-Run" version of Excel, uninstall
+this version and install the regular version.
+**** Problem opening Excel: Cannot create an instance of Excel: Error = OLE error 800401F3, ProgID: "Excel.Application"
+Total time = 223 Ms
+--- demowoaz_LiST_4_29_2020.gms(61) 3 Mb
+*** GDXIN failed Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_folate.gdx
+*** Msg: No such file or directory
+--- demowoaz_LiST_4_29_2020.gms(61) 3 Mb 12 Errors
+*** Error 510 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Unable to open gdx file for $GDXIN
+--- demowoaz_LiST_4_29_2020.gms(62) 3 Mb 13 Errors
+*** Error 502 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    GDXIN  file not open - ignore rest of line
+--- demowoaz_LiST_4_29_2020.gms(64) 3 Mb 14 Errors
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+--- demowoaz_LiST_4_29_2020.gms(108) 3 Mb 15 Errors
+*** Error 361 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Values for domain 1 are unknown - no checking possible
+--- demowoaz_LiST_4_29_2020.gms(116) 3 Mb 16 Errors
+*** Error 361 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Values for domain 1 are unknown - no checking possible
+--- demowoaz_LiST_4_29_2020.gms(121) 3 Mb 17 Errors
+*** Error 361 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Values for domain 1 are unknown - no checking possible
+--- demowoaz_LiST_4_29_2020.gms(125) 3 Mb 18 Errors
+*** Error 361 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Values for domain 1 are unknown - no checking possible
+--- demowoaz_LiST_4_29_2020.gms(130) 3 Mb 19 Errors
+*** Error 361 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Values for domain 1 are unknown - no checking possible
+--- demowoaz_LiST_4_29_2020.gms(138) 3 Mb 20 Errors
+*** Error 361 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Values for domain 1 are unknown - no checking possible
+--- demowoaz_LiST_4_29_2020.gms(142) 3 Mb 21 Errors
+*** Error 361 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Values for domain 1 are unknown - no checking possible
+--- demowoaz_LiST_4_29_2020.gms(146) 3 Mb 22 Errors
+*** Error 361 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Values for domain 1 are unknown - no checking possible
+--- demowoaz_LiST_4_29_2020.gms(155) 3 Mb 23 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(156) 3 Mb 24 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(157) 3 Mb 26 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(158) 3 Mb 28 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(159) 3 Mb 30 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(160) 3 Mb 32 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(161) 3 Mb 35 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 116 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Label is unknown
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(162) 3 Mb 38 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 116 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Label is unknown
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(163) 3 Mb 40 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(164) 3 Mb 42 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(165) 3 Mb 44 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(166) 3 Mb 46 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(167) 3 Mb 48 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(168) 3 Mb 50 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(169) 3 Mb 52 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(170) 3 Mb 54 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(171) 3 Mb 56 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(172) 3 Mb 58 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(173) 3 Mb 60 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(174) 3 Mb 62 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(175) 3 Mb 64 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(176) 3 Mb 66 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(177) 3 Mb 68 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(178) 3 Mb 70 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(179) 3 Mb 72 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(180) 3 Mb 74 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(182) 3 Mb 75 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(183) 3 Mb 77 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(184) 3 Mb 79 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(185) 3 Mb 81 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(186) 3 Mb 83 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(189) 3 Mb 85 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(190) 3 Mb 87 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(191) 3 Mb 89 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(192) 3 Mb 91 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(193) 3 Mb 93 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(194) 3 Mb 95 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(195) 3 Mb 97 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(196) 3 Mb 99 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(197) 3 Mb 101 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(198) 3 Mb 103 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(199) 3 Mb 105 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(200) 3 Mb 107 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(201) 3 Mb 109 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(202) 3 Mb 111 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(203) 3 Mb 113 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(204) 3 Mb 115 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(205) 3 Mb 117 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(206) 3 Mb 119 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(211) 3 Mb 120 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(212) 3 Mb 122 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(213) 3 Mb 123 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(214) 3 Mb 124 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(215) 3 Mb 125 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(221) 3 Mb 126 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(322) 3 Mb 127 Errors
+*** Error 257 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Solve statement not checked because of previous errors
+--- demowoaz_LiST_4_29_2020.gms(323) 3 Mb 133 Errors
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+*** Error 141 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    Symbol declared but no values have been assigned. Check for missing
+       data definition, assignment, data loading or implicit assignment
+       via a solve statement.
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+--- demowoaz_LiST_4_29_2020.gms(345) 3 Mb 134 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(346) 3 Mb 135 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(347) 3 Mb 136 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(348) 3 Mb 137 Errors
+*** Error 353 in Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+    The domain for this index position is unknown and the element
+       cannot be checked at this point. Missing data statement.
+--- demowoaz_LiST_4_29_2020.gms(418) 3 Mb 137 Errors
+*** Status: Compilation error(s)
+--- Job demowoaz_LiST_4_29_2020.gms Stop 05/21/20 18:04:53 elapsed 0:00:02.566
+

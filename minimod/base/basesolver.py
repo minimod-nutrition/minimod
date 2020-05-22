@@ -14,11 +14,14 @@ from minimod.utils.summary import OptimizationSummary
 from minimod.utils.plotting import Plotter
 from minimod.utils.suppress_messages import suppress_stdout_stderr
 
+from minimod.base.bau_constraint import BAUConstraintCreator
+
 import matplotlib.pyplot as plt
 
 import pandas as pd
 import numpy as np
 import mip
+import re
 
 import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -42,13 +45,13 @@ class BaseSolver:
     def __init__(
         self,
         interest_rate_cost=0.0,  # Discount factor for costs
-        interest_rate_benefit=0.03,  # Discount factor for benefits
+        interest_rate_benefit=0.03,  # Discount factor for benefits 
         va_weight=1.0,  # VA Weight
         sense=None,  # MIP optimization type (maximization or minimization)
         solver_name=mip.CBC,  # Solver for MIP to use
         show_output = True
     ):
-
+        
         self.interest_rate_cost = interest_rate_cost
         self.interest_rate_benefit = interest_rate_benefit
         self.va_weight = va_weight
@@ -90,6 +93,8 @@ class BaseSolver:
         self.model.max_mip_gap = 0.1
 
         self.model.preprocess = 0
+        
+        self.bau = BAUConstraintCreator(self, sense = self.sense)
 
         print(
             f"""
@@ -152,8 +157,7 @@ class BaseSolver:
                 time_discount_benefits=lambda df: self.discount_benefits
                 ** df["time_rank"],
                 discounted_costs=lambda df: df["time_discount_costs"] * df[costs],
-                discounted_benefits=lambda df: df["time_discount_benefits"]
-                * df[benefits],
+                discounted_benefits=lambda df: df["time_discount_benefits"]*df[benefits],
             )
             .set_index([intervention, space, time])
             .sort_index(level=(intervention, space, time))
@@ -415,6 +419,7 @@ class BaseSolver:
         space_subset=slice(None),
         time_subset=slice(None),
         clear=False,
+        benefit_title = "Effective Coverage",
         **kwargs,
     ):
         """Fits the model that is created above using the sense provided by `self.sense`.
@@ -469,6 +474,8 @@ class BaseSolver:
         self.num_int = self.model.num_int
         self.num_nz = self.model.num_nz
         
+        self.benefit_title = benefit_title
+        
         if clear:
             self.clear()
 
@@ -509,14 +516,36 @@ class BaseSolver:
         return p._plot_lines(to_plot = ['opt_benefit', 'opt_costs'],
                              title= "Optima over Time",
                              xlabel = 'Time',
-                             ylabel = 'Coverage',
+                             ylabel = self.benefit_title,
                              twin =True,
                              twin_ylabel= "Currency",
                              save = save,
-                             legend = ['Optimal Coverage',
+                             legend = ['Optimal Benefits',
                                        'Optimal Costs'],
                              figure=fig,
                              axis=ax)
+        
+    # def plot_bau_time(self,
+    #                   opt_variable = None,
+    #                   fig = None,
+    #                   ax = None,
+    #                   save = None):
+        
+    #     p = Plotter(self)
+        
+    #     if re.match(r"ben", opt_variable):
+    #         bau_var = 'discounted_benefits'
+        
+    #     return p._plot_lines(to_plot = [opt_variable, bau_var],
+    #                          title= "Optimal vs. BAU",
+    #                          xlabel = 'Time',
+    #                          save = save,
+    #                          legend = ['Optimal ',
+    #                                    'Optimal Costs'],
+    #                          figure=fig,
+    #                          axis=ax)
+        
+        
 
     def plot_opt_val_hist(self, 
                           fig = None, 
@@ -545,7 +574,7 @@ class BaseSolver:
                 
         if optimum_interest == 'b':
             opt = 'opt_benefit'
-            title = "Optimal Coverage"
+            title = self.benefit_title
         elif optimum_interest == 'c':
             opt = 'opt_costs'
             title = "Optimal Costs"
@@ -599,7 +628,7 @@ class BaseSolver:
                            bench_merge_key = None,
                            map_df = None,
                            merge_key = None,
-                           save = None
+                           save = None,
                            ):
         
         fig = plt.figure()
@@ -613,7 +642,7 @@ class BaseSolver:
         
         if optimum_interest == 'b':
             opt = 'opt_benefit'
-            title = "Effective Coverage"
+            title = self.benefit_title
         elif optimum_interest == 'c':
             opt = 'opt_costs'
             title = "Costs"
@@ -667,5 +696,5 @@ class BaseSolver:
         plt.tight_layout()
         
         if save is not None:
-            plt.savefig(save, dpi = 600)
+            plt.savefig(save, dpi = p.dpi)
         

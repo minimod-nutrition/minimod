@@ -1,16 +1,36 @@
 import matplotlib.pyplot as plt
-
+import matplotlib as mpl
 import numpy as np
 from minimod.utils.exceptions import MissingOptimizationMethod
+import functools
+
 
 
 class Plotter:
     """This class is in charge of plotting the results of the `minimod`. 
-    """        
+    """     
     
-    def __init__(self, model):
+    def plot_context(func):
+        
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):   
+            with mpl.rc_context(self.mpl_theme_dict):
+                plot = func(self, *args, **kwargs)  
+                return plot
+        return wrapper
+               
+    
+    def __init__(self, model, dpi = 600):
         
         self.model = model
+        self.dpi = dpi
+        
+        self.mpl_theme_dict = {
+            'font.family' : 'serif',
+            # 'yaxis.formatter' : mpl.ticker.FuncFormatter(lambda x, pos: "{:,}".format(x/1000) + 'K'),
+            'savefig.dpi' : self.dpi
+        }
+
         
     def _check_if_optimization(self):
         
@@ -27,7 +47,8 @@ class Plotter:
             figure, axis = fig, ax
         
         return figure, axis
-            
+    
+    @plot_context         
     def _plot_process(self, figure = None, axis = None):
         
         self._check_if_optimization()
@@ -35,7 +56,8 @@ class Plotter:
         fig, ax = self._define_axis_object(fig = figure, ax=axis)
         
         return fig, ax
-            
+    
+    @plot_context       
     def _plot_lines(self, 
                     to_plot = None,
                     title = None,
@@ -75,18 +97,19 @@ class Plotter:
         
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        ax.legend(['Optimal Coverage'], loc= 'upper left')
+        ax.legend(['Optimal Benefits'], loc= 'upper left')
         ax2.legend(['Optimal Costs'], loc = 'lower left')
         plt.tight_layout()
         
         if save is not None:
-            plt.savefig(save, dpi=600)
+            plt.savefig(save)
         
         if twin:
             return fig, ax, ax2
         if not twin:
             return fig, ax
-        
+    
+    @plot_context    
     def _plot_hist(self,
                    to_plot = None,
                    title = None,
@@ -110,7 +133,7 @@ class Plotter:
         plt.tight_layout()
         
         if save is not None:
-            plt.savefig(save, dpi=600)
+            plt.savefig(save)
         
         return fig, ax
     
@@ -156,7 +179,7 @@ class Plotter:
                 
         return data.dissolve(by = [self.model._space, self.model._time], aggfunc = aggfunc)
         
-    
+    @plot_context
     def _plot_chloropleth(self, 
                           data = None,
                           intervention = None,
@@ -206,11 +229,11 @@ class Plotter:
         plt.tight_layout()
         
         if save is not None:
-            plt.savefig(save, dpi=600)
+            plt.savefig(save)
             
         return ax        
 
-            
+    @plot_context        
     def _plot_multi_chloropleth(self, 
                                 data = None,
                                 time = None, 
@@ -256,12 +279,14 @@ class Plotter:
             ax.set_xticks([])
             ax.set_yticklabels([])
             ax.set_yticks([])
+            ax.set_title(title)
             
         plt.tight_layout()
         plt.savefig(save)
         
         return axs
     
+    @plot_context
     def _plot_sim_hist(self, 
                        data,
                        benefit_col = None, 
@@ -284,6 +309,7 @@ class Plotter:
         
         return fig, ax
     
+    @plot_context
     def _plot_grouped_bar(self,
                           intervention_col = None,
                           space_col = None,
@@ -309,15 +335,15 @@ class Plotter:
         plot.legend(bbox_to_anchor = (1,1))
         
         if save is not None:
-            plt.savefig(save, dpi=600)
-            
+            plt.savefig(save)
+    
+    @plot_context
     def _plot_chloropleth_getter(self, time):
                 
         _plotter = {
             'single' : self._plot_chloropleth,
             'multi' : self._plot_multi_chloropleth
         }
-        
         
         if time is not None and len(time) == 1:
             number = 'single'
@@ -326,8 +352,11 @@ class Plotter:
 
             
         return _plotter.get(number)
-            
+
+
     
+
+
         
         
         

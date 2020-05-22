@@ -233,7 +233,7 @@ class MonteCarloMinimod:
                     .astype(int))
                 ['val_appeared']
                 .groupby(self.intervention_col)
-                .sum()/10)*100
+                .sum()/self.N)*100
                 )
             
             s.print_generic([('Percentage Appeared in Simulations', '')])            
@@ -276,7 +276,7 @@ class MonteCarloMinimod:
         p = Plotter(self)
         
         costs = 'Optimal Costs'
-        benefits = 'Effective Coverage'
+        benefits = self.minimod.benefit_title
         
         if self.solver_type == 'costmin':
             
@@ -345,7 +345,7 @@ class MonteCarloMinimod:
         ax.set_title("Trajectories of all Simulations")
         
         if save is not None:
-            plt.savefig(save, dpi=600)
+            plt.savefig(save, dpi = self.dpi)
         
 
         
