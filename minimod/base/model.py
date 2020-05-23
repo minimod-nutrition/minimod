@@ -97,6 +97,9 @@ class Model:
         over=None,
         subset_list=slice(None)
     ):
+        
+        if subset_list is None:
+            subset_list = slice(None)
 
         subset_dict = self._intervention_subset(intervention, subset_names=subset_names)
 
@@ -134,7 +137,7 @@ class Model:
 
                 for cv in constraining_var:
                     if str(cv) != str(mip_var):
-                        self.model += mip_var == cv
+                        self.add_constraint(mip_var, cv, 'eq')
 
     def _all_space_constraint(
         self,
@@ -195,6 +198,8 @@ class Model:
             self.model += eq >= constraint
         elif way == 'le':
             self.model += eq <= constraint
+        elif way == 'eq':
+            self.model += eq == constraint
         
 
     def base_model_create(self, 

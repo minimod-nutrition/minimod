@@ -95,10 +95,10 @@ class BaseSolver:
         self.model.base_model_create(intervention_col, 
                                     space_col, 
                                     time_col, 
-                                    all_time=None, 
-                                    all_space=None, 
-                                    time_subset = None, 
-                                    space_subset = None)
+                                    all_time=all_time, 
+                                    all_space=all_space, 
+                                    time_subset = time_subset, 
+                                    space_subset = space_subset)
         
 
         print(
