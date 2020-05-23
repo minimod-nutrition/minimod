@@ -12,16 +12,11 @@ class CostSolver(BaseSolver):
 
         super().__init__(sense = mip.MINIMIZE, **kwargs)
         
-        if minimum_benefit is not None:
+        if isinstance(minimum_benefit, float) or isinstance(minimum_benefit, int):
             self.minimum_benefit = minimum_benefit
-        else:
-            raise Exception("No minimum benefit specified.")
-        
-        if isinstance(self.minimum_benefit, float):
-            minimum_constraint = self.minimum_benefit
         elif isinstance(self.minimum_benefit, str):
             # Get sum of benefits for interventions
-            minimum_constraint = self.bau.create_bau_constraint()
+            self.minimum_benefit = self.bau.create_bau_constraint()
 
     def _objective(self):
 
@@ -37,7 +32,7 @@ class CostSolver(BaseSolver):
 
         ## Make benefits constraint be at least as large as the one from the minimum benefit intervention
 
-        self.model += self._discounted_sum_all(benefit) >= minimum_constraint
+        self.model += self._discounted_sum_all(benefit) >= self.minimum_benefit
 
         ## Also add constraint that only allows one intervention in a time period and region
 
