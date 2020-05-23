@@ -75,7 +75,7 @@ class Plotter:
         if not twin:
             
             (self.model.opt_df[to_plot]
-            .groupby([self.model._time])
+            .groupby([self.model.time_col])
             .sum()
             .plot(title = title, 
                 fig = fig, 
@@ -84,12 +84,12 @@ class Plotter:
             )
             
         if twin:
-            ax.plot(self.model.opt_df[to_plot[0]].groupby([self.model._time])
+            ax.plot(self.model.opt_df[to_plot[0]].groupby([self.model.time_col])
                     .sum(), 
                     color='red')
             
             ax2 = ax.twinx()
-            ax2.plot(self.model.opt_df[to_plot[1]].groupby([self.model._time])
+            ax2.plot(self.model.opt_df[to_plot[1]].groupby([self.model.time_col])
                      .sum(), 
                      color = 'blue')
             
@@ -123,7 +123,7 @@ class Plotter:
         
         (
             self.model.opt_df[to_plot]
-            .groupby([self.model._time])
+            .groupby([self.model.time_col])
             .sum()
             .plot
             .bar(fig = fig, ax = ax, grid = True, width = 1)
@@ -152,11 +152,11 @@ class Plotter:
                 data
                 .reset_index(),
                 left_on = [merge_key],
-                right_on = [self.model._space]
+                right_on = [self.model.space_col]
             )
-            .set_index([self.model._intervention,
-                        self.model._space,
-                        self.model._time
+            .set_index([self.model.intervention_col,
+                        self.model.space_col,
+                        self.model.time_col
                         ])
         )
         
@@ -177,7 +177,7 @@ class Plotter:
                                 data = None, 
                                 aggfunc = None):
                 
-        return data.dissolve(by = [self.model._space, self.model._time], aggfunc = aggfunc)
+        return data.dissolve(by = [self.model.space_col, self.model.time_col], aggfunc = aggfunc)
         
     @plot_context
     def _plot_chloropleth(self, 
@@ -250,7 +250,7 @@ class Plotter:
         if time is None:
             time = (self.model.opt_df
                  .index
-                 .get_level_values(level = self.model._time)
+                 .get_level_values(level = self.model.time_col)
                  .unique()
                  .values
                  )

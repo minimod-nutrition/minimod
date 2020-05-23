@@ -100,15 +100,20 @@ df = pd.read_csv("examples/data/processed/example1.csv")
 
 # %%
 c = mm.Minimod(solver_type = 'costmin', 
-               minimum_benefit = vasoilold_constraint)
+            minimum_benefit = vasoilold_constraint,
+            data = df, 
+            benefit_col = 'benefit',
+            cost_col = 'costs',
+            intervention_col = 'intervention',
+            space_col = 'space',
+            time_col = 'time',
+            all_space = ['cube', 'oil', 'maize'], 
+            all_time = ['maize', 'cube'],
+            time_subset = [1,2,3])
 
 # %%
 
-opt = c.fit(data = df, 
-            all_space = ['cube', 'oil', 'maize'], 
-            all_time = ['maize', 'cube'],
-            time_subset = [1,2,3]
-            )
+opt = c.fit()
 # %%
 
 c.report()
