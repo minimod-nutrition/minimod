@@ -73,24 +73,36 @@ class Model:
 
             self.model += constr <= 1
 
-    def _intervention_subset(self, intervention, subset_names=[]):
+    def _intervention_subset(self, intervention, strict, subset_names=[]):
 
         subset_dict = {}
 
         for i in subset_names:
-            subset_dict[i] = self._df.loc[
-                lambda df: df.index.get_level_values(level=intervention).str.contains(
-                    i, case=False
-                )
-            ]
+            
+            if strict:
+                subset_dict[i[0]] = self._df.loc[
+                    lambda df: df.index.get_level_values(level=intervention).isin(i)
+                ]
+                
+                if subset_dict[i[0]].empty:
+                    raise Exception(f"'{i[0]}' not found in dataset.")
 
-            if subset_dict[i].empty:
-                raise Exception(f"'{i}' not found in dataset.")
+            
+            else:
+                subset_dict[i] = self._df.loc[
+                    lambda df: df.index.get_level_values(level=intervention).str.contains(
+                        i, case=False
+                    )
+                ]
+                
+                if subset_dict[i].empty:
+                    raise Exception(f"'{i}' not found in dataset.")
 
         return subset_dict
 
     def _all_constraint(
         self,
+        strict,
         intervention=None,
         group_index=None,
         subset_names=None,
@@ -101,7 +113,9 @@ class Model:
         if subset_list is None:
             subset_list = slice(None)
 
-        subset_dict = self._intervention_subset(intervention, subset_names=subset_names)
+        subset_dict = self._intervention_subset(intervention = intervention, 
+                                                strict=strict,
+                                                subset_names=subset_names)
 
         all_indices = group_index + [over]
 
@@ -141,6 +155,7 @@ class Model:
 
     def _all_space_constraint(
         self,
+        strict,
         intervention=None,
         time=None,
         subset_names=None,
@@ -149,6 +164,7 @@ class Model:
     ):
 
         return self._all_constraint(
+            strict,
             intervention=intervention,
             group_index=[intervention, time],
             subset_names=subset_names,
@@ -158,6 +174,7 @@ class Model:
 
     def _all_time_constraint(
         self,
+        strict,
         intervention=None,
         space=None,
         subset_names=None,
@@ -166,6 +183,7 @@ class Model:
     ):
 
         return self._all_constraint(
+            strict,
             intervention=intervention,
             group_index=[intervention, space],
             subset_names=subset_names,
@@ -209,7 +227,8 @@ class Model:
                           all_time=None, 
                           all_space=None, 
                           time_subset = None, 
-                          space_subset = None):
+                          space_subset = None,
+                          strict = False):
 
         ## Now we create the choice variable, x, which is binary and is the size of the dataset.
         ## In this case, it should just be a column vector with the rows equal to the data:
@@ -226,6 +245,7 @@ class Model:
                 raise Exception("One of the subset columns were not found")
 
             self._all_time_constraint(
+                strict,
                 intervention=intervention,
                 space=space,
                 subset_names=all_time,
@@ -239,6 +259,7 @@ class Model:
                 raise Exception("One of the subset columns were not found")
 
             self._all_space_constraint(
+                strict,
                 intervention=intervention,
                 time=time,
                 subset_names=all_space,
@@ -286,7 +307,9 @@ class Model:
             opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.x),
             opt_benefit=lambda df: df[benefit_col] * df["opt_vals"],
             opt_costs=lambda df: df[cost_col] * df["opt_vals"],
-        )[["opt_vals", "opt_benefit", "opt_costs"]]
+            opt_costs_discounted = lambda df: df['discounted_costs'] * df["opt_vals"],
+            opt_benefit_discounted = lambda df: df['discounted_benefits']*df['opt_vals']
+        )[["opt_vals", "opt_benefit", "opt_costs", 'opt_costs_discounted', 'opt_benefit_discounted']]
         
         return opt_df
     
@@ -295,7 +318,8 @@ class Model:
         
     def get_model_results(self):
         
-        return (self.model.objective_value, 
+        return (self.model.objective_value,
+                self.model.objective_values, 
                 self.model.objective_bound, 
                 self.model.num_solutions, 
                 self.model.num_cols, 

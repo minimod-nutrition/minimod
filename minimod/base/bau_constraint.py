@@ -5,7 +5,10 @@ class BAUConstraintCreator:
     def __init__(self):
         pass
     
-    def bau_df(self, data, constraint, discounted_variable):
+    def bau_df(self, data, constraint, discounted_variable = None):
+        
+        if discounted_variable is None:
+            discounted_variable = data.columns
         
         df = (data
          .loc[(constraint, 

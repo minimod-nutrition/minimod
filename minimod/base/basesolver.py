@@ -40,6 +40,7 @@ class BaseSolver:
         all_space=None, 
         time_subset = None, 
         space_subset = None,
+        strict = False,
         interest_rate_cost=0.0,  # Discount factor for costs
         interest_rate_benefit=0.03,  # Discount factor for benefits 
         va_weight=1.0,  # VA Weight
@@ -48,6 +49,41 @@ class BaseSolver:
         show_output = True,
         benefit_title = "Benefits",
     ):       
+        """The base solver for the Optimization. This sets up the basic setup of the model, which includes:
+        - data handling
+        - BAU constraint creation
+        - base model constraint creation
+
+        :param data: dataframe with benefits and cost data
+        :type data: pandas.DataFrame
+        :param benefit_col: benefit data column, defaults to 'benefits'
+        :type benefit_col: str, optional
+        :param cost_col: cost data column, defaults to 'costs'
+        :type cost_col: str, optional
+        :param intervention_col: intervention data column, defaults to 'intervention'
+        :type intervention_col: str, optional
+        :param space_col: space/region data column, defaults to 'space'
+        :type space_col: str, optional
+        :param time_col: time period data column, defaults to 'time'
+        :type time_col: str, optional
+        :param all_time: Whether to treat some interventions as being constrained in time. Coupled with ``time_subset`` to constrain some time periods to all time periods, defaults to None
+        :type all_time: list or iterable, optional
+        :param all_space: whether to treat some interventions as being constraint over space. Coupled with ``space_subset`` to constrain some regions to all regions, defaults to None
+        :type all_space: list or iterable, optional
+        :param time_subset: a subset of time periods in the ``data.time_col`` that are constrained to all other time periods.
+        For example, if ``time_subset = [1,2,3]``, you cannot choose time periods 4-10, without also choosing 1-3. defaults to None, which constrains all time periods to each other.
+        :type time_subset: list or iterable, optional
+        :param space_subset: a subset of regions in ``data.space_col`` that constrain to all other regions, defaults to None which constrains all regions to each other (national intervention).
+        :type space_subset: list or iterable, optional
+        :param strict: Whether to use strict string matching for time and space subsets or whether ``time_subset`` or ``space_subset`` should be treated as a string stub that an intervention should contain. 
+        :type strict: bool, optional
+        :param interest_rate_cost: interest rate of costs, defaults to 0.0
+        :type interest_rate_cost: float, optional
+        :param benefit_title: title for benefits to put in plots and reports, defaults to "Benefits"
+        :type benefit_title: str, optional
+        
+        ``BaseSolver`` is inherited by ``CostSolver`` and ``BenefitSolver`` to then run optimizations.
+        """        
                 
         self.interest_rate_cost = interest_rate_cost
         self.interest_rate_benefit = interest_rate_benefit
@@ -98,7 +134,8 @@ class BaseSolver:
                                     all_time=all_time, 
                                     all_space=all_space, 
                                     time_subset = time_subset, 
-                                    space_subset = space_subset)
+                                    space_subset = space_subset,
+                                    strict = strict)
         
 
         print(
@@ -113,6 +150,13 @@ class BaseSolver:
         )
         
     def _discounted_sum_all(self, data):
+        """Multiply each ``mip_var`` in the data by benefits or costs (``data``) and then create a ``mip`` expression from it.
+
+        :param data: dataset of benefits and costs
+        :type data: pandas.DataFrame
+        :return: ``mip`` Expression
+        :rtype: ``mip.LinExpr``
+        """        
 
         eq = mip.xsum(
             self._df["mip_vars"].loc[k, j, t] * data[k, j, t]
@@ -122,6 +166,12 @@ class BaseSolver:
         return eq
 
     def _is_dataframe(self, data):
+        """Checks if input dataset if a ``pandas.DataFrame``
+
+        :param data: input data
+        :type data: anything
+        :raises NotPandasDataframe: Exception if not a ``pandas.DataFrame``
+        """        
 
         if not isinstance(data, pd.DataFrame):
             raise NotPandasDataframe(
@@ -137,11 +187,23 @@ class BaseSolver:
         benefits="benefits",
         costs="costs",
     ):
-        """This method processes the data and gets it ready to be used in the problem
-            
-        Arguments:
-        data {pandas dataframe} -- A pandas dataframe with columns for each time period and a column for regions or whatever spatial dimension is used. The rows for each time period should give the benefits of each intervention at time t, and space j
+        """Processes the input data by creating discounted benefits and costs.
+
+        :param data: data, defaults to None
+        :type data: pandas.DataFrame, optional
+        :param intervention: intervention column, defaults to "intervention"
+        :type intervention: str, optional
+        :param space: space/region column, defaults to "space"
+        :type space: str, optional
+        :param time: time period column, defaults to "time"
+        :type time: str, optional
+        :param benefits: benefits column, defaults to "benefits"
+        :type benefits: str, optional
+        :param costs: cost column, defaults to "costs"
+        :type costs: str, optional
         
+        This method processes the data and gets it ready to be used in the problem
+
         |k     | j   |t   | benefits   | costs |
         |------|-----|----|------------|-------|
         |maize |north|0   | 100        | 10    |
@@ -149,8 +211,6 @@ class BaseSolver:
         |maize |east |0   | 30         |30     |
         |maize |west |0   | 20         |40     |
         
-    Raises:
-        MissingColumn: If a column is not included, it raises the missing column exception
         """
 
         ## First do some sanity checks
@@ -194,6 +254,8 @@ class BaseSolver:
 
 
     def _fit(self, **kwargs):
+        """Fits data to model. The instantiation of the class creates the base model. Uses ``mip.optimize`` to find the optimal point.
+        """        
 
         if self.show_output:
             print("[Note]: Optimizing...")
@@ -202,7 +264,8 @@ class BaseSolver:
         
         self.opt_df = self.model.process_results(self.benefit_col, self.cost_col)
         
-        (self.objective_value, 
+        (self.objective_value,
+         self.objective_values, 
          self.objective_bound, 
          self.num_solutions, 
          self.num_cols, 
@@ -216,6 +279,8 @@ class BaseSolver:
         self.model.write(filename)
 
     def report(self):
+        """Prints out a report of optimal model parameters and useful statistics.
+        """        
 
         header = [
             ('MiniMod Solver Results', ""),
@@ -240,6 +305,15 @@ class BaseSolver:
                   fig = None, 
                   ax = None,
                   save = None):
+        """Plots optimal benefits and costs across time after model optimization
+
+        :param fig: matplotlib figure, defaults to None
+        :type fig: matplotlib.figure, optional
+        :param ax: matplotlib axis to use, defaults to None
+        :type ax: matplotlib.axis, optional
+        :param save: whether to save the figure, defaults to None
+        :type save:  str for file path, optional
+        """        
         
         p = Plotter(self)
         
@@ -281,6 +355,15 @@ class BaseSolver:
                           fig = None, 
                           ax = None, 
                           save = None):
+        """A histogram of the optimally chosen interventions
+
+        :param fig: figure instance to use, defaults to None
+        :type fig: matplotlib.figure, optional
+        :param ax: axis instance to use, defaults to None
+        :type ax: matplotlib.axis, optional
+        :param save: whether to save the figure, defaults to None
+        :type save: str of file path, optional
+        """        
         
         p = Plotter(self)
         
@@ -299,6 +382,23 @@ class BaseSolver:
                          map_df = None,
                          merge_key = None,
                          save = None):
+        """Creates a chloropleth map of the specified intervention and time period for the optimal variable. 
+        If more than one intervention is specified, then aggregates them. If more than one time period is specified, then creates a subplots of len(time) and show each.
+
+        :param intervention: interventions to use, defaults to slice(None)
+        :type intervention: str or list, optional
+        :param time: time periods to plot, defaults to None
+        :type time: int or list, optional
+        :param optimum_interest: optimum variable to use. 
+        Options include: 'b' for optimal benefits, 'c' for optimal costs, and 'v' for optimal variable, defaults to 'b'
+        :type optimum_interest: str, optional
+        :param map_df: geopandas dataframe with geometry information, defaults to None
+        :type map_df: geopandas.GeoDataFrame, optional
+        :param merge_key: key to merge on to geo dataframe, defaults to None
+        :type merge_key: str or list, optional
+        :param save: whether to save the figure, defaults to None
+        :type save: str of file path, optional
+        """        
         
         p = Plotter(self)
                 
@@ -332,6 +432,17 @@ class BaseSolver:
                                 title = None,
                                 intervention_subset = slice(None),
                                 save = None):
+        """Shows Optimal level of benefits or costs in a grouped bar plots for every optimally chosen variable across regions.
+
+        :param data_of_interest: variable to show, defaults to 'benefits'
+        :type data_of_interest: str, optional
+        :param title: title for resulting plot, defaults to None
+        :type title: str, optional
+        :param intervention_subset: subset of interventions to show on bar plot, defaults to slice(None)
+        :type intervention_subset: str ot list, optional
+        :param save: whether to save the figure, defaults to None
+        :type save: str of filepath, optional
+        """        
         
         p = Plotter(self)
             
@@ -360,6 +471,29 @@ class BaseSolver:
                            merge_key = None,
                            save = None,
                            ):
+        """Maps the the optimal level on a map against a benchmark, optionally the BAU level chosen from ``minimum_benefit`` or ``total_funds``.
+
+        :param intervention: interventions to map, defaults to slice(None)
+        :type intervention: list, optional
+        :param time: time periods to map, defaults to None
+        :type time: list, optional
+        :param optimum_interest: which optimal value to use. Options include 'b' (benefits), 'c' (costs), 'v' (variables), defaults to 'b'
+        :type optimum_interest: str, optional
+        :param data_bench: data to use for benchmark mapping, defaults to None
+        :type data_bench: pandas.DataFrame, optional
+        :param bench_intervention: interventions to use for benchmark, defaults to None
+        :type bench_intervention: list, optional
+        :param bench_col: column to use for benchmark, defaults to None
+        :type bench_col: str, optional
+        :param bench_merge_key: merge key for bench_df, defaults to None
+        :type bench_merge_key: list, optional
+        :param map_df: geo dataframe with geometry data, defaults to None
+        :type map_df: geopandas.GeoDataFrame, optional
+        :param merge_key: key to merge data from opt_df to geo dataframe, defaults to None
+        :type merge_key: str or list, optional
+        :param save: whether to save the figure, defaults to None
+        :type save: str of file path, optional
+        """        
         
         fig = plt.figure()
         
