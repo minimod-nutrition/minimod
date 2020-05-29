@@ -1,4 +1,4 @@
-GAMS 30.1.0  re01a340 Released Jan 10, 2020 WEX-WEI x86 64bit/MS Windows - 05/26/20 18:41:04 Page 1
+GAMS 30.3.0  rc5da09e Released Mar  6, 2020 WEX-WEI x86 64bit/MS Windows - 05/27/20 13:14:52 Page 1
 CAMEROON COVERAGE MODEL
 C o m p i l a t i o n
 
@@ -14,22 +14,22 @@ C o m p i l a t i o n
   10   
   11   
   12   
-GAMS 30.1.0  re01a340 Released Jan 10, 2020 WEX-WEI x86 64bit/MS Windows - 05/26/20 18:41:04 Page 2
+GAMS 30.3.0  rc5da09e Released Mar  6, 2020 WEX-WEI x86 64bit/MS Windows - 05/27/20 13:14:52 Page 2
 CAMEROON COVERAGE MODEL
 Include File Summary
 
 
    SEQ   GLOBAL TYPE      PARENT   LOCAL  FILENAME
 
-     1        1 INPUT          0       0  Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
-     2       40 GDXIN          1      40  Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsaverted.gdx
-     3       47 GDXIN          1      47  Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsavertedhigh.gdx
-     4       54 GDXIN          1      54  Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsavertedcost.gdx
-     5       61 GDXIN          1      61  Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_folate.gdx
+     1        1 INPUT          0       0  M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+     2       40 GDXIN          1      40  M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsaverted.gdx
+     3       47 GDXIN          1      47  M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsavertedhigh.gdx
+     4       54 GDXIN          1      54  M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_deathsavertedcost.gdx
+     5       61 GDXIN          1      61  M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\Cameroon_folate.gdx
 
 
-COMPILATION TIME     =        0.000 SECONDS      3 MB  30.1.0 re01a340 WEX-WEI
-GAMS 30.1.0  re01a340 Released Jan 10, 2020 WEX-WEI x86 64bit/MS Windows - 05/26/20 18:41:04 Page 3
+COMPILATION TIME     =        0.109 SECONDS      3 MB  30.3.0 rc5da09e WEX-WEI
+GAMS 30.3.0  rc5da09e Released Mar  6, 2020 WEX-WEI x86 64bit/MS Windows - 05/27/20 13:14:52 Page 3
 CAMEROON COVERAGE MODEL
 E x e c u t i o n
 
@@ -1733,7 +1733,7 @@ maxoilcubeclinicflourzcube.Cities     673.823     693.352     727.842     878.70
 
 ----    224 PARAMETER totalbenefitsbau     =    31788.546  TOTAL BENEFITS OF BAU*
             PARAMETER totalbenefits2       =    31788.546  TOTAL BENEFITS
-GAMS 30.1.0  re01a340 Released Jan 10, 2020 WEX-WEI x86 64bit/MS Windows - 05/26/20 18:41:04 Page 4
+GAMS 30.3.0  rc5da09e Released Mar  6, 2020 WEX-WEI x86 64bit/MS Windows - 05/27/20 13:14:52 Page 4
 CAMEROON COVERAGE MODEL
 Equation Listing    SOLVE nutrition Using MINLP From line 342
 
@@ -5531,7 +5531,7 @@ allzcubeeq2(South,1,4)..  - YESZCUBE(South,1) + YESZCUBE(South,4) =E= 0 ; (LHS =
      
 REMAINING 51 ENTRIES SKIPPED
 
-GAMS 30.1.0  re01a340 Released Jan 10, 2020 WEX-WEI x86 64bit/MS Windows - 05/26/20 18:41:04 Page 5
+GAMS 30.3.0  rc5da09e Released Mar  6, 2020 WEX-WEI x86 64bit/MS Windows - 05/27/20 13:14:52 Page 5
 CAMEROON COVERAGE MODEL
 Column Listing      SOLVE nutrition Using MINLP From line 342
 
@@ -8029,7 +8029,7 @@ YESFLOUR(Cities,10)
         1       allfloureq(Cities,North,10)
         1       allfloureq(Cities,South,10)
 
-GAMS 30.1.0  re01a340 Released Jan 10, 2020 WEX-WEI x86 64bit/MS Windows - 05/26/20 18:41:04 Page 6
+GAMS 30.3.0  rc5da09e Released Mar  6, 2020 WEX-WEI x86 64bit/MS Windows - 05/27/20 13:14:52 Page 6
 CAMEROON COVERAGE MODEL
 Model Statistics    SOLVE nutrition Using MINLP From line 342
 
@@ -8043,7 +8043,134 @@ DERIVATIVE POOL              20     CONSTANT POOL              16
 CODE LENGTH                   0     DISCRETE VARIABLES      3,300
 
 
-GENERATION TIME      =        0.048 SECONDS      6 MB  30.1.0 re01a340 WEX-WEI
+GENERATION TIME      =        0.093 SECONDS      6 MB  30.3.0 rc5da09e WEX-WEI
 
 
-EXECUTION TIME       =        0.096 SECONDS      6 MB  30.1.0 re01a340 WEX-WEI
+EXECUTION TIME       =        0.156 SECONDS      6 MB  30.3.0 rc5da09e WEX-WEI
+GAMS 30.3.0  rc5da09e Released Mar  6, 2020 WEX-WEI x86 64bit/MS Windows - 05/27/20 13:14:52 Page 7
+CAMEROON COVERAGE MODEL
+Solution Report     SOLVE nutrition Using MINLP From line 342
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   nutrition           OBJECTIVE  Z
+     TYPE    MINLP               DIRECTION  MINIMIZE
+     SOLVER  BONMIN              FROM LINE  342
+
+**** SOLVER STATUS     8 User Interrupt            
+**** MODEL STATUS      14 No Solution Returned     
+**** OBJECTIVE VALUE               NA
+
+ RESOURCE USAGE, LIMIT        184.016      1000.000
+ ITERATION COUNT, LIMIT         0    2000000000
+ EVALUATION ERRORS              0             0
+
+COIN-OR Bonmin   30.3.0 rc5da09e Released Mar 06, 2020 WEI x86 64bit/MS Window
+NLP0012I 
+NLP0014I             1      INFEAS 24071106     2186 183.994
+
+
+Best possible:    2.407111e+07   (only reliable for convex models)
+
+No solution returned
+GAMS 30.3.0  rc5da09e Released Mar  6, 2020 WEX-WEI x86 64bit/MS Windows - 05/27/20 13:14:52 Page 8
+CAMEROON COVERAGE MODEL
+E x e c u t i o n
+
+
+----    343 VARIABLE X.L  QUANTITY OF VA INTERVENTION ZERO OR ONE
+
+                      ( ALL       0.000 )
+
+
+----    343 VARIABLE Y.L  QUANTITY OF VA INTERVENTION ZERO OR ONE
+
+                      ( ALL       0.000 )
+
+
+----    343 VARIABLE Z.L                   =        0.000  TOTAL COSTS
+            VARIABLE BEN.L                 =        0.000  TOTAL COVERAGE
+
+----    343 VARIABLE XCOV.L  TOTAL COVERAGE FOR X VARIABLE INTERVENTIONS
+
+                      ( ALL       0.000 )
+
+
+----    343 VARIABLE XCOST.L  TOTAL COST FOR X VARIABLE INTERVENTIONS
+
+                      ( ALL       0.000 )
+
+
+----    343 PARAMETER totalfunds           =  3.582170E+7  TOTAL FUNDS AVAILABLE
+            PARAMETER totalbenefits        =  1.345806E+7  total benefits available
+**** Exec Error at line 380: division by zero (0)
+
+----    382 PARAMETER finalcov  Coverage per time period all
+
+                      ( ALL       0.000 )
+
+
+----    382 PARAMETER finalcost  Cost per time period
+
+                      ( ALL       0.000 )
+
+
+----    382 PARAMETER covbau  Coverage per time for BAU scenario
+
+1  3424.724,    2  3464.843,    3  3503.780,    4  3548.985,    5  3597.614,    6  3646.695,    7  3698.410,    8  3749.148,    9  3805.264,    10 3859.061
+
+
+----    382 PARAMETER costbau  Cost per time for BAU scenario
+
+1  4182164.648,    2  4206677.633,    3  4293124.599,    4  4256754.076,    5  4366353.038,    6  4369799.611,    7  4334494.672,    8  4361173.289,    9  4449859.840,    10 4499869.589
+
+
+----    382 PARAMETER covbauspace  Coverage per space for BAU scenario
+
+North  17292.960,    South  10760.688,    Cities  8244.875
+
+
+----    382 PARAMETER costbauspace  Cost per space for BAU scenario
+
+North  1.375364E+7,    South  1.849809E+7,    Cities 1.106854E+7
+
+
+----    382 PARAMETER costbaupc            =     1193.444  Cost per child 6-59 months for BAU scenario
+            PARAMETER costpc               =         UNDF  Cost per child 6-59 months
+            PARAMETER tcovbau              =    36298.524  Total coverage for BAU
+            PARAMETER tcostbau             =  4.332027E+7  Total cost for BAU
+            PARAMETER tcovbauspace         =    36298.524  Total coverage per space for BAU scenario
+            PARAMETER tcostbauspace        =  4.332027E+7  Total cost per space for BAU scenario
+
+----    382 PARAMETER finalcovspace  Coverage per time period all
+
+                      ( ALL       0.000 )
+
+
+----    382 PARAMETER finalcostspace  Cost per time period
+
+                      ( ALL       0.000 )
+
+
+**** REPORT FILE SUMMARY
+
+lives_saved_low M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\lives_saved_low.csv
+costs_low M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\costs_low.csv
+tablput20_4bk M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\table1.txt
+
+
+EXECUTION TIME       =        0.047 SECONDS      4 MB  30.3.0 rc5da09e WEX-WEI
+
+
+USER: Small MUD - 5 User License                     G190305:1227AO-WIN
+      University of California, Davis, Agricultural and Resource DC9668
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.gms
+Output     M:\minimod\Optimization Work\demewoz_lives_saved\data_files\justin_data\demowoaz_LiST_4_29_2020.lst
+
+**** USER ERROR(S) ENCOUNTERED

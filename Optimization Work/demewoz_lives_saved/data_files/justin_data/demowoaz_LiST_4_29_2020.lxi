@@ -47,3 +47,27 @@ E 6980 YESMAXOIL
 E 7385 YESZCUBE
 E 7790 YESFLOUR
 B 8034 Model Statistics    SOLVE nutrition Using MINLP From line 342
+B 8052 Solution Report     SOLVE nutrition Using MINLP From line 342
+B 8079 E x e c u t i o n
+I 8081 X
+I 8086 Y
+I 8091 Z
+I 8092 BEN
+I 8094 XCOV
+I 8099 XCOST
+I 8104 totalfunds
+I 8105 totalbenefits
+I 8108 finalcov
+I 8113 finalcost
+I 8117 covbau
+I 8122 costbau
+I 8127 covbauspace
+I 8132 costbauspace
+I 8138 costbaupc
+I 8139 costpc
+I 8140 tcovbau
+I 8141 tcostbau
+I 8142 tcovbauspace
+I 8143 tcostbauspace
+I 8145 finalcovspace
+I 8150 finalcostspace
