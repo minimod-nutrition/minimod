@@ -1,2 +1,73 @@
 B 3 C o m p i l a t i o n
-B 353 Include File Summary
+B 19 Include File Summary
+B 34 E x e c u t i o n
+I 34 k
+I 46 j
+I 51 t
+I 56 deathsaverted
+I 491 deathsavertedhigh
+I 926 deathsavertedcost
+I 1369 folate
+I 1396 cov
+I 1564 cov
+I 1733 totalbenefitsbau
+I 1734 totalbenefits2
+B 1738 Equation Listing    SOLVE nutrition Using MINLP From line 342
+D 1741 benefit
+D 2426 benefitconst
+D 2431 totcost
+D 2878 onesx
+D 3301 onesy
+D 3724 xcoveq
+D 3789 xcosteq
+D 3854 yescubeeq
+D 4097 yeszcubeeq
+D 4280 yesfloureq
+D 4584 yesoileq
+D 4767 yesmaxoileq
+D 4950 allcubeeq
+D 5015 allzcubeeq
+D 5080 allfloureq
+D 5145 alloileq
+D 5210 allmaxoileq
+D 5275 alloileq2
+D 5340 allmaxoileq2
+D 5405 allcubeeq2
+D 5470 allzcubeeq2
+B 5536 Column Listing      SOLVE nutrition Using MINLP From line 342
+E 5539 X
+E 5723 Y
+E 5847 XCOST
+E 6001 XCOV
+E 6155 Z
+E 6162 BEN
+E 6170 YESCUBE
+E 6575 YESOIL
+E 6980 YESMAXOIL
+E 7385 YESZCUBE
+E 7790 YESFLOUR
+B 8034 Model Statistics    SOLVE nutrition Using MINLP From line 342
+B 8052 Solution Report     SOLVE nutrition Using MINLP From line 342
+B 8079 E x e c u t i o n
+I 8081 X
+I 8086 Y
+I 8091 Z
+I 8092 BEN
+I 8094 XCOV
+I 8099 XCOST
+I 8104 totalfunds
+I 8105 totalbenefits
+I 8108 finalcov
+I 8113 finalcost
+I 8117 covbau
+I 8122 costbau
+I 8127 covbauspace
+I 8132 costbauspace
+I 8138 costbaupc
+I 8139 costpc
+I 8140 tcovbau
+I 8141 tcostbau
+I 8142 tcovbauspace
+I 8143 tcostbauspace
+I 8145 finalcovspace
+I 8150 finalcostspace

@@ -2,30 +2,27 @@ import mip
 
 class BAUConstraintCreator:
     
-    def __init__(self, other, sense):
-        
-        self.other = other
-        
-        if sense == mip.MINIMIZE:
-            self.discounted_variable = 'discounted_benefits'
-        elif sense == mip.MAXIMIZE:
-            self.discounted_variable = 'discounted_costs'
+    def __init__(self):
+        pass
     
-    def bau_df(self):
+    def bau_df(self, data, constraint, discounted_variable = None):
         
-        df = (self.other._df
-         .loc[(self.other.minimum_benefit, 
+        if discounted_variable is None:
+            discounted_variable = data.columns
+        
+        df = (data
+         .loc[(constraint, 
                slice(None), 
-               slice(None)),:][self.discounted_variable]
+               slice(None)),:][discounted_variable]
          )
         
         return df
         
     
-    def create_bau_constraint(self):
+    def create_bau_constraint(self, data, constraint, discounted_variable):
         
         minimum_constraint = (
-            self.bau_df()
+            self.bau_df(data, constraint, discounted_variable)
             .sum()
         )
         

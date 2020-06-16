@@ -218,10 +218,10 @@ class OptimizationSummary:
             intervention_specific = slice(None)
 
         if across_space:
-            grouper.append(self.model._space)
+            grouper.append(self.model.space_col)
 
         if over_time:
-            grouper.append(self.model._time)
+            grouper.append(self.model.time_col)
 
         summary_data = (data
                         .loc[(intervention_specific, slice(None), slice(None)), :]

@@ -3,9 +3,6 @@ from minimod.utils.exceptions import (
     MissingData,
     NotPandasDataframe,
     MissingOptimizationMethod,
-    NoVars,
-    NoConstraints,
-    NoObjective,
 )
 
 from minimod.version import __version__
@@ -15,6 +12,7 @@ from minimod.utils.plotting import Plotter
 from minimod.utils.suppress_messages import suppress_stdout_stderr
 
 from minimod.base.bau_constraint import BAUConstraintCreator
+from minimod.base.model import Model
 
 import matplotlib.pyplot as plt
 
@@ -29,72 +27,116 @@ import matplotlib.gridspec as gridspec
 
 
 class BaseSolver:
-    """The BaseSolver instance from which the CostSolver and BenefitSolver classes are made.
-    
-    Raises:
-        MissingData: Data not defined
-        NotPandasDataframe: Data that is input is not a pandas dataframe
-        NoVars: Variables not defined
-        NoConstraints: No Constraints Defined
-        NoObjective: No Objective Function Defined
-    
-    Returns:
-        BaseSolver Instance -- An instance of BaseSolver that starts a `mip` model instance 
-    """
 
     def __init__(
         self,
+        data,
+        benefit_col = 'benefits',
+        cost_col = 'costs',
+        intervention_col = 'intervention',
+        space_col = 'space',
+        time_col = 'time',
+        all_time=None, 
+        all_space=None, 
+        time_subset = None, 
+        space_subset = None,
+        strict = False,
         interest_rate_cost=0.0,  # Discount factor for costs
         interest_rate_benefit=0.03,  # Discount factor for benefits 
         va_weight=1.0,  # VA Weight
         sense=None,  # MIP optimization type (maximization or minimization)
         solver_name=mip.CBC,  # Solver for MIP to use
-        show_output = True
-    ):
+        show_output = True,
+        benefit_title = "Benefits",
+    ):       
+        """The base solver for the Optimization. This sets up the basic setup of the model, which includes:
+        - data handling
+        - BAU constraint creation
+        - base model constraint creation
+
+        :param data: dataframe with benefits and cost data
+        :type data: pandas.DataFrame
+        :param benefit_col: benefit data column, defaults to 'benefits'
+        :type benefit_col: str, optional
+        :param cost_col: cost data column, defaults to 'costs'
+        :type cost_col: str, optional
+        :param intervention_col: intervention data column, defaults to 'intervention'
+        :type intervention_col: str, optional
+        :param space_col: space/region data column, defaults to 'space'
+        :type space_col: str, optional
+        :param time_col: time period data column, defaults to 'time'
+        :type time_col: str, optional
+        :param all_time: Whether to treat some interventions as being constrained in time. Coupled with ``time_subset`` to constrain some time periods to all time periods, defaults to None
+        :type all_time: list or iterable, optional
+        :param all_space: whether to treat some interventions as being constraint over space. Coupled with ``space_subset`` to constrain some regions to all regions, defaults to None
+        :type all_space: list or iterable, optional
+        :param time_subset: a subset of time periods in the ``data.time_col`` that are constrained to all other time periods.
+        For example, if ``time_subset = [1,2,3]``, you cannot choose time periods 4-10, without also choosing 1-3. defaults to None, which constrains all time periods to each other.
+        :type time_subset: list or iterable, optional
+        :param space_subset: a subset of regions in ``data.space_col`` that constrain to all other regions, defaults to None which constrains all regions to each other (national intervention).
+        :type space_subset: list or iterable, optional
+        :param strict: Whether to use strict string matching for time and space subsets or whether ``time_subset`` or ``space_subset`` should be treated as a string stub that an intervention should contain. 
+        :type strict: bool, optional
+        :param interest_rate_cost: interest rate of costs, defaults to 0.0
+        :type interest_rate_cost: float, optional
+        :param benefit_title: title for benefits to put in plots and reports, defaults to "Benefits"
+        :type benefit_title: str, optional
         
+        ``BaseSolver`` is inherited by ``CostSolver`` and ``BenefitSolver`` to then run optimizations.
+        """        
+                
         self.interest_rate_cost = interest_rate_cost
         self.interest_rate_benefit = interest_rate_benefit
         self.va_weight = va_weight
         self.discount_costs = 1 / (1 + self.interest_rate_cost)
         self.discount_benefits = 1 / (1 + self.interest_rate_benefit)
-
+        self.benefit_title = benefit_title
+        
         if sense is not None:
             self.sense = sense
         else:
             raise Exception("No Optimization Method was specified")
-
-        if solver_name is not None:
-
-            self.solver_name = solver_name
-        else:
-            raise Exception("No Solver name was specified.")
-
-        ## Tell the fitter whether to maximize or minimize
-        self.model = mip.Model(sense=self.sense, solver_name=solver_name)
-
-        self.show_output = show_output
-
-        if self.show_output:
-            self.model.verbose = 1
-        else:
-            self.model.verbose = 0
-        ## set tolerances based on GAMS tolerances
-        # primal tol -> infeas
-        # dual tol -> opt tol
-        # integer  tol -> integer_tol
-        self.model.opt_tol = 1e-07
-        self.model.infeas_tol = 1e-07
-        self.model.integer_tol = 1e-07
-
-        # # allowable gap/ optca -> max_mip_gap_abs
-        # # ratioGap/ optcr -> max_mip_gap
-
-        self.model.max_mip_gap_abs = 0
-        self.model.max_mip_gap = 0.1
-
-        self.model.preprocess = 0
         
-        self.bau = BAUConstraintCreator(self, sense = self.sense)
+        self.solver_name = solver_name
+        self.show_output = show_output
+        
+        # Process Data
+        
+        if self.show_output:
+            print("[Note]: Processing Data...")
+
+        self._df = self._process_data(
+            data=data,
+            intervention=intervention_col,
+            space=space_col,
+            time=time_col,
+            benefits=benefit_col,
+            costs=cost_col,
+        )
+        
+        self.model = Model(data = self._df, sense = sense, solver_name=self.solver_name, show_output=self.show_output)
+        
+        self.benefit_col = benefit_col
+        self.cost_col = cost_col
+        self.intervention_col = intervention_col
+        self.space_col = space_col
+        self.time_col = time_col
+        
+        if self.show_output:
+            print("[Note]: Creating Base Model with constraints")
+            
+        self.bau = BAUConstraintCreator()
+
+        ## Create base model
+        self.model.base_model_create(intervention_col, 
+                                    space_col, 
+                                    time_col, 
+                                    all_time=all_time, 
+                                    all_space=all_space, 
+                                    time_subset = time_subset, 
+                                    space_subset = space_subset,
+                                    strict = strict)
+        
 
         print(
             f"""
@@ -106,8 +148,30 @@ class BaseSolver:
               
               """
         )
+        
+    def _discounted_sum_all(self, data):
+        """Multiply each ``mip_var`` in the data by benefits or costs (``data``) and then create a ``mip`` expression from it.
+
+        :param data: dataset of benefits and costs
+        :type data: pandas.DataFrame
+        :return: ``mip`` Expression
+        :rtype: ``mip.LinExpr``
+        """        
+
+        eq = mip.xsum(
+            self._df["mip_vars"].loc[k, j, t] * data[k, j, t]
+            for (k, j, t) in self._df.index.values
+        )
+
+        return eq
 
     def _is_dataframe(self, data):
+        """Checks if input dataset if a ``pandas.DataFrame``
+
+        :param data: input data
+        :type data: anything
+        :raises NotPandasDataframe: Exception if not a ``pandas.DataFrame``
+        """        
 
         if not isinstance(data, pd.DataFrame):
             raise NotPandasDataframe(
@@ -123,11 +187,23 @@ class BaseSolver:
         benefits="benefits",
         costs="costs",
     ):
-        """This method processes the data and gets it ready to be used in the problem
-            
-        Arguments:
-        data {pandas dataframe} -- A pandas dataframe with columns for each time period and a column for regions or whatever spatial dimension is used. The rows for each time period should give the benefits of each intervention at time t, and space j
+        """Processes the input data by creating discounted benefits and costs.
+
+        :param data: data, defaults to None
+        :type data: pandas.DataFrame, optional
+        :param intervention: intervention column, defaults to "intervention"
+        :type intervention: str, optional
+        :param space: space/region column, defaults to "space"
+        :type space: str, optional
+        :param time: time period column, defaults to "time"
+        :type time: str, optional
+        :param benefits: benefits column, defaults to "benefits"
+        :type benefits: str, optional
+        :param costs: cost column, defaults to "costs"
+        :type costs: str, optional
         
+        This method processes the data and gets it ready to be used in the problem
+
         |k     | j   |t   | benefits   | costs |
         |------|-----|----|------------|-------|
         |maize |north|0   | 100        | 10    |
@@ -135,8 +211,6 @@ class BaseSolver:
         |maize |east |0   | 30         |30     |
         |maize |west |0   | 20         |40     |
         
-    Raises:
-        MissingColumn: If a column is not included, it raises the missing column exception
         """
 
         ## First do some sanity checks
@@ -169,7 +243,7 @@ class BaseSolver:
         """To be overridden by BenefitSolver and CostSolver classes.
         This defines the constraints for the mips model.
         """
-        pass
+        self.constraint_called = 0
 
     def _objective(self):
         """To be overridden by BenefitSolver and CostSolver classes.
@@ -177,330 +251,51 @@ class BaseSolver:
         """
         pass
 
-    def _discounted_sum_all(self, data):
 
-        eq = mip.xsum(
-            self._df["mip_vars"].loc[k, j, t] * data[k, j, t]
-            for (k, j, t) in self._df.index.values
-        )
 
-        return eq
-
-    def _stringify_tuple(self, tup):
-        
-        strings= [str(x) for x in tup]
-        
-        stringified = ''.join(strings)
-        
-        return stringified
-
-    def _model_var_create(self):
-
-        self._df["mip_vars"] = self._df.apply(
-            lambda x: self.model.add_var(var_type=mip.BINARY, name= f"x_{self._stringify_tuple(x.name)}"), axis=1
-        )
-
-    def _base_constraint(self):
-
-        base_constrs = (
-            self._df["mip_vars"].groupby([self._space, self._time]).agg(mip.xsum).values
-        )
-
-        for constr in base_constrs:
-
-            self.model += constr <= 1
-
-    def _intervention_subset(self, intervention, subset_names=[]):
-
-        subset_dict = {}
-
-        for i in subset_names:
-            subset_dict[i] = self._df.loc[
-                lambda df: df.index.get_level_values(level=intervention).str.contains(i, case = False)
-            ]
-            
-            if subset_dict[i].empty:
-                raise Exception(f"'{i}' not found in dataset.")
-
-        return subset_dict
-
-    def _all_constraint(
-        self,
-        intervention=None,
-        group_index=None,
-        subset_names=None,
-        over = None,
-        subset_list=slice(None),
-    ):
-
-        subset_dict = self._intervention_subset(intervention, subset_names=subset_names)
-        
-        all_indices = group_index + [over]
-
-        for sub in subset_dict.keys():
-            
-            mip_vars_all = subset_dict[sub]["mip_vars"]
-
-            mip_vars_subset = (subset_dict[sub]["mip_vars"]
-                            .reset_index()
-                            .set_index(over)
-                            .loc[subset_list]
-                            .reset_index()
-                            .set_index(all_indices)
-                            )            
-
-            # Now we group by the variables we aren't doing the constraints for
-            grouped_mip = (
-                mip_vars_subset.groupby(group_index)
-                .agg(lambda x: list(x))
-                .rename({"mip_vars": "constraining_var"}, axis="columns")
-            )
-
-            grouped_subset = (
-                mip_vars_all.reset_index()
-                .set_index(group_index)
-                .merge(grouped_mip, left_index=True, right_index=True)[
-                    ["mip_vars", "constraining_var"]
-                ]
-            )
-
-            for _, mip_var, constraining_var in grouped_subset.itertuples():
-
-                for cv in constraining_var:
-                    if str(cv) != str(mip_var):
-                        self.model += mip_var == cv
-
-    def _all_space_constraint(
-        self, intervention=None, time=None, subset_names=None, over = None, subset_list=slice(None)
-    ):
-
-        return self._all_constraint(
-            intervention=intervention,
-            group_index=[intervention, time],
-            subset_names=subset_names,
-            over = over,
-            subset_list=subset_list
-        )
-
-    def _all_time_constraint(
-        self, intervention=None, space=None, subset_names=None, over = None, subset_list=slice(None)
-    ):
-
-        return self._all_constraint(
-            intervention=intervention,
-            group_index=[intervention, space],
-            subset_names=subset_names,
-            over = over,
-            subset_list=subset_list
-        )
-
-    def get_constraint(self, name=None):
-        """Returns a constraint by its name. If no name is specified, returns all constraints
-        
-        Arguments:
-            name {str} -- a string corresponding to the name of the constraint
-        
-        Returns:
-            mip.Constr -- A `mip` constraint object
-        """
-
-        if name is None:
-            return self.model.constrs
-
-        else:
-            return self.model.constr_by_name(name)
-
-    def base_model_create(self, all_time=None, all_space=None, **kwargs):
-
-        ## Now we create the choice variable, x, which is binary and is the size of the dataset.
-
-        ## In this case, it should just be a column vector with the rows equal to the data:
-
-        self._model_var_create()
-
-        ## Now write the objective function
-        self._objective()
-
-        ## First add base constraint, which only allows one intervention per time and space
-        self._base_constraint()
-
-        ## Add all_space or all_time constraints if necessary
-        if all_time is not None:
-
-            intervention = kwargs.get("intervention")
-            space = kwargs.get("space")
-            time = kwargs.get('time')
-            time_subset = kwargs.get("time_subset")
-
-            if intervention is None or space is None:
-                raise Exception("One of the subset columns were not found")
-
-            self._all_time_constraint(
-                intervention=intervention,
-                space=space,
-                subset_names=all_time,
-                over = time,
-                subset_list=time_subset,
-            )
-
-        if all_space is not None:
-
-            intervention = kwargs.get("intervention")
-            time = kwargs.get("time")
-            space = kwargs.get('space')
-            space_subset = kwargs.get("space_subset")
-
-            if intervention is None or time is None:
-                raise Exception("One of the subset columns were not found")
-
-            self._all_space_constraint(
-                intervention=intervention,
-                time=time,
-                subset_names=all_space,
-                over = space,
-                subset_list=space_subset,
-            )
-
-        ## Now add solver-specific constraints to the model
-        self._constraint()
-
-    def optimize(self, **kwargs):
-
-        self.status = None
-
-        if self.model.num_cols == 0:
-            raise NoVars("No Variables added to the model")
-        if self.model.num_rows == 0:
-            raise NoConstraints("No constraints added to the model.")
-        try:
-            self.model.objective
-        except Exception:
-            raise NoObjective("No Objective added to the model")
-
-        # Now, allow for arguments to the optimize function to be given:
-
-        max_seconds = kwargs.pop("max_seconds", mip.INF)
-        max_nodes = kwargs.pop("max_nodes", mip.INF)
-        max_solutions = kwargs.pop("max_solutions", mip.INF)
+    def _fit(self, **kwargs):
+        """Fits data to model. The instantiation of the class creates the base model. Uses ``mip.optimize`` to find the optimal point.
+        """        
 
         if self.show_output:
-            self.status = self.model.optimize(max_seconds, max_nodes, max_solutions)
-        else:
-            with suppress_stdout_stderr():
-                self.status = self.model.optimize(max_seconds, max_nodes, max_solutions)
-        if self.show_output:
-            if self.status == mip.OptimizationStatus.OPTIMAL:
-                print("[Note]: Optimal Solution Found")
-            elif self.status == mip.OptimizationStatus.FEASIBLE:
-                print("[Note]: Feasible Solution Found. This may not be optimal.")
-            elif self.status == mip.OptimizationStatus.NO_SOLUTION_FOUND:
-                print("[Warning]: No Solution Found")
-            elif self.status == mip.OptimizationStatus.INFEASIBLE:
-                print("[Warning]: Infeasible Solution Found")
-
-    def process_results(self, benefits, costs):
-
-        self.opt_df = self._df.copy(deep=True).assign(
-            opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.x),
-            opt_benefit=lambda df: df[benefits] * df["opt_vals"],
-            opt_costs=lambda df: df[costs] * df["opt_vals"],
-        )[["opt_vals", "opt_benefit", "opt_costs"]]
-
-    def _fit(
-        self,
-        data=None,
-        intervention="intervention",
-        space="space",
-        time="time",
-        benefits="benefit",
-        costs="costs",
-        all_space=None,
-        all_time=None,
-        space_subset=slice(None),
-        time_subset=slice(None),
-        clear=False,
-        benefit_title = "Effective Coverage",
-        **kwargs,
-    ):
-        """Fits the model that is created above using the sense provided by `self.sense`.
-        
-        Keyword Arguments:
-            data {pandas.DataFrame} -- A pandas dataframe (default: {None})
-            intervention {str} -- the column denoting the interventions (default: {"intervention"})
-            space {str} -- column denoting space/region (default: {"space"})
-            time {str} -- column denoting time period (default: {"time"})
-            benefits {str} -- column denoting benefits/effective coverage (default: {"benefit"})
-            costs {str} -- column denoting costs (default: {"costs"})
-            clear {bool} -- Clears the model (default: {False})
-        """
-
-        self._benefits = benefits
-        self._intervention = intervention
-        self._space = space
-        self._time = time
-
-        # Process Data
-        if self.show_output:
-            print("[Note]: Processing Data...")
-            print("[Note]: Creating Base Model with constraints")
             print("[Note]: Optimizing...")
 
-        self._df = self._process_data(
-            data=data,
-            intervention=intervention,
-            space=space,
-            time=time,
-            benefits=benefits,
-            costs=costs,
-        )
-
-        self.base_model_create(
-            all_space=all_space,
-            all_time=all_time,
-            intervention=intervention,
-            space=space,
-            time=time,
-            space_subset=space_subset,
-            time_subset=time_subset,
-        )
-        self.optimize()
-        self.process_results(benefits, costs)
+        self.model.optimize(**kwargs)  
         
-        self.objective_value = self.model.objective_value
-        self.objective_bound = self.model.objective_bound
-        self.num_solutions = self.model.num_solutions
-        self.num_cols = self.model.num_cols
-        self.num_rows = self.model.num_rows
-        self.num_int = self.model.num_int
-        self.num_nz = self.model.num_nz
+        self.opt_df = self.model.process_results(self.benefit_col, self.cost_col)
         
-        self.benefit_title = benefit_title
+        (self.objective_value,
+         self.objective_values, 
+         self.objective_bound, 
+         self.num_solutions, 
+         self.num_cols, 
+         self.num_rows, 
+         self.num_int, 
+         self.num_nz, 
+         self.status) = self.model.get_model_results()
         
-        if clear:
-            self.clear()
-
-    def clear(self):
-        self.model.clear()
-
     def write(self, filename="model.lp"):
+        
         self.model.write(filename)
 
     def report(self):
+        """Prints out a report of optimal model parameters and useful statistics.
+        """        
 
         header = [
             ('MiniMod Solver Results', ""),
             ("Method:" , str(self.sense)),
             ("Solver:", str(self.solver_name)),
             ("Optimization Status:", str(self.status)),
-            ("Number of Solutions Found:", str(self.model.num_solutions))
+            ("Number of Solutions Found:", str(self.num_solutions))
 
         ]
         
         features = [
-            ("No. of Variables:", str(self.model.num_cols)),
-            ("No. of Integer Variables:", str(self.model.num_int)),
-            ("No. of Constraints", str(self.model.num_rows)),
-            ("No. of Non-zeros in Constr.", str(self.model.num_nz))
+            ("No. of Variables:", str(self.num_cols)),
+            ("No. of Integer Variables:", str(self.num_int)),
+            ("No. of Constraints", str(self.num_rows)),
+            ("No. of Non-zeros in Constr.", str(self.num_nz))
         ]
         s = OptimizationSummary(self)
 
@@ -510,6 +305,15 @@ class BaseSolver:
                   fig = None, 
                   ax = None,
                   save = None):
+        """Plots optimal benefits and costs across time after model optimization
+
+        :param fig: matplotlib figure, defaults to None
+        :type fig: matplotlib.figure, optional
+        :param ax: matplotlib axis to use, defaults to None
+        :type ax: matplotlib.axis, optional
+        :param save: whether to save the figure, defaults to None
+        :type save:  str for file path, optional
+        """        
         
         p = Plotter(self)
         
@@ -551,6 +355,15 @@ class BaseSolver:
                           fig = None, 
                           ax = None, 
                           save = None):
+        """A histogram of the optimally chosen interventions
+
+        :param fig: figure instance to use, defaults to None
+        :type fig: matplotlib.figure, optional
+        :param ax: axis instance to use, defaults to None
+        :type ax: matplotlib.axis, optional
+        :param save: whether to save the figure, defaults to None
+        :type save: str of file path, optional
+        """        
         
         p = Plotter(self)
         
@@ -569,6 +382,23 @@ class BaseSolver:
                          map_df = None,
                          merge_key = None,
                          save = None):
+        """Creates a chloropleth map of the specified intervention and time period for the optimal variable. 
+        If more than one intervention is specified, then aggregates them. If more than one time period is specified, then creates a subplots of len(time) and show each.
+
+        :param intervention: interventions to use, defaults to slice(None)
+        :type intervention: str or list, optional
+        :param time: time periods to plot, defaults to None
+        :type time: int or list, optional
+        :param optimum_interest: optimum variable to use. 
+        Options include: 'b' for optimal benefits, 'c' for optimal costs, and 'v' for optimal variable, defaults to 'b'
+        :type optimum_interest: str, optional
+        :param map_df: geopandas dataframe with geometry information, defaults to None
+        :type map_df: geopandas.GeoDataFrame, optional
+        :param merge_key: key to merge on to geo dataframe, defaults to None
+        :type merge_key: str or list, optional
+        :param save: whether to save the figure, defaults to None
+        :type save: str of file path, optional
+        """        
         
         p = Plotter(self)
                 
@@ -602,6 +432,17 @@ class BaseSolver:
                                 title = None,
                                 intervention_subset = slice(None),
                                 save = None):
+        """Shows Optimal level of benefits or costs in a grouped bar plots for every optimally chosen variable across regions.
+
+        :param data_of_interest: variable to show, defaults to 'benefits'
+        :type data_of_interest: str, optional
+        :param title: title for resulting plot, defaults to None
+        :type title: str, optional
+        :param intervention_subset: subset of interventions to show on bar plot, defaults to slice(None)
+        :type intervention_subset: str ot list, optional
+        :param save: whether to save the figure, defaults to None
+        :type save: str of filepath, optional
+        """        
         
         p = Plotter(self)
             
@@ -610,8 +451,8 @@ class BaseSolver:
         elif data_of_interest == 'costs':
             col_of_interest = 'opt_costs'
         
-        p._plot_grouped_bar(intervention_col= self._intervention,
-                            space_col = self._space,
+        p._plot_grouped_bar(intervention_col= self.intervention_col,
+                            space_col = self.space_col,
                             col_of_interest= col_of_interest,
                             ylabel = "Optimal Level",
                             intervention_subset= intervention_subset,
@@ -630,6 +471,29 @@ class BaseSolver:
                            merge_key = None,
                            save = None,
                            ):
+        """Maps the the optimal level on a map against a benchmark, optionally the BAU level chosen from ``minimum_benefit`` or ``total_funds``.
+
+        :param intervention: interventions to map, defaults to slice(None)
+        :type intervention: list, optional
+        :param time: time periods to map, defaults to None
+        :type time: list, optional
+        :param optimum_interest: which optimal value to use. Options include 'b' (benefits), 'c' (costs), 'v' (variables), defaults to 'b'
+        :type optimum_interest: str, optional
+        :param data_bench: data to use for benchmark mapping, defaults to None
+        :type data_bench: pandas.DataFrame, optional
+        :param bench_intervention: interventions to use for benchmark, defaults to None
+        :type bench_intervention: list, optional
+        :param bench_col: column to use for benchmark, defaults to None
+        :type bench_col: str, optional
+        :param bench_merge_key: merge key for bench_df, defaults to None
+        :type bench_merge_key: list, optional
+        :param map_df: geo dataframe with geometry data, defaults to None
+        :type map_df: geopandas.GeoDataFrame, optional
+        :param merge_key: key to merge data from opt_df to geo dataframe, defaults to None
+        :type merge_key: str or list, optional
+        :param save: whether to save the figure, defaults to None
+        :type save: str of file path, optional
+        """        
         
         fig = plt.figure()
         

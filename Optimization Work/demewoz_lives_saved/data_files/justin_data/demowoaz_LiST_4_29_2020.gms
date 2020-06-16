@@ -36,28 +36,28 @@ folate(k,j,t)              Deaths Averted for Folate
 * As a general rule, you should use one gdx file for each spreadsheet (keeps things clean)
 
 * Input LiST results to nutrition interventions
-$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsaverted.gdx index=Indexdeathsaverted!A2"
+*$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsaverted.gdx index=Indexdeathsaverted!A2"
 $gdxin Cameroon_deathsaverted.gdx
 $load k j DEATHSAVERTED
 option deathsaverted:3:1:1 ;
 display k, j, t, deathsaverted ;
 
 * Input LiST results to nutrition interventions
-$call "gdxxrw input=benefits_zincVAfolate_demwoaz_high.xlsx output=Cameroon_deathsavertedhigh.gdx index=Indexdeathsavertedhigh!A2"
+*$call "gdxxrw input=benefits_zincVAfolate_demwoaz_high.xlsx output=Cameroon_deathsavertedhigh.gdx index=Indexdeathsavertedhigh!A2"
 $gdxin Cameroon_deathsavertedhigh.gdx
 $load DEATHSAVERTEDHIGH
 option deathsavertedhigh:3:1:1 ;
 display deathsavertedhigh ;
 
 * Input cost results to nutrition interventions
-$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsavertedcost.gdx index=Indexdeathsavertedcost!A2"
+*$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsavertedcost.gdx index=Indexdeathsavertedcost!A2"
 $gdxin Cameroon_deathsavertedcost.gdx
 $load DEATHSAVERTEDCOST
 option deathsavertedcost:3:1:1 ;
 display deathsavertedcost ;
 
 * Input cost results to nutrition interventions
-$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_folate.gdx index=Indexfolate!A2"
+*$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_folate.gdx index=Indexfolate!A2"
 $gdxin Cameroon_folate.gdx
 $load FOLATE
 option folate:3:1:1 ;
@@ -317,6 +317,26 @@ allmaxoileq2(j,t2,tt)..      yesmaxoil(j,tt) =e=yesmaxoil(j,t2) ;
 allcubeeq2(j,t2,tt)..        yescube(j,tt) =e=yescube(j,t2) ;
 allzcubeeq2(j,t2,tt)..       yeszcube(j,tt) =e=yeszcube(j,t2) ;
 
+
+
+file lives_saved_low /lives_saved_low.csv/;
+lives_saved_low.pc = 5;
+put lives_saved_low;
+put "intervention", "space", "time", "lives_saved" /;
+loop((k,j,t),
+     put k.tl, j.tl, t.tl, cov(k,j,t) /
+);
+putclose;
+
+file costs_low /costs_low.csv/;
+costs_low.pc = 5;
+put costs_low;
+put "intervention", "space", "time", "costs" /;
+loop((k,j,t),
+     put k.tl, j.tl, t.tl, cost(k,j,t) /
+);
+putclose;
+
 Model nutrition /all/ ;
 option minlp=BONMIN ;
 Solve nutrition using minlp minimizing z ;
@@ -371,6 +391,9 @@ finalcovspace, finalcostspace;
 * OUTPUT: after the run, open the following .txt file.
 * It can be cut+pasted to excel for easy comparison between runs
 * (do a text-to-columns with semicolon as the separator)
+
+
+
 file tablput20_4bk /table1.txt/;
 put tablput20_4bk ;
 

@@ -6,7 +6,7 @@ __pycache__/
 
 *.png
 reports/source/*.png
-*.csv
+# *.csv
 *.xls
 *.xlsx
 *.xlsx#
@@ -14,8 +14,15 @@ reports/source/*.png
 .idea/*
 # C extensions
 *.so
-*.png
-
+*.json
+*.log~1
+*.log~2
+*.log~3
+*.lst
+*.lxi
+*.dat
+*.cmd
+*.txt
 reports/source/_codebraid/
 
 # Distribution / packaging
