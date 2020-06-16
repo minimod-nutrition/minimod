@@ -1344,9 +1344,6 @@ tcov("capMNPoilcube",j,t)=0;
 
 Variables
 X(k,j,t)      QUANTITY OF VA INTERVENTION ZErO OR ONE
-Y(k,j,t)      QUANTITY OF VA INTERVENTION ZERO OR ONE
-W(k,j,t)      QUANTITY OF VA INTERVENTION ZERO OR ONE
-V(k,j,t)      QUANTITY OF VA INTERVENTION ZERO OR ONE
 XCOST         TOTAL COST FOR X VARIABLE INTERVENTIONS
 XCOV1          TOTAL COVERAGE FOR X VARIABLE INTERVENTIONS
 XCOV2          TOTAL COVERAGE FOR X VARIABLE INTERVENTIONS
@@ -1500,42 +1497,19 @@ allcubeeq8(j,t2,tt)    equation forcing cube to be either 1 or 0 in all time
 *xcoveq4(k,j,t) ..        XCOV4(k,j,t)=e=(tcovnone(k,j,t))*v(k,j,t);
 *xcoveq(k,j,t)  ..        XCOV(k,j,t)=e=tcovnone(k,j,t)*x(k,j,t)+fdeathsaverted(j,t,k)*y(k,j,t);
 *xcoveq(k,j,t) ..         XCOV(k,j,t)=e=XCOV1(k,j,t)+XCOV2(k,j,t)+XCOV3(k,j,t);
-xcoveq(k,j,t) ..       XCOV(k,j,t)=e=vawght*(alphakids*tcov(k,j,t)+betawra*tcovwra(k,j,t))*x(k,j,t)+
-                                 zincwght*(zinckidwght*tcovzinc(k,j,t)+zincwrawght*tcovzincwra(k,j,t))*y(k,j,t)+ironwght*(ironkidwght*tcoviron(k,j,t)+ironwrawght*tcovironwra(k,j,t))*x(k,j,t)
+xcoveq(k,j,t) ..       XCOV(k,j,t)=e=vawght*(alphakids*tcov(k,j,t)+betawra*tcovwra(k,j,t))*x(k,j,t)+ironwght*(ironkidwght*tcoviron(k,j,t)+ironwrawght*tcovironwra(k,j,t))*x(k,j,t)
                                  +folatewght*(folatekidwght*tcovfolate(k,j,t)+folatewrawght*tcovfolatewra(k,j,t))*x(k,j,t)+b12wght*(b12kidwght*tcovb12(k,j,t)*x(k,j,t)
                                  +b12wrawght*tcovb12wra(k,j,t))*x(k,j,t);
 *xcosteq(k,j,t) ..        XCOST(k,j,t)=e=tcost(k,j,t)*x(k,j,t)+tcostfolate(k,j,t)*y(k,j,t);
-xcosteq(k,j,t) ..      XCOST(k,j,t)=e=vawght*tcost(k,j,t)*x(k,j,t)+zincwghtc*tcostzinc(k,j,t)*y(k,j,t)+ironwght*tcostiron(k,j,t)*x(k,j,t)
-                                 +folatewght*tcostfolate(k,j,t)*x(k,j,t)+b12wght*tcostb12(k,j,t)*x(k,j,t)-vawght*zincwghtc*tcostzinc("mnp",j,t)*y(k,j,t)$mnpzinck(k);
+xcosteq(k,j,t) ..      XCOST(k,j,t)=e=vawght*tcost(k,j,t)*x(k,j,t)+ironwght*tcostiron(k,j,t)*x(k,j,t)+folatewght*tcostfolate(k,j,t)*x(k,j,t)+b12wght*tcostb12(k,j,t)*x(k,j,t);
 benefit ..             BEN=e=sum(t,GAMMA(t)*(sum((k,j),XCOV(k,j,t))));
-*benefitfirst3(t2) ..   BENFIRST3(t2)=e=sum(t,GAMMA(t2)*(sum((k,j),XCOV(k,j,t2))));
-*benefitva ..           BENVA=e=sum(t,GAMMA(t)*(sum((k,j),vawght*(alphakids*tcov(k,j,t)+betawra*tcovwra(k,j,t))*x(k,j,t))));
-*benefitvakids ..       BENVAKIDS=e=sum(t,GAMMA(t)*(sum((k,j),vawght*(alphakids*tcov(k,j,t))*x(k,j,t))));
-*cost ..                Z=e=sum(t,BETA(t)*(sum((k,j),XCOST(k,j,t))+sum(j,tcostfolate("flour",j,t)))) ;
+
 cost ..                Z=e=sum(t,BETA(t)*(sum((k,j),XCOST(k,j,t)))) ;
 
-* Constraints:
-* Equity changes space
-*benefitspace(j) ..          BENSPACE(j)=e=sum(t,GAMMA(t)*(sum((k),XCOV(k,j,t)))) ;
-*benefitconstspace(j) ..     BENSPACE(j)=g=totalbenefitsbau2(j);
-
-* Equity changes time
-*benefittime(t) ..          BENTIME(t)=e=sum(j,GAMMA(t)*(sum((k),XCOV(k,j,t)))) ;
-*benefitconsttime(t) ..     BENTIME(t)=g=totalbenefitsbau3(t);
-
-* Equity changes space/time
-*benefitspacetime(j,t) ..          BENSPACETIME(j,t)=e=GAMMA(t)*(sum((k),XCOV(k,j,t))) ;
-*benefitconstspacetime(j,t) ..     BENSPACETIME(j,t)=g=totalbenefitsbau4(j,t);
-
 benefitconst ..         BEN=g=totalbenefits2;
-*benefitconst ..        BEN=g=sum(t,BENTIME(t));
-*benefitconstva ..      BENVA=g=totalbenefitsbauva;
-*benefitconstvakids ..  BENVAKIDS=g=totalbenefitsbauvakids;
-*benconstfirst3(t2) ..  BENFIRST3(t2)=g=totalbenefitsbau3(t2);
+
 onesx(j,t)..           sum(k,x(k,j,t))=l=1;
-onesy(j,t)..           sum(k,y(k,j,t))=l=1;
-*onesw(j,t)..           sum(k,w(k,j,t))=l=1;
-*oneswxy(j,t)..         sum(k,x(k,j,t)+y(k,j,t)+w(k,j,t)+v(k,j,t))=l=1;
+
 
 
 * equations checking if there is maize, flour, oil and cube anywhere:
@@ -1544,24 +1518,21 @@ yescubeeq(j,t)..       yescube(j,t) =e= sum((cubek),x(cubek,j,t)) ;
 yesmaizeeq(j,t)..      yesmaize(j,t) =e= sum((maizek),x(maizek,j,t)) ;
 yesdweq(j,t)..         yesdw(j,t) =e= sum((dwk),x(dwk,j,t)) ;
 yescapeq(j,t)..        yescap(j,t) =e= sum((capk),x(capk,j,t)) ;
-yeszinccubeeq(j,t)..   yeszinccube(j,t) =e= sum((zinccubek),y(zinccubek,j,t)) ;
+yeszinccubeeq(j,t)..   yeszinccube(j,t) =e= sum((zinccubek),x(zinccubek,j,t)) ;
 yesfloureq(j,t)..      yesflour(j,t) =e= sum((flourk),y(flourk,j,t)) ;
-yesfolatefloureq(j,t)..yesfolateflour(j,t) =e= sum((folateflourk),y(folateflourk,j,t)) ;
-yesfolatecubeeq(j,t).. yesfolatecube(j,t) =e= sum((folatecubek),y(folatecubek,j,t)) ;
+yesfolatefloureq(j,t)..yesfolateflour(j,t) =e= sum((folateflourk),x(folateflourk,j,t)) ;
+yesfolatecubeeq(j,t).. yesfolatecube(j,t) =e= sum((folatecubek),x(folatecubek,j,t)) ;
 yesb12floureq(j,t)..   yesb12flour(j,t) =e= sum((b12flourk),x(b12flourk,j,t)) ;
 yesb12cubeeq(j,t)..    yesb12cube(j,t) =e= sum((b12cubek),x(b12cubek,j,t)) ;
 yesironfloureq(j,t)..  yesironflour(j,t) =e= sum((ironflourk),x(ironflourk,j,t)) ;
 yesironcubeeq(j,t)..   yesironcube(j,t) =e= sum((ironcubek),x(ironcubek,j,t)) ;
 yesmnpeq(j,t)..        yesmnpx(j,t) =e= sum((mnpk),x(mnpk,j,t)) ;
-yesmnpeq2(j,t)..       yesmnpy(j,t) =e= sum((mnpk),y(mnpk,j,t)) ;
 
 * equations forcing there to be maize, oil, or cube everywhere if it is anywhere:
-allnooileq(j,jj,t)..         yesoil(j,t)+yesdw(j,t) =l= 2;
 alloileq(j,jj,t)..           yesoil(j,t) =e= yesoil(jj,t) ;
 allcubeeq(j,jj,t)..          yescube(j,t) =e= yescube(jj,t) ;
 allmaizeeq(j,jj,t)..         yesmaize(j,t) =e= yesmaize(jj,t) ;
 alldweq(j,jj,t)..            yesdw(j,t) =e= yesdw(jj,t) ;
-allzinccubeeq(j,jj,t)..      yeszinccube(j,t) =e= yeszinccube(jj,t) ;
 allb12cubeeq(j,jj,t)..       yesb12cube(j,t) =e= yesb12cube(jj,t) ;
 allironcubeeq(j,jj,t)..      yesironcube(j,t) =e= yesironcube(jj,t) ;
 allfloureq(j,jj,t)..         yesflour(j,t) =e= yesflour(jj,t) ;
@@ -1575,7 +1546,6 @@ allzinccubeeq2(j,t2,tt)..    yeszinccube(j,tt) =e= yeszinccube(j,t2) ;
 allb12cubeeq2(j,t2,tt)..     yesb12cube(j,tt) =e= yesb12cube(j,t2) ;
 allironcubeeq2(j,t2,tt)..    yesironcube(j,tt) =e= yesironcube(j,t2) ;
 allfolatecubeeq2(j,t2,tt)..  yesfolatecube(j,tt) =e= yesfolatecube(j,t2) ;
-*allb12floureq2(j,t2,tt)..    yesb12flour(j,tt) =e= yesb12flour(j,t2) ;
 allmaizeeq2(j,t2,tt)..       yesmaize(j,tt) =e= yesmaize(j,t2) ;
 
 yesoileq2(j,t)..        yesoil2(j,t) =e= sum((oilk),w(oilk,j,t)) ;

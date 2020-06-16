@@ -254,6 +254,10 @@ class OptimizationSummary:
             
             print(tabulate(table, tablefmt=self.table_fmt))
             
+    def print_df(self, data):
+        
+        print(tabulate(data, headers = data.columns, tablefmt=self.table_fmt))
+            
          
             
     

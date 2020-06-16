@@ -30,10 +30,6 @@ class MonteCarloMinimod:
         
         self.solver_type = solver_type
         
-        self.minimod = Minimod(solver_type = self.solver_type,
-                               show_output = False, 
-                               **kwargs)
-        
         self.dist = normal
     
         self.data = data.set_index([intervention_col, space_col, time_col])
@@ -74,7 +70,7 @@ class MonteCarloMinimod:
                     benefit_random_draw = lambda df: self.dist(df['weight_mean'], df['weight_sd'])
                     )
         )
-                
+        
         return df['benefit_random_draw']
     
     
@@ -116,8 +112,9 @@ class MonteCarloMinimod:
                         N = None,
                         all_space = None,
                         all_time = None,
-                        space_subset = slice(None),
-                        time_subset = slice(None),
+                        space_subset = None,
+                        time_subset = None,
+                        strict = False,
                         show_progress = True,
                         **kwargs):
         if N is None:
@@ -136,19 +133,23 @@ class MonteCarloMinimod:
                         
             df = self._merge_samples()
             
-            self.minimod.fit(data=df,
-                            intervention=self.intervention_col,
-                            space=self.space_col,
-                            time=self.time_col,
-                            benefits='benefit_random_draw',
-                            costs="cost_random_draw",
+            self.minimod = Minimod(solver_type = self.solver_type,
+                                   data=df,
+                            intervention_col=self.intervention_col,
+                            space_col=self.space_col,
+                            time_col=self.time_col,
+                            benefit_col='benefit_random_draw',
+                            cost_col="cost_random_draw",
                             all_space=all_space,
                             all_time=all_time,
                             space_subset=space_subset,
                             time_subset=time_subset,
-                            clear=True,
                             show_output = False,
+                            strict = strict,
+                            benefit_title = 'Effective Coverage',
                             **kwargs)
+            
+            self.minimod.fit()
             
             iteration_dict = {'status' : self.minimod.status,
                               'opt_objective' : self.minimod.objective_value,
@@ -156,7 +157,7 @@ class MonteCarloMinimod:
                               'num_vars' : self.minimod.num_cols,
                               'constraints' : self.minimod.num_rows,
                               'solutions' : self.minimod.num_solutions,
-                              'num_int' : self.minimod.model.num_int,
+                              'num_int' : self.minimod.num_int,
                               'num_nz' : self.minimod.num_nz,
                               'opt_df' : self.minimod.opt_df}
             
@@ -170,7 +171,12 @@ class MonteCarloMinimod:
         
         return pd.DataFrame(sim_dict).T
     
-    def report(self, avg_time = False, avg_space = False, perc_intervention_appeared = False):
+    def report(self, 
+               avg_time = False, 
+               avg_space = False, 
+               perc_intervention_appeared = False, 
+               show_percint_full = False,
+               intervention_group = None):
         
         perc_opt = self.sim_results['status'].value_counts(normalize=True)[0]*100
         avg = self.sim_results.mean()
@@ -237,7 +243,22 @@ class MonteCarloMinimod:
                 )
             
             s.print_generic([('Percentage Appeared in Simulations', '')])            
-            print(perc_int.to_markdown())
+            
+            if show_percint_full:
+                print(perc_int.to_markdown())
+            
+            if intervention_group is not None:
+                if isinstance(intervention_group, str):
+                    intervention_group = [intervention_group]
+                
+                s.print_generic([(f"% Appearance of:", '')])
+
+                for i in intervention_group:
+                    int_group = perc_int.loc[lambda df: df.index.str.contains(i)].sum()/perc_int.sum()
+                    s.print_generic([(f"{i}", f'{int_group}')])
+
+            
+            
             
         if avg_time:
             
@@ -329,7 +350,7 @@ class MonteCarloMinimod:
             iter_df = (
                 self.sim_results
                 .loc[i]['opt_df'][col_of_interest]
-                .groupby(self.minimod._time)
+                .groupby(self.minimod.time_col)
                 .sum()
             )
             
@@ -345,7 +366,7 @@ class MonteCarloMinimod:
         ax.set_title("Trajectories of all Simulations")
         
         if save is not None:
-            plt.savefig(save, dpi = self.dpi)
+            plt.savefig(save, dpi = 160)
         
 
         

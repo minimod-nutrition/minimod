@@ -4,7 +4,7 @@ import pandas as pd
 from minimod.utils.suppress_messages import suppress_stdout_stderr
 
 from minimod.utils.exceptions import NoVars, NoObjective, NoConstraints
-
+from itertools import combinations, permutations
 
 
 class Model:
@@ -36,17 +36,21 @@ class Model:
         # primal tol -> infeas
         # dual tol -> opt tol
         # integer  tol -> integer_tol
-        self.model.opt_tol = 1e-07
-        self.model.infeas_tol = 1e-07
-        self.model.integer_tol = 1e-07
+        self.model.opt_tol = 1e-10
+        self.model.infeas_tol = 1e-10
+        self.model.integer_tol = 1e-06
+        self.model.seed = 0
+        # self.model.clique = 0
 
-        # # allowable gap/ optca -> max_mip_gap_abs
-        # # ratioGap/ optcr -> max_mip_gap
+        # # # # allowable gap/ optca -> max_mip_gap_abs
+        # # # # ratioGap/ optcr -> max_mip_gap
 
         self.model.max_mip_gap_abs = 0
         self.model.max_mip_gap = 0.1
 
         self.model.preprocess = 0
+        self.model.lp_method = -1
+        self.cut_passes = 1
 
     def _stringify_tuple(self, tup):
 
@@ -66,35 +70,44 @@ class Model:
         )
 
     def _base_constraint(self, space, time):
+        
+        grouped_df = self._df["mip_vars"].groupby([space, time]).agg(mip.xsum)
 
-        base_constrs = self._df["mip_vars"].groupby([space, time]).agg(mip.xsum).values
+        base_constrs = grouped_df.values
 
-        for constr in base_constrs:
+        # Get constraint name
+        names = list(
+            map(
+                self._stringify_tuple,
+                grouped_df.index.to_list()
+            )
+        )
 
-            self.model += constr <= 1
+        for constr, name in zip(base_constrs, names):
+
+            self.model += constr <= 1, "ones_" + name
 
     def _intervention_subset(self, intervention, strict, subset_names=[]):
 
         subset_dict = {}
 
         for i in subset_names:
-            
+
             if strict:
                 subset_dict[i[0]] = self._df.loc[
                     lambda df: df.index.get_level_values(level=intervention).isin(i)
                 ]
-                
+
                 if subset_dict[i[0]].empty:
                     raise Exception(f"'{i[0]}' not found in dataset.")
 
-            
             else:
                 subset_dict[i] = self._df.loc[
-                    lambda df: df.index.get_level_values(level=intervention).str.contains(
-                        i, case=False
-                    )
+                    lambda df: df.index.get_level_values(
+                        level=intervention
+                    ).str.contains(i, case=False)
                 ]
-                
+
                 if subset_dict[i].empty:
                     raise Exception(f"'{i}' not found in dataset.")
 
@@ -104,69 +117,63 @@ class Model:
         self,
         strict,
         intervention=None,
-        group_index=None,
+        space=None,
+        time=None,
         subset_names=None,
         over=None,
-        subset_list=slice(None)
+        subset_list=None,
     ):
-        
-        if subset_list is None:
-            subset_list = slice(None)
 
-        subset_dict = self._intervention_subset(intervention = intervention, 
-                                                strict=strict,
-                                                subset_names=subset_names)
-
-        all_indices = group_index + [over]
-
+        subset_dict = self._intervention_subset(
+            intervention=intervention, strict=strict, subset_names=subset_names
+        )
         for sub in subset_dict.keys():
 
-            mip_vars_all = subset_dict[sub]["mip_vars"]
-
-            mip_vars_subset = (
-                subset_dict[sub]["mip_vars"]
-                .reset_index()
-                .set_index(over)
-                .loc[subset_list]
-                .reset_index()
-                .set_index(all_indices)
+            mip_vars_grouped_sum = (
+                subset_dict[sub].groupby([space, time])["mip_vars"].agg(mip.xsum)
             )
 
-            # Now we group by the variables we aren't doing the constraints for
-            grouped_mip = (
-                mip_vars_subset.groupby(group_index)
-                .agg(lambda x: list(x))
-                .rename({"mip_vars": "constraining_var"}, axis="columns")
-            )
+            if over == time:
+                slicer = space
+            elif over == space:
+                slicer = time
 
-            grouped_subset = (
-                mip_vars_all.reset_index()
-                .set_index(group_index)
-                .merge(grouped_mip, left_index=True, right_index=True)[
-                    ["mip_vars", "constraining_var"]
-                ]
-            )
+            unstacked = mip_vars_grouped_sum.unstack(level=slicer)
 
-            for _, mip_var, constraining_var in grouped_subset.itertuples():
+            if subset_list is None:
+                subset_list = unstacked.index
 
-                for cv in constraining_var:
-                    if str(cv) != str(mip_var):
-                        self.add_constraint(mip_var, cv, 'eq')
+            # get combinations of different choices
+            constraint_combinations = permutations(unstacked.index.tolist(), 2)
+
+            constraint_list = [
+                (i, j) for (i, j) in constraint_combinations if i in subset_list
+            ]
+
+            for col in unstacked.columns:
+                for (comb1, comb2) in constraint_list:
+                    self.add_constraint(
+                        unstacked[col].loc[comb1], unstacked[col].loc[comb2], 
+                        "eq",
+                        name = str(sub) + "_" + str(col) + "_" + str(comb1) + "_" + str(comb2)
+                    )
 
     def _all_space_constraint(
         self,
         strict,
         intervention=None,
+        space=None,
         time=None,
         subset_names=None,
         over=None,
-        subset_list=slice(None),
+        subset_list=None,
     ):
 
         return self._all_constraint(
             strict,
             intervention=intervention,
-            group_index=[intervention, time],
+            space=space,
+            time=time,
             subset_names=subset_names,
             over=over,
             subset_list=subset_list,
@@ -177,21 +184,23 @@ class Model:
         strict,
         intervention=None,
         space=None,
+        time=None,
         subset_names=None,
         over=None,
-        subset_list=slice(None),
+        subset_list=None,
     ):
 
         return self._all_constraint(
             strict,
             intervention=intervention,
-            group_index=[intervention, space],
+            space=space,
+            time=time,
             subset_names=subset_names,
             over=over,
             subset_list=subset_list,
         )
 
-    def get_constraint(self, name=None):
+    def get_equation(self, name=None, show=True):
         """Returns a constraint by its name. If no name is specified, returns all constraints
         
         Arguments:
@@ -203,32 +212,41 @@ class Model:
 
         if name is None:
             return self.model.constrs
+        elif name == 'objective':
+            if show:
+                return str(self.model.objective)
+            else:
+                return self.model.objective
         else:
-            return self.model.constr_by_name(name)
-        
-    def add_objective(self, eq):
-        
-        self.model.objective = eq
-        
-    def add_constraint(self, eq, constraint, way = 'ge'):
-        
-        if way == 'ge':
-            self.model += eq >= constraint
-        elif way == 'le':
-            self.model += eq <= constraint
-        elif way == 'eq':
-            self.model += eq == constraint
-        
+            if show:
+                return str(self.model.constr_by_name(name))
+            else:
+                return self.model.constr_by_name(name)
 
-    def base_model_create(self, 
-                          intervention, 
-                          space, 
-                          time, 
-                          all_time=None, 
-                          all_space=None, 
-                          time_subset = None, 
-                          space_subset = None,
-                          strict = False):
+    def add_objective(self, eq):
+
+        self.model.objective = eq
+
+    def add_constraint(self, eq, constraint, way="ge", name=""):
+
+        if way == "ge":
+            self.model += eq >= constraint, name
+        elif way == "le":
+            self.model += eq <= constraint, name
+        elif way == "eq":
+            self.model += eq == constraint, name
+
+    def base_model_create(
+        self,
+        intervention,
+        space,
+        time,
+        all_time=None,
+        all_space=None,
+        time_subset=None,
+        space_subset=None,
+        strict=False,
+    ):
 
         ## Now we create the choice variable, x, which is binary and is the size of the dataset.
         ## In this case, it should just be a column vector with the rows equal to the data:
@@ -248,6 +266,7 @@ class Model:
                 strict,
                 intervention=intervention,
                 space=space,
+                time=time,
                 subset_names=all_time,
                 over=time,
                 subset_list=time_subset,
@@ -261,6 +280,7 @@ class Model:
             self._all_space_constraint(
                 strict,
                 intervention=intervention,
+                space=space,
                 time=time,
                 subset_names=all_space,
                 over=space,
@@ -300,32 +320,42 @@ class Model:
                 print("[Warning]: No Solution Found")
             elif self.status == mip.OptimizationStatus.INFEASIBLE:
                 print("[Warning]: Infeasible Solution Found")
-                
+
     def process_results(self, benefit_col, cost_col):
 
         opt_df = self._df.copy(deep=True).assign(
             opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.x),
             opt_benefit=lambda df: df[benefit_col] * df["opt_vals"],
             opt_costs=lambda df: df[cost_col] * df["opt_vals"],
-            opt_costs_discounted = lambda df: df['discounted_costs'] * df["opt_vals"],
-            opt_benefit_discounted = lambda df: df['discounted_benefits']*df['opt_vals']
-        )[["opt_vals", "opt_benefit", "opt_costs", 'opt_costs_discounted', 'opt_benefit_discounted']]
-        
+            opt_costs_discounted=lambda df: df["discounted_costs"] * df["opt_vals"],
+            opt_benefit_discounted=lambda df: df["discounted_benefits"]
+            * df["opt_vals"],
+        )[
+            [
+                "opt_vals",
+                "opt_benefit",
+                "opt_costs",
+                "opt_costs_discounted",
+                "opt_benefit_discounted",
+            ]
+        ]
+
         return opt_df
-    
+
     def write(self, filename="model.lp"):
         self.model.write(filename)
-        
+
     def get_model_results(self):
-        
-        return (self.model.objective_value,
-                self.model.objective_values, 
-                self.model.objective_bound, 
-                self.model.num_solutions, 
-                self.model.num_cols, 
-                self.model.num_rows, 
-                self.model.num_int, 
-                self.model.num_nz,
-                self.status)
-        
-        
+
+        return (
+            self.model.objective_value,
+            self.model.objective_values,
+            self.model.objective_bound,
+            self.model.num_solutions,
+            self.model.num_cols,
+            self.model.num_rows,
+            self.model.num_int,
+            self.model.num_nz,
+            self.status,
+        )
+

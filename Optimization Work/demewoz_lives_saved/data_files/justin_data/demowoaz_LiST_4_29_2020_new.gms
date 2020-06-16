@@ -36,28 +36,28 @@ folate(k,j,t)              Deaths Averted for Folate
 * As a general rule, you should use one gdx file for each spreadsheet (keeps things clean)
 
 * Input LiST results to nutrition interventions
-*$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsaverted.gdx index=Indexdeathsaverted!A2"
+$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsaverted.gdx index=Indexdeathsaverted!A2"
 $gdxin Cameroon_deathsaverted.gdx
 $load k j DEATHSAVERTED
 option deathsaverted:3:1:1 ;
 display k, j, t, deathsaverted ;
 
 * Input LiST results to nutrition interventions
-*$call "gdxxrw input=benefits_zincVAfolate_demwoaz_high.xlsx output=Cameroon_deathsavertedhigh.gdx index=Indexdeathsavertedhigh!A2"
+$call "gdxxrw input=benefits_zincVAfolate_demwoaz_high.xlsx output=Cameroon_deathsavertedhigh.gdx index=Indexdeathsavertedhigh!A2"
 $gdxin Cameroon_deathsavertedhigh.gdx
 $load DEATHSAVERTEDHIGH
 option deathsavertedhigh:3:1:1 ;
 display deathsavertedhigh ;
 
 * Input cost results to nutrition interventions
-*$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsavertedcost.gdx index=Indexdeathsavertedcost!A2"
+$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_deathsavertedcost.gdx index=Indexdeathsavertedcost!A2"
 $gdxin Cameroon_deathsavertedcost.gdx
 $load DEATHSAVERTEDCOST
 option deathsavertedcost:3:1:1 ;
 display deathsavertedcost ;
 
 * Input cost results to nutrition interventions
-*$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_folate.gdx index=Indexfolate!A2"
+$call "gdxxrw input=benefits_zincVAfolate_demwoaz.xlsx output=Cameroon_folate.gdx index=Indexfolate!A2"
 $gdxin Cameroon_folate.gdx
 $load FOLATE
 option folate:3:1:1 ;
@@ -84,8 +84,6 @@ totalbenefits2           TOTAL BENEFITS
 totalbenefitsbau         TOTAL BENEFITS OF BAU*
 cost(k,j,t)              TOTAL COSTS
 cov(k,j,t)               COVERAGE MATRIX
-flour_north_1
-cube_cities_2
 ;
 
 * Computing discount rates for costs and benefits (may differ if interest rates differ)
@@ -101,7 +99,6 @@ totalfunds = totalfunds1*1;
 cov(k,j,t)         = deathsaverted(k,j,t) ;
 *cov(k,j,t)         = deathsavertedhigh(k,j,t) ;
 cost(k,j,t)        = deathsavertedcost(k,j,t) ;
-
 
 * DEFINE SUBSETSS OF NATIONAL AND SUBNATIONAL INTERVENTIONS
 *-------------------------------------------------------------------
@@ -155,7 +152,6 @@ set
             maxoilcubeclinicflourzcube /
 ;
 *Need to adjust all cube benefit interventions because input table has benefits for the first three years
-
 cov("cube",j,t2)=0                              ;
 cov("cubezcube",j,t2)=0                         ;
 cov("maxoilcube",j,t2)=cov("maxoil",j,t2) ;
@@ -220,10 +216,6 @@ cov(flourcubek,j,t)=cov(flourcubek,j,t)+folate("cubeflour",j,t) ;
 
 
 display cov ;
-flour_north_1 = cov("flour", "North", "1");
-cube_cities_2 = cov("cube", "Cities", "2");
-display flour_north_1;
-display cube_cities_2;
 
 
 totalbenefitsbau=sum(t,GAMMA(t)*(sum((j),cov("oilvasflour",j,t))));
@@ -231,219 +223,193 @@ totalbenefits2=percben*totalbenefitsbau ;
 
 display totalbenefitsbau, totalbenefits2 ;
 
-*Variables
-*X(k,j,t)      QUANTITY OF VA INTERVENTION ZERO OR ONE
-**Y(k,j,t)      QUANTITY OF VA INTERVENTION ZERO OR ONE
-*XCOST         TOTAL COST FOR X VARIABLE INTERVENTIONS
-*XCOV          TOTAL COVERAGE FOR X VARIABLE INTERVENTIONS
-*Z             TOTAL COSTS
-*BEN           TOTAL COVERAGE
-*YESCUBE(j,t)   equal to 1 if there is cube in j at t
-*YESOIL(j,t)    equal to 1 if there is oil in j at t
-*YESMAXOIL(j,t) equal to 1 if there is oil in j at t
-*YESZCUBE(j,t)  equal to 1 if there is zinc cube in j at t
-*YESFLOUR(j,t)  equal to 1 if there is flour in j at t
-*;
-*
-*Binary Variable X, Y;
-*
-** this is useful to refer to two regions within a single equation
-*alias (j,jj) ;
-*alias (t,tt) ;
-*
-*Equations
-*benefit                  TOTAL AMOUNT OF COVERAGE BENEFITS
-*benefitconst             TOTAL AMOUNT OF PEOPLE THAT MUST BENEFIT IN TOTAL
-*
-**fundconst                THE TOTAL AMOUNT OF FUNDING
-*totcost                  TOTAL COSTS FOR THE OPTIMAL INTERVENTIONS
-*onesx(j,t)               A CONSTRAINT ON THE NUMBER OF INTERVENTIONS THAT CAN BE CHOSEN FOR X VARIABLES INTERVENTIONS
-**onesy(j,t)               A CONSTRAINT ON THE NUMBER OF INTERVENTIONS THAT CAN BE CHOSEN FOR Y VARIABLES INTERVENTIONS
-*xcoveq(k,j,t)            THE AMOUNT OF COVERAGE FOR X
-*xcosteq(k,j,t)           THE AMOUNT OF COST FOR X
-*
-*** Equations that force national interventions to be in all regions:
-**yescubeeq(j,t)       equation defining yescube>0 if there is cube in j
-**yeszcubeeq(j,t)       equation defining yeszcube>0 if there is cube in j
-**yesfloureq(j,t)      equation defining yesflour>0 if there is flour in j
-**yesoileq(j,t)        equation defining yesoil>0 if there is oil in j
-**yesmaxoileq(j,t)     equation defining yesmaxoil>0 if there is maxoil in j
-**allcubeeq(j,jj,t)    equation forcing cube to be either 1 or 0 in all regions
-**allzcubeeq(j,jj,t)    equation forcing zinc cube to be either 1 or 0 in all regions
-**allfloureq(j,jj,t)   equation forcing flour to be either 1 or 0 in all regions
-**alloileq(j,jj,t)     equation forcing oil to be either 1 or 0 in all regions
-**allmaxoileq(j,jj,t)  equation forcing maxoil to be either 1 or 0 in all regions
-**alloileq2(j,t,tt)    equation forcing oil to be either 1 or 0 in all time periods
-**allmaxoileq2(j,t,tt) equation forcing maxoil to be either 1 or 0 in all time periods
-**allcubeeq2(j,t,tt)   equation forcing cube to be either 1 or 0 in all time periods
-**allzcubeeq2(j,t,tt)  equation forcing zcube to be either 1 or 0 in all time periods
-*
-*;
-*
-*
-** Coverage and cost:
-*xcoveq(k,j,t) ..       XCOV(k,j,t)=e=cov(k,j,t)*x(k,j,t);
-*xcosteq(k,j,t) ..      XCOST(k,j,t)=e=cost(k,j,t)*x(k,j,t);
-*benefit ..             BEN=e=sum(t,GAMMA(t)*(sum((k,j),XCOV(k,j,t))));
-*totcost ..             Z=e=sum(t,BETA(t)*(sum((k,j),XCOST(k,j,t)))) ;
-*
-** Constraints:
-** Equity changes space
-**benefitspace(j) ..          BENSPACE(j)=e=sum(t,GAMMA(t)*(sum((k),XCOV(k,j,t)))) ;
-**benefitconstspace(j) ..     BENSPACE(j)=g=totalbenefitsbau2(j);
-*
-** Equity changes time
-**benefittime(t) ..          BENTIME(t)=e=sum(j,GAMMA(t)*(sum((k),XCOV(k,j,t)))) ;
-**benefitconsttime(t) ..     BENTIME(t)=g=totalbenefitsbau3(t);
-*
-** Equity changes space/time
-**benefitspacetime(j,t) ..          BENSPACETIME(j,t)=e=GAMMA(t)*(sum((k),XCOV(k,j,t))) ;
-**benefitconstspacetime(j,t) ..     BENSPACETIME(j,t)=g=totalbenefitsbau4(j,t);
-*
-*benefitconst ..        BEN=g=totalbenefits2;
-*onesx(j,t)..           sum(k,x(k,j,t))=l=1;
-**onesy(j,t)..           sum(k,y(k,j,t))=l=1;
-*
-*
-** equations checking if there is flour, oil and cube anywhere:
-**yescubeeq(j,t)..       yescube(j,t) =e= sum((cubek),x(cubek,j,t)) ;
-**yeszcubeeq(j,t)..      yeszcube(j,t) =e= sum((zcubek),x(zcubek,j,t)) ;
-**yesfloureq(j,t)..      yesflour(j,t) =e= sum((flourk),x(flourk,j,t)) ;
-**yesoileq(j,t)..        yesoil(j,t) =e= sum((oilk),x(oilk,j,t)) ;
-**yesmaxoileq(j,t)..     yesmaxoil(j,t) =e= sum((maxoilk),x(maxoilk,j,t)) ;
-**
-*** equations forcing there to be oil or cube everywhere if it is anywhere:
-**allcubeeq(j,jj,t)..          yescube(j,t) =e= yescube(jj,t) ;
-**allzcubeeq(j,jj,t)..         yeszcube(j,t) =e= yeszcube(jj,t) ;
-**alloileq(j,jj,t)..           yesoil(j,t) =e= yesoil(jj,t) ;
-**allmaxoileq(j,jj,t)..        yesmaxoil(j,t) =e= yesmaxoil(jj,t) ;
-**allfloureq(j,jj,t)..         yesflour(j,t) =e= yesflour(jj,t) ;
-**
-*** equations forcing there to be cube, in all times if it at anytime:
-**alloileq2(j,t2,tt)..         yesoil(j,tt) =e=yesoil(j,t2) ;
-**allmaxoileq2(j,t2,tt)..      yesmaxoil(j,tt) =e=yesmaxoil(j,t2) ;
-**allcubeeq2(j,t2,tt)..        yescube(j,tt) =e=yescube(j,t2) ;
-**allzcubeeq2(j,t2,tt)..       yeszcube(j,tt) =e=yeszcube(j,t2)  ;
-*
-*
-**file lives_saved_low /lives_saved_low.csv/;
-**lives_saved_low.pc = 5;
-**put lives_saved_low;
-**put "intervention", "space", "time", "lives_saved" /;
-**loop((k,j,t),
-**     put k.tl, j.tl, t.tl, cov(k,j,t) /
-**);
-**putclose;
-**
-**file costs_low /costs_low.csv/;
-**costs_low.pc = 5;
-**put costs_low;
-**put "intervention", "space", "time", "costs" /;
-**loop((k,j,t),
-**     put k.tl, j.tl, t.tl, cost(k,j,t) /
-**);
-**putclose;
-*
-*Model nutrition /all/ ;
-*option minlp=BONMIN ;
-*Solve nutrition using minlp minimizing z ;
-*Display  x.l, z.l, ben.l, xcov.l, xcost.l, totalfunds, totalbenefits;
-*
-*Parameters
-*finalcov         Coverage per time period all
-*finalcost        Cost per time period
-*finalcovspace    Coverage per time period all
-*finalcostspace   Cost per time period
-*covbau           Coverage per time for BAU scenario
-*costbau          Cost per time for BAU scenario
-*covbauspace      Coverage per space for BAU scenario
-*costbauspace     Cost per space for BAU scenario
-*tfinalcov        Total coverage for optimal model
-*tfinalcost       Total costs for optimal model
-*tcovbau          Total coverage for BAU
-*tcostbau         Total cost for BAU
-*tcovbauspace     Total coverage per space for BAU scenario
-*tcostbauspace    Total cost per space for BAU scenario
-*costpc           Cost per child 6-59 months
-*costbaupc        Cost per child 6-59 months for BAU scenario
-*;
-*finalcov(t)              =sum(k,sum(j,xcov.l(k,j,t)))  ;
-*finalcost(t)             =sum(k,sum(j,xcost.l(k,j,t))) ;
-*covbau(t)                =sum(j,cov("oilvasflour",j,t))  ;
-*costbau(t)               =sum(j,cost("oilvasflour",j,t))  ;
-*covbauspace(j)           =sum(t,cov("oilvasflour",j,t))  ;
-*costbauspace(j)          =sum(t,cost("oilvasflour",j,t))  ;
-*costbaupc                =sum(t,costbau(t))/sum(t,covbau(t));
-*finalcovspace(j)         =sum(k,sum(t,xcov.l(k,j,t)))  ;
-*finalcostspace(j)        =sum(k,sum(t,xcost.l(k,j,t))) ;
-*tfinalcov                =sum(t,finalcov(t));
-*tfinalcost               =sum(t,finalcost(t));
-*tcovbau                  =sum(t,covbau(t));
-*tcostbau                 =sum(t,costbau(t));
-*tcovbauspace             =sum(j,covbauspace(j));
-*tcostbauspace            =sum(j,costbauspace(j));
-*tcovbau                  =sum(t,covbau(t));
-*tcostbau                 =sum(t,costbau(t));
-*costpc                   =sum(t,finalcost(t))/sum(t,finalcov(t)) ;
-*
-*display finalcov, finalcost, covbau, costbau, covbauspace, costbauspace, costbaupc, costpc, tcovbau, tcostbau, tcovbauspace, tcostbauspace,
-*finalcovspace, finalcostspace;
-*
-** #################################################################################################
-** ################################# OUTPUT THE TABLE WITH A PUT STATEMENT #########################
-** #################################################################################################
-** (This is useful to automate certain kinds of output and avoid repetitive excel manipulations
-** It makes a text file (table1.txt) which can be easily cut and pasted into excel.
-*
-** OUTPUT: after the run, open the following .txt file.
-** It can be cut+pasted to excel for easy comparison between runs
-** (do a text-to-columns with semicolon as the separator)
-*
-*
-*
-*file tablput20_4bk /table1.txt/;
-*put tablput20_4bk ;
-*
-** This is to have capital values in the denominator of the multipliers
-*put 'OPTIMIZED SCENARIO' /;
-*
-*put 'Total cost and coverage by year' /;
-*loop(t,
-*     put t.tl 'cost';
-*     put  @45';' finalcost(t):12:0 /;
-*);
-*loop(t,
-*     put t.tl 'coverage';
-*     put  @45';' finalcov(t):12:0 /;
-*);
-*put //;
-*
-*put 'Total cost and coverage by year for bau*' /;
-*loop(t,
-*     put t.tl 'cost';
-*     put  @45';' costbau(t):12:0 /;
-*);
-*loop(t,
-*     put t.tl 'coverage';
-*     put  @45';' covbau(t):12:0 /;
-*);
-*put //;
-*
-*put 'Discounted total cost for BAU'/;
-*         put @45';' tcostbau:12:0 /;
-*
-*put 'Discounted total benefits for BAU'/;
-*         put @45';' tcovbau:12:0 /;
-*
-*put 'Discounted cost per child 6-59 months for BAU'/;
-*         put @45';' costbaupc:6:2 /;
-*
-*put 'Discounted total cost for optimal simulation'/;
-*         put @45';' tfinalcost:12:0 /;
-*
-*put 'Discounted total benefits for optimal simulation'/;
-*         put @45';' tfinalcov:12:0 /;
-*
-*put 'Discounted cost per child 6-59 months for optimal simulation'/;
-*         put @45';' costpc:6:2 /;
-*
+Variables
+X(k,j,t)      QUANTITY OF VA INTERVENTION ZERO OR ONE
+XCOST         TOTAL COST FOR X VARIABLE INTERVENTIONS
+XCOV          TOTAL COVERAGE FOR X VARIABLE INTERVENTIONS
+Z             TOTAL COSTS
+BEN           TOTAL COVERAGE
+YESCUBE(j,t)   equal to 1 if there is cube in j at t
+YESOIL(j,t)    equal to 1 if there is oil in j at t
+YESMAXOIL(j,t) equal to 1 if there is oil in j at t
+YESZCUBE(j,t)  equal to 1 if there is zinc cube in j at t
+YESFLOUR(j,t)  equal to 1 if there is flour in j at t
+;
+
+Binary Variable X, Y;
+
+* this is useful to refer to two regions within a single equation
+alias (j,jj) ;
+alias (t,tt) ;
+
+Equations
+benefit                  TOTAL AMOUNT OF COVERAGE BENEFITS
+benefitconst             TOTAL AMOUNT OF PEOPLE THAT MUST BENEFIT IN TOTAL
+
+*fundconst                THE TOTAL AMOUNT OF FUNDING
+totcost                  TOTAL COSTS FOR THE OPTIMAL INTERVENTIONS
+onesx(j,t)               A CONSTRAINT ON THE NUMBER OF INTERVENTIONS THAT CAN BE CHOSEN FOR X VARIABLES INTERVENTIONS
+xcoveq(k,j,t)            THE AMOUNT OF COVERAGE FOR X
+xcosteq(k,j,t)           THE AMOUNT OF COST FOR X
+
+* Equations that force national interventions to be in all regions:
+yescubeeq(j,t)       equation defining yescube>0 if there is cube in j
+yeszcubeeq(j,t)       equation defining yeszcube>0 if there is cube in j
+yesfloureq(j,t)      equation defining yesflour>0 if there is flour in j
+yesoileq(j,t)        equation defining yesoil>0 if there is oil in j
+yesmaxoileq(j,t)     equation defining yesmaxoil>0 if there is maxoil in j
+allcubeeq(j,jj,t)    equation forcing cube to be either 1 or 0 in all regions
+allzcubeeq(j,jj,t)    equation forcing zinc cube to be either 1 or 0 in all regions
+allfloureq(j,jj,t)   equation forcing flour to be either 1 or 0 in all regions
+alloileq(j,jj,t)     equation forcing oil to be either 1 or 0 in all regions
+allmaxoileq(j,jj,t)  equation forcing maxoil to be either 1 or 0 in all regions
+alloileq2(j,t,tt)    equation forcing oil to be either 1 or 0 in all time periods
+allmaxoileq2(j,t,tt) equation forcing maxoil to be either 1 or 0 in all time periods
+allcubeeq2(j,t,tt)   equation forcing cube to be either 1 or 0 in all time periods
+allzcubeeq2(j,t,tt)  equation forcing zcube to be either 1 or 0 in all time periods
+
+;
+
+
+* Coverage and cost:
+xcoveq(k,j,t) ..       XCOV(k,j,t)=e=cov(k,j,t)*x(k,j,t);
+xcosteq(k,j,t) ..      XCOST(k,j,t)=e=cost(k,j,t)*x(k,j,t);
+benefit ..             BEN=e=sum(t,GAMMA(t)*(sum((k,j),XCOV(k,j,t))));
+totcost ..             Z=e=sum(t,BETA(t)*(sum((k,j),XCOST(k,j,t)))) ;
+
+* Constraints:
+* Equity changes space
+*benefitspace(j) ..          BENSPACE(j)=e=sum(t,GAMMA(t)*(sum((k),XCOV(k,j,t)))) ;
+*benefitconstspace(j) ..     BENSPACE(j)=g=totalbenefitsbau2(j);
+
+* Equity changes time
+*benefittime(t) ..          BENTIME(t)=e=sum(j,GAMMA(t)*(sum((k),XCOV(k,j,t)))) ;
+*benefitconsttime(t) ..     BENTIME(t)=g=totalbenefitsbau3(t);
+
+* Equity changes space/time
+*benefitspacetime(j,t) ..          BENSPACETIME(j,t)=e=GAMMA(t)*(sum((k),XCOV(k,j,t))) ;
+*benefitconstspacetime(j,t) ..     BENSPACETIME(j,t)=g=totalbenefitsbau4(j,t);
+
+benefitconst ..        BEN=g=totalbenefits2;
+onesx(j,t)..           sum(k,x(k,j,t))=l=1;
+
+
+* equations checking if there is flour, oil and cube anywhere:
+yescubeeq(j,t)..       yescube(j,t) =e= sum((cubek),x(cubek,j,t)) ;
+yeszcubeeq(j,t)..      yeszcube(j,t) =e= sum((zcubek),x(zcubek,j,t)) ;
+yesfloureq(j,t)..      yesflour(j,t) =e= sum((flourk),x(flourk,j,t)) ;
+yesoileq(j,t)..        yesoil(j,t) =e= sum((oilk),x(oilk,j,t)) ;
+yesmaxoileq(j,t)..     yesmaxoil(j,t) =e= sum((maxoilk),x(maxoilk,j,t)) ;
+
+* equations forcing there to be oil or cube everywhere if it is anywhere:
+allcubeeq(j,jj,t)..          yescube(j,t) =e= yescube(jj,t) ;
+allzcubeeq(j,jj,t)..         yeszcube(j,t) =e= yeszcube(jj,t) ;
+alloileq(j,jj,t)..           yesoil(j,t) =e= yesoil(jj,t) ;
+allmaxoileq(j,jj,t)..        yesmaxoil(j,t) =e= yesmaxoil(jj,t) ;
+allfloureq(j,jj,t)..         yesflour(j,t) =e= yesflour(jj,t) ;
+
+* equations forcing there to be cube, in all times if it at anytime:
+alloileq2(j,t2,tt)..         yesoil(j,tt) =e=yesoil(j,t2) ;
+allmaxoileq2(j,t2,tt)..      yesmaxoil(j,tt) =e=yesmaxoil(j,t2) ;
+allcubeeq2(j,t2,tt)..        yescube(j,tt) =e=yescube(j,t2) ;
+allzcubeeq2(j,t2,tt)..       yeszcube(j,tt) =e=yeszcube(j,t2) ;
+
+Model nutrition /all/ ;
+option minlp=BONMIN ;
+Solve nutrition using minlp minimizing z ;
+Display  x.l,  z.l, ben.l, xcov.l, xcost.l, totalfunds, totalbenefits;
+
+Parameters
+finalcov         Coverage per time period all
+finalcost        Cost per time period
+finalcovspace    Coverage per time period all
+finalcostspace   Cost per time period
+covbau           Coverage per time for BAU scenario
+costbau          Cost per time for BAU scenario
+covbauspace      Coverage per space for BAU scenario
+costbauspace     Cost per space for BAU scenario
+tfinalcov        Total coverage for optimal model
+tfinalcost       Total costs for optimal model
+tcovbau          Total coverage for BAU
+tcostbau         Total cost for BAU
+tcovbauspace     Total coverage per space for BAU scenario
+tcostbauspace    Total cost per space for BAU scenario
+costpc           Cost per child 6-59 months
+costbaupc        Cost per child 6-59 months for BAU scenario
+;
+finalcov(t)              =sum(k,sum(j,xcov.l(k,j,t)))  ;
+finalcost(t)             =sum(k,sum(j,xcost.l(k,j,t))) ;
+covbau(t)                =sum(j,cov("oilvasflour",j,t))  ;
+costbau(t)               =sum(j,cost("oilvasflour",j,t))  ;
+covbauspace(j)           =sum(t,cov("oilvasflour",j,t))  ;
+costbauspace(j)          =sum(t,cost("oilvasflour",j,t))  ;
+costbaupc                =sum(t,costbau(t))/sum(t,covbau(t));
+finalcovspace(j)         =sum(k,sum(t,xcov.l(k,j,t)))  ;
+finalcostspace(j)        =sum(k,sum(t,xcost.l(k,j,t))) ;
+tfinalcov                =sum(t,finalcov(t));
+tfinalcost               =sum(t,finalcost(t));
+tcovbau                  =sum(t,covbau(t));
+tcostbau                 =sum(t,costbau(t));
+tcovbauspace             =sum(j,covbauspace(j));
+tcostbauspace            =sum(j,costbauspace(j));
+tcovbau                  =sum(t,covbau(t));
+tcostbau                 =sum(t,costbau(t));
+costpc                   =sum(t,finalcost(t))/sum(t,finalcov(t)) ;
+
+display finalcov, finalcost, covbau, costbau, covbauspace, costbauspace, costbaupc, costpc, tcovbau, tcostbau, tcovbauspace, tcostbauspace,
+finalcovspace, finalcostspace;
+
+* #################################################################################################
+* ################################# OUTPUT THE TABLE WITH A PUT STATEMENT #########################
+* #################################################################################################
+* (This is useful to automate certain kinds of output and avoid repetitive excel manipulations
+* It makes a text file (table1.txt) which can be easily cut and pasted into excel.
+
+* OUTPUT: after the run, open the following .txt file.
+* It can be cut+pasted to excel for easy comparison between runs
+* (do a text-to-columns with semicolon as the separator)
+file tablput20_4bk /table1.txt/;
+put tablput20_4bk ;
+
+* This is to have capital values in the denominator of the multipliers
+put 'OPTIMIZED SCENARIO' /;
+
+put 'Total cost and coverage by year' /;
+loop(t,
+     put t.tl 'cost';
+     put  @45';' finalcost(t):12:0 /;
+);
+loop(t,
+     put t.tl 'coverage';
+     put  @45';' finalcov(t):12:0 /;
+);
+put //;
+
+put 'Total cost and coverage by year for bau*' /;
+loop(t,
+     put t.tl 'cost';
+     put  @45';' costbau(t):12:0 /;
+);
+loop(t,
+     put t.tl 'coverage';
+     put  @45';' covbau(t):12:0 /;
+);
+put //;
+
+put 'Discounted total cost for BAU'/;
+         put @45';' tcostbau:12:0 /;
+
+put 'Discounted total benefits for BAU'/;
+         put @45';' tcovbau:12:0 /;
+
+put 'Discounted cost per child 6-59 months for BAU'/;
+         put @45';' costbaupc:6:2 /;
+
+put 'Discounted total cost for optimal simulation'/;
+         put @45';' tfinalcost:12:0 /;
+
+put 'Discounted total benefits for optimal simulation'/;
+         put @45';' tfinalcov:12:0 /;
+
+put 'Discounted cost per child 6-59 months for optimal simulation'/;
+         put @45';' costpc:6:2 /;
