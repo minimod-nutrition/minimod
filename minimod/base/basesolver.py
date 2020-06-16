@@ -137,17 +137,17 @@ class BaseSolver:
                                     space_subset = space_subset,
                                     strict = strict)
         
-
-        print(
-            f"""
-              MiniMod Nutrition Intervention Tool
-              Optimization Method: {str(self.sense)}
-              Version: {__version__}
-              Solver: {str(self.solver_name)},
-              Show Output: {self.show_output}
-              
-              """
-        )
+        if self.show_output:
+            print(
+                f"""
+                MiniMod Nutrition Intervention Tool
+                Optimization Method: {str(self.sense)}
+                Version: {__version__}
+                Solver: {str(self.solver_name)},
+                Show Output: {self.show_output}
+                
+                """
+            )
         
     def _discounted_sum_all(self, data):
         """Multiply each ``mip_var`` in the data by benefits or costs (``data``) and then create a ``mip`` expression from it.
@@ -220,7 +220,7 @@ class BaseSolver:
         # Check if dataframe
         self._is_dataframe(data)
 
-        df = (
+        df_aux = (
             data.reset_index()
             .assign(
                 time_col=lambda df: df[time].astype(int),
@@ -231,8 +231,14 @@ class BaseSolver:
                 time_discount_benefits=lambda df: self.discount_benefits
                 ** df["time_rank"],
                 discounted_costs=lambda df: df["time_discount_costs"] * df[costs],
-                discounted_benefits=lambda df: df["time_discount_benefits"]*df[benefits],
+                discounted_benefits=lambda df: df["time_discount_benefits"]*df[benefits]
             )
+        )
+        
+        df_aux[intervention] = df_aux[intervention].str.lower().str.lstrip().str.rstrip()
+        
+        df = (
+            df_aux
             .set_index([intervention, space, time])
             .sort_index(level=(intervention, space, time))
         )
@@ -300,6 +306,8 @@ class BaseSolver:
         s = OptimizationSummary(self)
 
         s.print_generic(header, features)
+        
+        print("Interventions Chosen:")
     
     def plot_time(self, 
                   fig = None, 

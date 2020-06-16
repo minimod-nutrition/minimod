@@ -11,7 +11,7 @@ import numpy as np
 
 
 class CostSolver(BaseSolver):
-    def __init__(self, minimum_benefit=None, **kwargs):
+    def __init__(self, minimum_benefit=None, drop_bau = False, **kwargs):
 
         super().__init__(sense=mip.MINIMIZE, **kwargs)
 
@@ -33,10 +33,13 @@ class CostSolver(BaseSolver):
                 "discounted_costs",
             ],
         )
+        
+        if drop_bau:
+            self._df = self._df.drop(minimum_benefit, level=self.intervention_col)
 
         # Add objective and constraint
         self.model.add_objective(self._objective())
-        self.model.add_constraint(self._constraint(), self.minimum_benefit)
+        self.model.add_constraint(self._constraint(), self.minimum_benefit, name = "base_constraint")
 
     def _objective(self):
 
@@ -84,4 +87,13 @@ class CostSolver(BaseSolver):
             data=self.opt_df[["opt_vals", "opt_benefit", "opt_costs"]],
             style="markdown",
         )
+        
+        print()
+        print("Optimal Interventions")
+        print()
+        s.print_df(self.opt_df.loc[lambda df: df['opt_vals']>0]['opt_vals'].unstack(level='time').fillna(0))
+        
+        
+        
+        
 
