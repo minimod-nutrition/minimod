@@ -321,15 +321,26 @@ class Model:
             elif self.status == mip.OptimizationStatus.INFEASIBLE:
                 print("[Warning]: Infeasible Solution Found")
 
-    def process_results(self, benefit_col, cost_col):
+    def process_results(self, benefit_col, cost_col, intervention_col, space_col):
 
         opt_df = self._df.copy(deep=True).assign(
             opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.x),
             opt_benefit=lambda df: df[benefit_col] * df["opt_vals"],
             opt_costs=lambda df: df[cost_col] * df["opt_vals"],
             opt_costs_discounted=lambda df: df["discounted_costs"] * df["opt_vals"],
-            opt_benefit_discounted=lambda df: df["discounted_benefits"]
-            * df["opt_vals"],
+            opt_benefit_discounted=lambda df: df["discounted_benefits"]* df["opt_vals"],
+            cumulative_discounted_benefits = lambda df: (df
+                                                         .groupby([intervention_col, space_col])['opt_benefit_discounted']
+                                                         .transform('cumsum')),
+            cumulative_discounted_costs = lambda df: (df
+                                                         .groupby([intervention_col, space_col])['opt_costs_discounted']
+                                                         .transform('cumsum')),
+            cumulative_benefits = lambda df: (df
+                                                         .groupby([intervention_col, space_col])['opt_benefit']
+                                                         .transform('cumsum')),
+            cumulative_costs = lambda df: (df
+                                                         .groupby([intervention_col, space_col])['opt_costs']
+                                                         .transform('cumsum'))
         )[
             [
                 "opt_vals",
@@ -337,6 +348,10 @@ class Model:
                 "opt_costs",
                 "opt_costs_discounted",
                 "opt_benefit_discounted",
+                "cumulative_discounted_benefits",
+                "cumulative_discounted_costs",
+                "cumulative_benefits",
+                "cumulative_costs"
             ]
         ]
 

@@ -11,7 +11,11 @@ import numpy as np
 
 
 class CostSolver(BaseSolver):
-    def __init__(self, minimum_benefit=None, drop_bau = False, **kwargs):
+    def __init__(self, 
+                 minimum_benefit=None, 
+                 drop_bau = False, 
+                 main_constraint_over = None, 
+                 **kwargs):
 
         super().__init__(sense=mip.MINIMIZE, **kwargs)
 
@@ -58,7 +62,7 @@ class CostSolver(BaseSolver):
     def fit(self, **kwargs):
         return self._fit(**kwargs)
 
-    def report(self):
+    def report(self, intervention_groups = False):
 
         s = OptimizationSummary(self)
 
@@ -91,8 +95,30 @@ class CostSolver(BaseSolver):
         print()
         print("Optimal Interventions")
         print()
-        s.print_df(self.opt_df.loc[lambda df: df['opt_vals']>0]['opt_vals'].unstack(level='time').fillna(0))
+        opt_chosen = self.opt_df.loc[lambda df: df['opt_vals']>0]['opt_vals']
         
+        s.print_df(opt_chosen.unstack(level='time').fillna(0))
+        
+        if isinstance(intervention_groups, dict):
+            opt_chosen_reset = opt_chosen.reset_index()
+            for intervention in intervention_groups:
+                opt_chosen_reset[intervention_groups[intervention]] \
+                    = opt_chosen_reset[self.intervention_col].str.contains(intervention).astype(int)
+            
+            intervention_grouper_df = (
+                opt_chosen_reset
+                .drop(columns = [self.intervention_col, 'opt_vals'])
+                .set_index([self.space_col, self.time_col])
+                .stack()
+                .unstack(level=self.time_col)
+                )
+
+            s.print_df(intervention_grouper_df)
+                
+            # Use for later
+            # a = intervention_grouper_df.reset_index(level='region')[list(range(1,11))].mul(intervention_grouper_df.reset_index(level='region')['region'], axis='index')
+            # b = a.groupby(a.index).agg(list)
+
         
         
         

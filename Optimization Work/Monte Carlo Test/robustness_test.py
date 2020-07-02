@@ -439,4 +439,4 @@ a.plot_sim_trajectories(save = 'sim_traj.png')
 
 # %%
 
-
+a.plot_intervention_stacked(intervention_group=['cube', 'maize', 'cap'])

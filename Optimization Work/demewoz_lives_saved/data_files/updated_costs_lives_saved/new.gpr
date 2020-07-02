@@ -1,0 +1,14 @@
+[PROJECT]
+
+[RP:LIVES_SAVED_6_19_2020]
+1=
+
+[OPENWINDOW_1]
+FILE0=Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\updated_costs_lives_saved\Lives_saved_6_19_2020.gms
+FILE1=Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\updated_costs_lives_saved\Lives_saved_6_19_2020.lst
+FILE2=Z:\home\lordflaron\Documents\minimod\Optimization Work\demewoz_lives_saved\data_files\updated_costs_lives_saved\Lives_saved_6_19_2020.lst
+MAXIM=0
+TOP=8
+LEFT=26
+HEIGHT=785
+WIDTH=1257

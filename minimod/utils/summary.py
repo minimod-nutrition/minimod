@@ -14,9 +14,12 @@ class PreOptimizationDataSummary:
                 space_col, 
                 time_col, 
                 benefit_title,
-                cost_title = "Costs",
+                cost_title = "Costs ($)",
                 intervention_title = 'Intervention',
                 intervention_subset = None,
+                intervention_subset_titles = None,
+                bau_intervention = None,
+                bau_title = None,
                 space_title = 'Regions',
                 time_title = 'Time'):
         
@@ -32,6 +35,9 @@ class PreOptimizationDataSummary:
         self.space_title = space_title
         self.time_title = time_title
         self.intervention_subset = intervention_subset
+        self.intervention_subset_titles = intervention_subset_titles
+        self.bau_intervention = bau_intervention
+        self.bau_title = bau_title
     
     def _rename_variables(self, data):
         
@@ -51,6 +57,15 @@ class PreOptimizationDataSummary:
         if self.space_col in data.columns:
             df = df.rename({self.space_col : self.space_title}, axis = 'columns')
             
+        return df
+    
+    def _rename_intervention_subset(self, data):
+        
+        df = (
+            data
+            .replace(to_replace = {self.intervention_col : self.intervention_subset_titles})
+        )
+        
         return df
     
     def _create_national_intervention(self, data):
@@ -79,7 +94,6 @@ class PreOptimizationDataSummary:
             
             if variables_of_interest[var] == 'cost_per_benefit':
                 
-                # kwargs[var] = data[cost_col]/data[benefit_col]
                 variables_of_interest[var] = lambda df: df[self.cost_col]/df[self.benefit_col]
             
             df = data.assign( var = variables_of_interest[var]).round({'var' : 2}).rename({'var' : var}, axis = 'columns')
@@ -126,7 +140,7 @@ class PreOptimizationDataSummary:
     def _num_formatter(self, data):
         
         data[self.benefit_col] = data[self.benefit_col].map("{:,.0f}".format)
-        data[self.cost_col] = data[self.cost_col].map("${:,.0f}".format)
+        data[self.cost_col] = data[self.cost_col].map("{:,.0f}".format)
         
         return data
         
@@ -138,33 +152,64 @@ class PreOptimizationDataSummary:
                       style = None, 
                       save_path = 'table.docx'):
         
-        if grouping == 'over_space':
-            grouping = [self.space_col]
-        elif grouping == 'over_time':
-            grouping = [self.time_col]
-            
-            
+        grouper = []
+        
         if intervention_specific:
-            grouping.append(self.intervention_col)
+            grouper.append(self.intervention_col)
+        
+        if grouping == 'over_space':
+            grouper.append(self.space_col)
+        elif grouping == 'over_time':
+            grouper.append(self.time_col)
             
-        index_order = ['North', 'South', 'Cities', 'National']
+    
+        # Get unique values of regions
+        regions_list = (self.data
+                        .reset_index(drop=True)
+                        [self.space_col]
+                        .unique()
+                        .tolist()
+                        )
+        regions_list.append('National')
+        
+                    
+        region_cat = pd.CategoricalDtype(categories = regions_list, ordered=True)
+        
+        intervention_list = self.intervention_subset.copy()
+        intervention_list.append(self.bau_intervention)
+        
+        intervention_cat = pd.CategoricalDtype(list(self.intervention_subset_titles.values()), ordered=True)
         
         df = (
             self.data
             .pipe(self._create_national_intervention)
-            .groupby(grouping).sum()
+            .groupby(grouper).sum()
             .reset_index()
-            .loc[lambda df: df[self.intervention_col].isin(self.intervention_subset)]
+            .loc[lambda df: df[self.intervention_col].isin(intervention_list)]
             .pipe(self._construct_variables, variables_of_interest)
             .pipe(self._num_formatter)
+            .pipe(self._rename_intervention_subset)
             .pipe(self._rename_variables)
             .drop(columns = 'index')
             )
-                    
+        
+        df[self.intervention_title] = df[self.intervention_title].astype(intervention_cat)
+        if grouping == 'over_space':
+            df[self.space_title] = df[self.space_title].astype(region_cat)
+            df = df.sort_values([self.intervention_title, self.space_title])
+            
         if style is not None:
             self._style(data = df, style=style, save_path=save_path)
         
-        return df
+        def color_cells(val, color):
+            """
+            Takes a scalar and returns a string with
+            the css property `'color: red'` for negative
+            strings, black otherwise.
+            """
+            return color
+        
+        return df.style.background_gradient()
         
 class OptimizationSummary:
 
