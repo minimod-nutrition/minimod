@@ -3,6 +3,7 @@ import matplotlib as mpl
 import numpy as np
 from minimod.utils.exceptions import MissingOptimizationMethod
 import functools
+import geopandas as gpd
 
 
 
@@ -97,8 +98,9 @@ class Plotter:
         
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        ax.legend(['Optimal Benefits'], loc= 'upper left')
-        ax2.legend(['Optimal Costs'], loc = 'lower left')
+        if twin:
+            ax.legend(['Optimal Benefits'], loc= 'upper left')
+            ax2.legend(['Optimal Costs'], loc = 'lower left')
         plt.tight_layout()
         
         if save is not None:
@@ -204,7 +206,6 @@ class Plotter:
         
         if intervention  == slice(None):
             
-            print(f"Dissolving for T = {time}")
             df = (
                 merged_df
                 .pipe(self._dissolve_interventions, aggfunc = aggfunc)
@@ -345,7 +346,7 @@ class Plotter:
             'multi' : self._plot_multi_chloropleth
         }
         
-        if time is not None and len(time) == 1:
+        if isinstance(time, int):
             number = 'single'
         else:
             number = 'multi'

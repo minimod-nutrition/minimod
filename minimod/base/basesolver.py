@@ -126,6 +126,9 @@ class BaseSolver:
             print("[Note]: Creating Base Model with constraints")
             
         self.bau = BAUConstraintCreator()
+        
+        self.minimum_benefit = None
+        self.total_funds = None
 
         ## Create base model
         self.model.base_model_create(intervention_col, 
@@ -257,8 +260,6 @@ class BaseSolver:
         """
         pass
 
-
-
     def _fit(self, **kwargs):
         """Fits data to model. The instantiation of the class creates the base model. Uses ``mip.optimize`` to find the optimal point.
         """        
@@ -268,7 +269,10 @@ class BaseSolver:
 
         self.model.optimize(**kwargs)  
         
-        self.opt_df = self.model.process_results(self.benefit_col, self.cost_col)
+        self.opt_df = self.model.process_results(self.benefit_col, 
+                                                 self.cost_col, 
+                                                 self.intervention_col,
+                                                 self.space_col)
         
         (self.objective_value,
          self.objective_values, 
@@ -312,7 +316,9 @@ class BaseSolver:
     def plot_time(self, 
                   fig = None, 
                   ax = None,
-                  save = None):
+                  save = None,
+                  cumulative = False,
+                  cumulative_discount = False):
         """Plots optimal benefits and costs across time after model optimization
 
         :param fig: matplotlib figure, defaults to None
@@ -324,40 +330,75 @@ class BaseSolver:
         """        
         
         p = Plotter(self)
+                
+        if cumulative:
+            return p._plot_lines(to_plot = ['cumulative_benefits', 'cumulative_costs'],
+                    title= "Optima over Time",
+                    xlabel = 'Time',
+                    ylabel = self.benefit_title,
+                    twin =True,
+                    twin_ylabel= "Currency",
+                    save = save,
+                    legend = ['Cumm. ' + self.benefit_title,
+                            'Cumm. Costs'],
+                    figure=fig,
+                    axis=ax)
+        elif cumulative_discount:
+            return p._plot_lines(to_plot = ['cumulative_discounted_benefits', 'cumulative_discounted_costs'],
+                    title= "Optima over Time",
+                    xlabel = 'Time',
+                    ylabel = self.benefit_title,
+                    twin =True,
+                    twin_ylabel= "Currency",
+                    save = save,
+                    legend = ['Cumm. Dis. '+ self.benefit_title,
+                            'Cumm. Dis. Costs'],
+                    figure=fig,
+                    axis=ax)
+        else:
+            return p._plot_lines(to_plot = ['opt_benefit', 'opt_costs'],
+                                title= "Optima over Time",
+                                xlabel = 'Time',
+                                ylabel = self.benefit_title,
+                                twin =True,
+                                twin_ylabel= "Currency",
+                                save = save,
+                                legend = ['Optimal ' + self.benefit_title,
+                                        'Optimal Costs'],
+                                figure=fig,
+                                axis=ax)
+
+    def plot_bau_time(self,
+                      opt_variable = 'b',
+                      fig = None,
+                      ax = None,
+                      save = None):
         
-        return p._plot_lines(to_plot = ['opt_benefit', 'opt_costs'],
-                             title= "Optima over Time",
-                             xlabel = 'Time',
-                             ylabel = self.benefit_title,
-                             twin =True,
-                             twin_ylabel= "Currency",
-                             save = save,
-                             legend = ['Optimal Benefits',
-                                       'Optimal Costs'],
-                             figure=fig,
-                             axis=ax)
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        p = Plotter(self)
         
-    # def plot_bau_time(self,
-    #                   opt_variable = None,
-    #                   fig = None,
-    #                   ax = None,
-    #                   save = None):
+        if opt_variable == 'b':
+            opt = 'opt_benefit'
+            bau_col = self.benefit_col
+            title = "Optimal " + self.benefit_title + " vs. BAU"
+        elif opt_variable == 'c':
+            opt = 'opt_costs'
+            bau_col = self.cost_col
+            title = "Optimal Costs vs. BAU"
+
+        p._plot_lines(to_plot = opt,
+                    title= title,
+                    xlabel = 'Time',
+                    save = save,
+                    figure=fig,
+                    axis=ax)
         
-    #     p = Plotter(self)
+        self.bau_df.groupby([self.time_col])[bau_col].sum().plot(ax=ax)
         
-    #     if re.match(r"ben", opt_variable):
-    #         bau_var = 'discounted_benefits'
-        
-    #     return p._plot_lines(to_plot = [opt_variable, bau_var],
-    #                          title= "Optimal vs. BAU",
-    #                          xlabel = 'Time',
-    #                          save = save,
-    #                          legend = ['Optimal ',
-    #                                    'Optimal Costs'],
-    #                          figure=fig,
-    #                          axis=ax)
-        
-        
+        ax.legend(['Optimal', 'BAU'])
+        ax.set_xlabel('Time')
 
     def plot_opt_val_hist(self, 
                           fig = None, 
@@ -419,6 +460,18 @@ class BaseSolver:
         elif optimum_interest == 'v':
             opt = 'opt_vals'
             title = "Optimal Interventions"
+        elif optimum_interest == 'cdb':
+            opt = 'cumulative_discounted_benefits'
+            title = 'Cumulative Discounted ' + self.benefit_title
+        elif optimum_interest == 'cdc':
+            opt = 'cumulative_discounted_costs'
+            title = 'Cumulative Discounted Costs'
+        elif optimum_interest == 'cb':
+            opt = 'cumulative_benefits'
+            title = 'Cumulative ' + self.benefit_title      
+        elif optimum_interest == 'cc':
+            opt = 'cumulative_costs'
+            title = 'Cumulative Costs'
         else:
             raise Exception("Not one of the allowed variables for map plotting. Try again.")
         
@@ -433,7 +486,7 @@ class BaseSolver:
                                             aggfunc = 'sum',
                                             title = title,
                                             save = save)
-        return plot
+        # return plot
 
     def plot_grouped_interventions(self, 
                                 data_of_interest = 'benefits', 
@@ -471,10 +524,7 @@ class BaseSolver:
                            intervention = slice(None),
                            time = None,
                            optimum_interest = 'b',
-                           data_bench = None,
                            bench_intervention = None,
-                           bench_col = None,
-                           bench_merge_key = None,
                            map_df = None,
                            merge_key = None,
                            save = None,
@@ -514,15 +564,49 @@ class BaseSolver:
         
         if optimum_interest == 'b':
             opt = 'opt_benefit'
+            bench_col = self.benefit_col
             title = self.benefit_title
         elif optimum_interest == 'c':
             opt = 'opt_costs'
+            bench_col = self.cost_col
             title = "Costs"
         elif optimum_interest == 'v':
             opt = 'opt_vals'
             title = "Interventions"
+        elif optimum_interest == 'cdb':
+            opt =  'cumulative_discounted_benefits'
+            bench_col = 'discounted_benefits'
+            title = 'Cumulative Discounted ' + self.benefit_title
+        elif optimum_interest == 'cdc':
+            opt =  'cumulative_discounted_costs'
+            title = 'Cumulative Discounted Costs'
+            bench_col = 'discounted_costs'
+        elif optimum_interest == 'cb':
+            opt =  'cumulative_benefits'
+            title = 'Cumulative ' + self.benefit_title   
+            bench_col = self.benefit_col   
+        elif optimum_interest == 'cc':
+            opt =  'cumulative_costs'
+            title = 'Cumulative Costs'
+            bench_col = self.cost_col
         else:
             raise Exception("Not one of the allowed variables for map plotting. Try again.")
+        
+        if bench_intervention is None:
+            bench_intervention = self.minimum_benefit
+        
+        if merge_key is None:
+            merge_key = self.space_col
+            
+        if optimum_interest in ['cdb', 'cdc', 'cb', 'cc']:
+            
+            bench_df = self._df.assign(bench_col = lambda df: (df
+                                                            .groupby([self.intervention_col, 
+                                                                    self.space_col])
+                                                            [bench_col]
+                                                            .transform('cumsum')))
+        else:
+            bench_df = self._df.assign(bench_col = lambda df: df[bench_col])
         
         fig.suptitle(title, y=1.05)
         plotter = p._plot_chloropleth_getter(time)
@@ -531,14 +615,14 @@ class BaseSolver:
         opt_max = self.opt_df[opt].max()
         opt_min = self.opt_df[opt].min()
         
-        bench_max = data_bench[bench_col].max()
-        bench_min = data_bench[bench_col].min()
+        bench_max = bench_df['bench_col'].max()
+        bench_min = bench_df['bench_col'].min()
         
         vmax = max(opt_max, bench_max)
         vmin = min(opt_min, bench_min)
         
         
-        optimal = plotter(data = self.opt_df,
+        plotter(data = self.opt_df,
                     intervention = intervention,
                     time = time,
                     optimum_interest=opt,
@@ -552,12 +636,12 @@ class BaseSolver:
                     vmax = vmax,
                     legend_kwds = {'orientation' : 'horizontal'})
         
-        bench = plotter(data = data_bench,
+        plotter(data = bench_df,
                         intervention = bench_intervention,
                         time = time,
-                        optimum_interest= bench_col,
+                        optimum_interest= 'bench_col',
                         map_df = map_df,
-                        merge_key=bench_merge_key,
+                        merge_key=merge_key,
                         aggfunc = 'sum',
                         ax = bench,
                         show_legend = False,
