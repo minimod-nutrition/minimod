@@ -23,8 +23,16 @@ class CostSolver(BaseSolver):
             self.minimum_benefit = minimum_benefit
         elif isinstance(minimum_benefit, str):
             # Get sum of benefits for interventions
+            if main_constraint_over == 'space':
+                over = self.space_col
+            elif main_constraint_over == 'time':
+                over = self.time_col
+            elif main_constraint_over == 'both':
+                over = [self.space_col, self.time_col]
+            elif main_constraint_over is None:
+                over = None
             self.minimum_benefit = self.bau.create_bau_constraint(
-                self._df, minimum_benefit, "discounted_benefits"
+                self._df, minimum_benefit, "discounted_benefits", over
             )
 
         self.bau_df = self.bau.bau_df(
@@ -43,18 +51,22 @@ class CostSolver(BaseSolver):
 
         # Add objective and constraint
         self.model.add_objective(self._objective())
-        self.model.add_constraint(self._constraint(), self.minimum_benefit, name = "base_constraint")
+        self.model.add_constraint(self._constraint(over = over), self.minimum_benefit, name = "base_constraint")
+        
 
     def _objective(self):
 
-        cost = self._df["discounted_costs"]
+        cost = "discounted_costs"
 
         # Discounted costs
-        return self._discounted_sum_all(cost)
+        return self._discounted_sum_all(col_name = cost)
 
-    def _constraint(self):
+    def _constraint(self, over = None):
 
-        benefit = self._df["discounted_benefits"]
+        benefit = "discounted_benefits"
+        
+        if over is not None:
+            return self._discounted_sum_over(benefit, over = over)
 
         ## Make benefits constraint be at least as large as the one from the minimum benefit intervention
         return self._discounted_sum_all(benefit)

@@ -228,13 +228,27 @@ class Model:
         self.model.objective = eq
 
     def add_constraint(self, eq, constraint, way="ge", name=""):
-
-        if way == "ge":
-            self.model += eq >= constraint, name
-        elif way == "le":
-            self.model += eq <= constraint, name
-        elif way == "eq":
-            self.model += eq == constraint, name
+        
+        if isinstance(constraint, pd.Series):
+            # Merge equation with constraint
+            df = eq.merge(constraint, left_index = True, right_index= True)
+            
+            for i, ee, c in df.itertuples():
+                if way == "ge":
+                    self.model += ee >= c, name
+                elif way == "le":
+                    self.model += ee <= c, name
+                elif way == "eq":
+                    self.model += ee == c, name
+                
+            
+        else:
+            if way == "ge":
+                self.model += eq >= constraint, name
+            elif way == "le":
+                self.model += eq <= constraint, name
+            elif way == "eq":
+                self.model += eq == constraint, name
 
     def base_model_create(
         self,

@@ -19,11 +19,18 @@ class BAUConstraintCreator:
         return df
         
     
-    def create_bau_constraint(self, data, constraint, discounted_variable):
+    def create_bau_constraint(self, data, constraint, discounted_variable, over = None):
         
-        minimum_constraint = (
-            self.bau_df(data, constraint, discounted_variable)
-            .sum()
-        )
+        if over is None:
+            minimum_constraint = (
+                self.bau_df(data, constraint, discounted_variable)
+                .sum()
+            )
+        else:
+            minimum_constraint = (
+                self.bau_df(data, constraint, discounted_variable)
+                .groupby(over)
+                .sum()
+            )
         
         return minimum_constraint

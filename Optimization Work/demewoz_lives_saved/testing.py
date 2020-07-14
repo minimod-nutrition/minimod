@@ -4,7 +4,7 @@
 # ms-python.python added
 import os
 try:
-	os.chdir(os.path.join(os.getcwd()))
+	os.chdir(os.path.join(os.getcwd(), 'Optimization Work/demewoz_lives_saved'))
 	print(os.getcwd())
 except:
 	pass
@@ -26,7 +26,8 @@ import re
 from functools import reduce
 import gams
 import geopandas as gpd
-
+import matplotlib.pyplot as plt
+import os
 from ipywidgets import fixed, interact, IntSlider
 
 
@@ -34,6 +35,10 @@ from ipywidgets import fixed, interact, IntSlider
 # Updated Costs and Lives Saved
 
 update_folder = Path('Optimization Work', 'demewoz_lives_saved','data_files', 'updated_costs_lives_saved')
+
+
+# %%
+os.chdir("/home/lordflaron/Documents/minimod/")
 
 # %% [markdown]
 # ## Processing Data
@@ -163,17 +168,16 @@ for i in a:
     found = cov_str.findall(i)
     time_found = time_str.findall(i)
     # print(time_found)
-    if not time_found:
-        print("not found time")
-        continue
-    else:
+    if time_found:
         if time_found[0] == 't2':
             time_range = '[1,2,3]'
         elif time_found[0] == 't4':
             time_range = '[1,2]'
         elif time_found[0] == 't':
             time_range = 'slice(None)'
-
+    elif not time_found:
+        print("not found time")
+        continue
 
     if len(found) == 2:
         second_int = found[1]
@@ -591,7 +595,52 @@ time_to_replace = slice(None))
 .pipe(observation_adjustment,
 int1 = "fflour33",
 int2 = 0,
-time_to_replace = slice(None)))
+time_to_replace = slice(None))
+.pipe(observation_adjustment,
+int1 = "cubezflourzcubefcubefflour",
+int2 = "zflourfflour",
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "cubezflourfcubefflour",
+int2 = "zflourfflour",
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "oilzflourzcubefcubefflour",
+int2 = "oilzflourfflour",
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "fcube",
+int2 = 0,
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "fcube",
+int2 = 0,
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "oilfcube",
+int2 = 'oil',
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "oilcubeclinicfcube",
+int2 = 'oilclinic',
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "maxoilzflourfcubefflour",
+int2 = 'maxoilzflourfflour',
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "maxoilcliniczflourfcubefflour",
+int2 = "maxoilcliniczflourfflour",
+time_to_replace = [1,2,3])
+.pipe(observation_adjustment,
+int1 = "maxoilzflourfcubefflour",
+int2 = "oilzflourfcubefflour",
+time_to_replace = [1,2])
+.pipe(observation_adjustment,
+int1 = "maxoilcliniczflourfcubefflour",
+int2 = "oilcliniczflourfcubefflour",
+time_to_replace = [1,2])
+)
 
 
 # %%
@@ -627,7 +676,15 @@ s = minimod.utils.summary.PreOptimizationDataSummary(
     space_col= 'region',
     time_col='time',
     benefit_title='Lives Saved (Low)',
-    intervention_subset=['clinic', 'cube', 'vas']
+    intervention_subset=['clinic', 'vas','zflour', 'fflour', 'cube', 'fcube'],
+    intervention_subset_titles={'clinic' : 'VAS Clinic Day', 
+    'vas' : 'Vitamin A Supp.', 
+    'zflour' : 'Zinc Flour',
+    'fflour' : 'Folic Acid Flour' ,
+    'cube' : 'Boullion Cube',
+    'fcube' : 'Boullion Cube with Folic Acid',
+    'oilvaszflourfflour33' : 'BAU: Oil/VAS/Flour with Zinc and Folic Acid (33%)'},
+    bau_intervention = 'oilvaszflourfflour33'
 )
 
 s.summary_table(variables_of_interest= {'Cost per Child ($)' : 'cost_per_benefit'}, grouping = 'over_space', style = 'markdown')
@@ -644,7 +701,15 @@ s = minimod.utils.summary.PreOptimizationDataSummary(
     space_col= 'region',
     time_col='time',
     benefit_title='Lives Saved (High)',
-    intervention_subset=['clinic', 'cube', 'vas']
+    intervention_subset=['clinic', 'vas','zflour', 'fflour', 'cube', 'fcube'],
+    intervention_subset_titles={'clinic' : 'VAS Clinic Day', 
+    'vas' : 'Vitamin A Supp.', 
+    'zflour' : 'Zinc Flour',
+    'fflour' : 'Folic Acid Flour' ,
+    'cube' : 'Boullion Cube',
+    'fcube' : 'Boullion Cube with Folic Acid',
+    'oilvaszflourfflour33' : 'BAU: Oil/VAS/Flour with Zinc and Folic Acid (33%)'},
+    bau_intervention = 'oilvaszflourfflour33'
 )
 
 s.summary_table(variables_of_interest= {'Cost per Child ($)' : 'cost_per_benefit'}, grouping = 'over_space', style = 'markdown')
@@ -716,6 +781,65 @@ flourcubek = ['zflourzcube',    'cubezflour', 'maxoilcubezflour',
 
 
 # %%
+# Do the same for the High Lives Saved numbers
+cubek_high = ['cube',   'maxoilcube', 'cubezflourfflour',  'cubefcube', 'cubezcubefcube', 'maxoilcubefcube',  'oilcubefflour',
+           'oilcube', 'oilcubevas', 'maxoilcubevas', 'cubevas', 'cubeclinic', 'oilcubeclinic', 'cubezflourfcube','maxoilcubezflourfcubefflour',
+           'maxoilcubeclinic', 'cubezflour', 'maxoilcubezflour', 'oilcubezflour', 'oilcubevaszflour', 'oilcubefcube', 'maxoilcubezflourzcubefcube',
+           'cubevaszflour', 'maxoilcubevaszflour', 'cubefcubefflour', 'cubezcubefcubefflour', 'cubecliniczflourzcubefcubefflour',
+          'cubezflourzcube', 'maxoilcubezflourzcube', 'oilcubezflourzcube', 'oilcubevaszflourzcube',   'cubecliniczflourfcubefflour',
+          'cubevaszflourzcube', 'maxoilcubevaszflourzcube',  'maxoilcubezflourfflour', 'cubecliniczflourzcubefcube', 'cubevaszflourzcubefcube',
+           'oilcubezflourfflour', 'cubezflourzcubefflour', 'cubecliniczflourzcubefflour', 'cubecliniczflourfcube', 'cubevaszflourzcubefcubefflour',
+           'maxoilcubefflour', 'cubeclinicfcube', 'maxoilcubezflourzcubefcubefflour', 'oilcubezflourfcubefflour', 'maxoilcubezflourfcube',
+           'cubevasfcube', 'maxoilcubefcubefflour', 'cubecliniczflourfflour', 'cubevaszflourfcube', 'cubevaszflourfcubefflour', 'oilcubefcubefflour',
+           'cubezflourfcubefflour', 'cubevaszflourzcubefflour', 'cubevasfcubefflour', 'cubezflourzcubefcubefflour', 'oilcubezflourzcubefcubefflour',
+           'oilcubezflourfcube', "maxoilcubecliniczflourfflour", "oilcubecliniczflourfcubefflour", "oilcubecliniczflourzcubefcubefflour",
+           "maxoilcubecliniczflourzcubefcube", "maxoilcubeclinicfcube", "oilcubecliniczflourfflour", "maxoilcubecliniczflourfcubefflour",
+           "maxoilcubecliniczflourzcubefflour", "maxoilcubeclinicfcubefflour", "oilcubeclinicfcube", "oilcubecliniczflourfcube", "oilcubeclinicfcubefflour"  ]
+
+zcubek_high = ['zcube', 'zflourzcube', 'cubezcube', 'cubezflourzcube', 'oilvaszflourzcube', 'maxoilcubezflourzcube', 'zcubefcube',
+            'oilzflourzcube', 'oilcubezflourzcube', 'oilcubevaszflourzcube', 'maxoilzflourzcube', 'maxoilvaszflourzcube', 'zflourzcubefcube',
+            'vaszflourzcube', 'cubevaszflourzcube', 'maxoilcubevaszflourzcube', 'zflourzcubefcubefflour', "oilcubezflourzcubefcube", "maxoilzflourzcubefcube",
+            "oilzflourzcubefflour", "cubezcubefcube", "maxoilcubecliniczflourfcube", "oilzflourzcubefcubefflour", "oilcubecliniczflourzcubefcube"]
+
+fcubek_high = ['fcube', 'oilfcube', 'cubezflourzcubefcubefflour', 'cubezflourzcubefcube', 'cubezflourfcubefflour', 'maxoilfcube', 'maxoilcubezflourfcube', 'maxoilfcubefflour',
+            'maxoilzflourzcubefcube', 'oilzflourfcubefflour' , "oilzflourfcube", "maxoilzflourzcubefcubefflour", "maxoilcliniczflourfcubefflour",
+           "oilcubezflourzcubefcube", "oilfcubefflour", "cubefcubefflour", "maxoilzflourfcubefflour", "maxoilcubecliniczflourzcubefcubefflour", "oilcubezflourfcubefflour",
+           "maxoilcubeclinicfcube", "maxoilcubecliniczflourzcubefcube", "cubefcube", "oilcubefcube", "oilcubeclinicfcube", "oilcubecliniczflourfcube",
+           "oilcubecliniczflourzcubefcube", "oilvasfcubefflour"  ]
+
+oilk_high = ['oilvas', 'oil', 'oilcube', 'oilcubevas', 'oilclinic',    'oilcubeclinic', 'oilvaszflour', 'oilzflour', 'oilzflourfflour', 'oilcubecliniczflourfflour', 'oilcubezflourzcubefflour',
+          'oilcliniczflour', 'oilcubezflour', 'oilcubevaszflour', 'oilcubecliniczflour', 'oilvaszflourzcube', 'oilfcube', 'oilcubezflourzcubefcube', 'oilcubezflourfcube', 'oilcubezflourfcubefflour',
+          'oilzflourzcube',    'oilcliniczflourzcube', 'oilcubezflourzcube',  'oilcubevaszflourzcube', 'oilcubecliniczflourzcube', 'oilcubezflourzcubefcubefflour',
+          'oilcubefcubefflour', 'oilzflourfcubefflour', 'oilcubecliniczflourzcubefcubefflour', 'oilcubeclinicfcube',  'oilzflourzcubefcubefflour', 'oilcubecliniczflourzcubefcube',
+          'oilzflourzcubefcube', 'oilcubecliniczflourfcube', 'oilcubecliniczflourfcubefflour', 'oilcubecliniczflourzcubefflour', 'oilzflourfcube', 'oilfcubefflour',
+          'oilcubeclinicfcubefflour', 'oilcliniczflourfcubefflour', 'oilcubevaszflourzcubefcubefflour', 'oilcubeclinicfflour', 'oilzflourzcubefflour', 'oilcubevasfcube',
+          'oilcubevaszflourzcubefcube', 'oilvaszflourfcubefflour', 'oilcubevaszflourfcube', 'oilcliniczflourzcubefcube', 'oilvasfcubefflour', 'oilcubevaszflourfcubefflour',
+          'oilcliniczflourfflour', 'oilcubevaszflourzcubefflour', "oilcubefcube", "oilcubezflourfflour", "oilcubefflour"    ]
+
+maxoilk_high = ['maxoil', 'maxoilcube', 'maxoilvas', 'maxoilcubevas' ,  'maxoilclinic', 'maxoilcubeclinic' ,  'maxoilzflour', 'maxoilcubezflourzcubefcube', 'maxoilzflourfcubefflour',
+             'maxoilcubezflour' ,    'maxoilvaszflour' ,    'maxoilcliniczflour', 'maxoilcubevaszflour'  ,    'maxoilcubecliniczflour', 'maxoilcubefcubefflour',
+             'maxoilzflourzcube'   ,   'maxoilcubezflourzcube', 'maxoilvaszflourzcube' ,   'maxoilcubezflourzcubefcubefflour', 'maxoilcubezflourfcubefflour',
+              'maxoilcliniczflourzcube'    ,    'maxoilcubevaszflourzcube', 'maxoilcubecliniczflourzcube', 'maxoilcubezflourfcube', 'maxoilcubecliniczflourzcubefcubefflour',
+            'maxoilcubezflourzcubefflour', 'maxoilcubecliniczflourzcubefcube', 'maxoilcubeclinicfcube', 'maxoilzflourzcubefcubefflour', 'maxoilzflourzcubefcube',
+            'maxoilcubecliniczflourfcubefflour', 'maxoilzflourfflour', 'maxoilcubecliniczflourfcube', 'maxoilzflourfcube', 'maxoilcubecliniczflourzcubefflour', 'maxoilzflourzcubefflour',
+            'maxoilfcubefflour', 'maxoilcubeclinicfcubefflour', 'maxoilcliniczflourfcubefflour', 'maxoilcubeclinicfflour', 'maxoilfcube', 'maxoilcubevaszflourzcubefcubefflour',
+           'maxoilcubevaszflourzcubefcube', 'maxoilcliniczflourzcubefcube', 'maxoilcliniczflourzcubefcubefflour', 'maxoilcubevasfcube', 'maxoilcubecliniczflourfflour', "maxoilcubefcube" , "maxoilcubezflourfflour", "maxoilcubefflour"]
+
+zflourk_high = ['zflour', 'zflourzcube',    'cubezflour', 'oilvaszflour', 'maxoilzflour', 'maxoilcubezflour', 'oilzflour',  'zflourfcube' , 'zflourzcubefcubefflour',
+            'oilcliniczflour', 'oilcubezflour', 'oilcubevaszflour' ,    'maxoilvaszflour', 'vaszflour' , 'cliniczflour', 'cliniczflourfflour', 'oilzflourfflour',
+            'cubevaszflour',  'maxoilcliniczflour', 'maxoilcubevaszflour' , 'oilcubecliniczflourfflour', 'zflourfflour',  'oilzflourfcubefflour', 'oilzflourfcube',
+            'cubezflourzcube',   'oilvaszflourzcube', 'maxoilzflourzcube',    'maxoilcubezflourzcube', 'oilzflourzcube',  'maxoilcubecliniczflourfflour', 'maxoilzflourfcubefflour',
+            'oilcubezflourzcube' ,    'oilcubevaszflourzcube', 'maxoilvaszflourzcube', 'vaszflourzcube',  'cubevaszflourzcube'    ,    'maxoilcubevaszflourzcube',
+           'maxoilzflourfflour', 'oilzflourzcubefcubefflour', 'zflourfcubefflour', 'zflourzcubefflour', 'maxoilzflourfcube', 'oilzflourzcubefcube', 'oilcliniczflourfcubefflour',
+            'oilcubezflourzcubefcubefflour', "oilcubezflourzcubefcube", "oilcliniczflourfflour", "cubezflourzcubefflour", "maxoilcliniczflourfcubefflour", "maxoilvaszflour",
+           "oilcubecliniczflourzcubefcubefflour", "cubezflourfflour", "cubezflourzcubefcubefflour", "oilcubezflourfcube", "oilcubezflourfflour", "cubezflourfcubefflour",
+           "oilcubecliniczflourzcubefcube", "maxoilzflourzcubefcube"]
+
+fflourk_high = ['fflour', 'oilzflourfflour', 'zflourfflour', 'oilfcubefflour', "maxoilcubezflourzcubefflour", "oilcubezflourzcubefflour", "oilcliniczflourfflour",  "oilvasfcubefflour",
+             "maxoilzflourzcubefcubefflour", "maxoilcubecliniczflourzcubefcubefflour", "oilcubefcubefflour", "oilzflourzcubefcubefflour", "oilcubecliniczflourzcubefflour" ]
+
+
+# %%
 m = minimod.Minimod(solver_type = 'costmin',
 data = df,
 benefit_col = 'lives_saved',
@@ -727,17 +851,19 @@ time_subset = [1,2,3],
 strict = True,
 benefit_title = 'Lives Saved',
 minimum_benefit = 'oilvaszflourfflour33',
+main_constraint_over = 'time'
 )
 
 
 # %%
 m.fit()
 
-intervention_grouper = {'oil' : 'Oil (75%)',
-                        '(?=.*zflour)(?=.*fflour)' : 'Flour (100% Zinc + Folate)',
-                        'fcube' : 'Cube (Folate Only)' }
 
 # %%
+intervention_grouper = {'oil' : 'Oil (75%)',
+                        '(?=.*zflour)(?=.*fflour)' : 'Flour (100% Zinc + Folic Acid)',
+                        'fcube' : 'Cube (Folic Acid Only)' }
+
 m.report(intervention_groups = intervention_grouper)
 
 # %% [markdown]
@@ -749,8 +875,8 @@ data = df,
 benefit_col = 'lives_saved_high',
 cost_col = 'costs',
 space_col = 'region',
-all_space = [cubek, zcubek, fcubek, oilk, maxoilk, zflourk, fflourk],
-all_time = [oilk, maxoilk,zflourk, fflourk, cubek, zcubek, fcubek],
+all_space = [cubek_high, zcubek_high, fcubek_high, oilk_high, maxoilk_high, zflourk_high, fflourk_high],
+all_time = [oilk_high, maxoilk_high, zflourk_high, fflourk_high, cubek_high, zcubek_high, fcubek_high],
 time_subset = [1,2,3],
 strict = True,
 benefit_title = 'Lives Saved',
@@ -763,13 +889,15 @@ m_high.fit()
 
 
 # %%
-intervention_grouper_high = {'oil' : 'Oil (75%)',
-'(?=.*zcube)(?=.*fcube)(?=.*(?<![zf])cube)': 'Cube (100% Zinc + Folate + VA)',
-                        '(?=.*zflour)(?=.*fflour)' : 'Flour (100% Zinc + Folate)',
-                        'zflourfcube' : 'Cube (Folate Only)',
-                        'zflour(?![zf]cube)' : 'Flour (Zinc Only)' }
+intervention_grouper_high = {'maxoil' : 'Oil (100%)',
+'(?=.*zcube)(?=.*fcube)(?=.*(?<![zf])cube)': 'Cube (100% Zinc + Folic Acid + VA)',
+                        '(?=.*zflour)(?=.*fflour)' : 'Flour (100% Zinc + Folic Acid)',
+                        'zflourfcube' : 'Cube (Folic Acid Only)',
+                        'zflour(?![zf]cube)' : 'Flour (Zinc Only)',
+                            'clinic' : "Clinic"}
 
 m_high.report(intervention_groups=intervention_grouper_high)
+
 # %% [markdown]
 # ## Visualizing the Results
 # %% [markdown]
@@ -777,6 +905,27 @@ m_high.report(intervention_groups=intervention_grouper_high)
 
 # %%
 m.plot_time()
+
+
+# %%
+fig, (ax1, ax2) = plt.subplots(1,2,  figsize = (8,5))
+m.plot_bau_time(ax=ax1)
+m.plot_bau_time(opt_variable = 'c', ax=ax2)
+plt.savefig("low_bau.png", dpi=600)
+
+
+# %%
+m_high.plot_time()
+
+
+# %%
+fig, (ax1, ax2) = plt.subplots(1,2, figsize = (8,5))
+m_high.plot_bau_time(ax=ax1)
+m_high.plot_bau_time(opt_variable = 'c', ax=ax2)
+plt.savefig("high_bau.png", dpi=600)
+
+# word doc with graphs and tables
+# email jsting about updated costs
 
 # %% [markdown]
 # ### Mapping Lives Saved and Costs
@@ -801,11 +950,31 @@ agg_geo_df = geo_df.dissolve(by = 'space')
 
 
 # %%
-interact(m.plot_chloropleth, 
-intervention = ['oilzflourfcubefflour'], 
+interact(m.plot_map_benchmark, 
+intervention = fixed('oilzflourfcubefflour'), 
 time = IntSlider(min=1, max=10, step=1, value=1), 
-optimum_interest = ['b', 'c'], 
+optimum_interest = ['b', 'c', 'cdb', 'cdc', 'cb', 'cc'], 
+bench_intervention = fixed('oilvaszflourfflour33'),
 map_df = fixed(agg_geo_df),
 merge_key = fixed('space'),
 save = fixed(None))
+
+
+# %%
+interact(m_high.plot_map_benchmark, 
+intervention = fixed(['maxoilcliniczflourfcubefflour','maxoilzflourfcubefflour']), 
+time = IntSlider(min=1, max=10, step=1, value=1), 
+optimum_interest = ['b', 'c', 'cdb', 'cdc', 'cb', 'cc'], 
+bench_intervention = fixed('oilvaszflourfflour33'),
+map_df = fixed(agg_geo_df),
+merge_key = fixed('space'),
+save = fixed(None))
+
+# %% [markdown]
+# ## Trying Out a Different Constraint
+# 
+# Now instead of having the benefit constraint be some aggregate across space and time, let's make sure that the constraint is time-specific, as in the benefits of the optimal solution have to be at least as much in every time period.
+
+# %%
+
 

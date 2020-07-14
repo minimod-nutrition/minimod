@@ -152,7 +152,7 @@ class BaseSolver:
                 """
             )
         
-    def _discounted_sum_all(self, data):
+    def _discounted_sum_all(self, col_name):
         """Multiply each ``mip_var`` in the data by benefits or costs (``data``) and then create a ``mip`` expression from it.
 
         :param data: dataset of benefits and costs
@@ -161,12 +161,23 @@ class BaseSolver:
         :rtype: ``mip.LinExpr``
         """        
 
-        eq = mip.xsum(
-            self._df["mip_vars"].loc[k, j, t] * data[k, j, t]
-            for (k, j, t) in self._df.index.values
-        )
+        # eq = mip.xsum(
+        #     self._df["mip_vars"].loc[k, j, t] * data.loc[k, j, t]
+        #     for (k, j, t) in data.index.values
+        # )
+        ## Pass string of column name, not this stuff
+        
+        eq = (self._df['mip_vars'] * self._df[col_name]).agg(mip.xsum)
 
         return eq
+
+    def _discounted_sum_over(self, col_name, over):
+        
+        # Merge data with self._df
+        
+        eq = (self._df['mip_vars'] * self._df[col_name]).groupby(over).agg(mip.xsum)
+        
+        return eq.to_frame().rename({0 : col_name + '_vars'}, axis=1)
 
     def _is_dataframe(self, data):
         """Checks if input dataset if a ``pandas.DataFrame``
@@ -605,6 +616,7 @@ class BaseSolver:
                                                                     self.space_col])
                                                             [bench_col]
                                                             .transform('cumsum')))
+            
         else:
             bench_df = self._df.assign(bench_col = lambda df: df[bench_col])
         

@@ -156,10 +156,10 @@ class Plotter:
                 left_on = [merge_key],
                 right_on = [self.model.space_col]
             )
-            .set_index([self.model.intervention_col,
-                        self.model.space_col,
-                        self.model.time_col
-                        ])
+            # .set_index([self.model.intervention_col,
+            #             self.model.space_col,
+            #             self.model.time_col
+            #             ])
         )
         
         return df
@@ -199,22 +199,14 @@ class Plotter:
         if ax is None:
             fig, ax = plt.subplots()
         
-        merged_df = (
+        df = (
             data
+            .pipe(self._shape_file_loc, intervention = intervention, time = time)
+            .groupby(self.model.space_col)
+            .sum()
             .pipe(self._merge_shape_file, map_df = map_df, merge_key = merge_key)
         )
         
-        if intervention  == slice(None):
-            
-            df = (
-                merged_df
-                .pipe(self._dissolve_interventions, aggfunc = aggfunc)
-            )
-        else:
-            df = (
-                merged_df
-                .pipe(self._shape_file_loc, intervention = intervention, time = time)
-            )
         
         
         df.plot(column = optimum_interest, 
