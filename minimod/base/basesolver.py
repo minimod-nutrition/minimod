@@ -717,4 +717,5 @@ class BaseSolver:
         
         if save is not None:
             plt.savefig(save, dpi = p.dpi)
-        
+            
+                    

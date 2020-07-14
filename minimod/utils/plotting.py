@@ -241,17 +241,7 @@ class Plotter:
                                                         xy = x.centroid.coords[0],
                                                         size = 7), 
                                   axis=1)
-                
-            # ax.annotate('bubble',
-            #                 xy=(2., -1), xycoords='data',
-            #                 xytext=(55, 0), textcoords='offset points',
-            #                 size=20, va="center",
-            #                 bbox=dict(boxstyle="round", fc=(1.0, 0.7, 0.7), ec="none"),
-            #                 arrowprops=dict(arrowstyle="wedge,tail_width=1.",
-            #                                 fc=(1.0, 0.7, 0.7), ec="none",
-            #                                 patchA=None,
-            #                                 patchB=el,
-            #                                 relpos=(0.2, 0.5)))        
+      
         ax.set_title(title)
         ax.set_xticklabels([])
         ax.set_xticks([])
