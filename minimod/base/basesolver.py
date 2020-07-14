@@ -323,6 +323,35 @@ class BaseSolver:
         s.print_generic(header, features)
         
         print("Interventions Chosen:")
+        
+    @property
+    def optimal_interventions(self):
+        opt_intervention = (
+            self.opt_df
+            .loc[lambda df: df['opt_vals']>0]
+            .index
+            .get_level_values(level=self.intervention_col)
+            .unique()
+            .tolist()
+        )
+        
+        return opt_intervention
+    
+    @property
+    def _intervention_list_space_time(self):
+        
+        df = (
+            self.opt_df['opt_vals']
+            .reset_index(level=self.intervention_col)
+            .assign(int_appeared= lambda df: df[self.intervention_col]*df['opt_vals'].astype(int))
+            .groupby([self.space_col, self.time_col])
+            ['int_appeared']
+            .agg(set)
+            .str.join('')
+        )
+        
+        return df
+        
     
     def plot_time(self, 
                   fig = None, 
@@ -436,11 +465,13 @@ class BaseSolver:
                             save = save)
         
     def plot_chloropleth(self,
-                         intervention = slice(None),
+                         intervention = None,
                          time = None,
                          optimum_interest = 'b',
                          map_df = None,
                          merge_key = None,
+                         intervention_bubbles = False,
+                         intervention_bubble_names = None,
                          save = None):
         """Creates a chloropleth map of the specified intervention and time period for the optimal variable. 
         If more than one intervention is specified, then aggregates them. If more than one time period is specified, then creates a subplots of len(time) and show each.
@@ -459,6 +490,9 @@ class BaseSolver:
         :param save: whether to save the figure, defaults to None
         :type save: str of file path, optional
         """        
+        
+        if intervention is None:
+            intervention = self.optimal_interventions
         
         p = Plotter(self)
                 
@@ -496,6 +530,8 @@ class BaseSolver:
                                             merge_key=merge_key,
                                             aggfunc = 'sum',
                                             title = title,
+                                            intervention_bubbles = intervention_bubbles,
+                                            intervention_bubble_names = intervention_bubble_names,
                                             save = save)
         # return plot
 
@@ -532,13 +568,16 @@ class BaseSolver:
         
         
     def plot_map_benchmark(self,
-                           intervention = slice(None),
+                           intervention = None,
                            time = None,
                            optimum_interest = 'b',
                            bench_intervention = None,
                            map_df = None,
                            merge_key = None,
                            save = None,
+                           intervention_in_title = True,
+                           intervention_bubbles = False,
+                           intervention_bubble_names = None,
                            ):
         """Maps the the optimal level on a map against a benchmark, optionally the BAU level chosen from ``minimum_benefit`` or ``total_funds``.
 
@@ -562,7 +601,10 @@ class BaseSolver:
         :type merge_key: str or list, optional
         :param save: whether to save the figure, defaults to None
         :type save: str of file path, optional
-        """        
+        """  
+        
+        if intervention is None:
+            intervention = self.optimal_interventions      
         
         fig = plt.figure()
         
@@ -620,7 +662,13 @@ class BaseSolver:
         else:
             bench_df = self._df.assign(bench_col = lambda df: df[bench_col])
         
-        fig.suptitle(title, y=1.05)
+        y = 1.05
+        
+        if intervention_in_title:
+            title = title + f"\nOptimal Interventions:\n{', '.join(intervention)}"
+            y = y + .05
+            
+        fig.suptitle(title, y=y)
         plotter = p._plot_chloropleth_getter(time)
         
         # Get min and max values for color map
@@ -644,6 +692,8 @@ class BaseSolver:
                     ax = optimal,
                     cax = cbar,
                     title = "Optimal Scenario",
+                    intervention_bubbles = intervention_bubbles,
+                    intervention_bubble_names = intervention_bubble_names,
                     vmin = vmin,
                     vmax = vmax,
                     legend_kwds = {'orientation' : 'horizontal'})
@@ -659,7 +709,9 @@ class BaseSolver:
                         show_legend = False,
                         title = f"Benchmark Scenario\n(using {bench_intervention})",
                          vmin = vmin,
-                        vmax = vmax)
+                        vmax = vmax,
+                        intervention_bubbles = False,
+                        intervention_bubble_names = None)
         
         plt.tight_layout()
         
