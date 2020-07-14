@@ -42,5 +42,6 @@ setup(
     long_description_content_type=LONG_DESC_TYPE,
     classifiers=CLASSIFIERS,
     install_requires=REQUIREMENTS,
+    setup_requires=REQUIREMENTS,
     packages=find_packages(),
 )

@@ -4,6 +4,7 @@ import numpy as np
 from minimod.utils.exceptions import MissingOptimizationMethod
 import functools
 import geopandas as gpd
+from matplotlib.patches import Ellipse
 
 
 
@@ -194,11 +195,13 @@ class Plotter:
                           ax = None,
                           save = None,
                           show_legend = True,
+                          intervention_bubbles = False,
+                          intervention_bubble_names = None,
                           **kwargs):
         
         if ax is None:
             fig, ax = plt.subplots()
-        
+                    
         df = (
             data
             .pipe(self._shape_file_loc, intervention = intervention, time = time)
@@ -208,12 +211,47 @@ class Plotter:
         )
         
         
-        
         df.plot(column = optimum_interest, 
                 ax = ax, 
                 legend = show_legend,
                 **kwargs)
         
+        if intervention_bubbles:
+            el = Ellipse((2, -1), 0.5, 0.5)
+            
+            df_bubble = (
+                df
+                .merge(self.model._intervention_list_space_time
+                       .loc[(slice(None), time)], on = self.model.space_col)
+                .assign(centroid = lambda df: df['geometry'].centroid)
+
+            )            
+            
+            df_bubble_final = (
+                df_bubble
+                .assign(**{k : df_bubble['int_appeared']
+                           .str.extract(f'(?P<{k}>{k})') \
+                               for k in intervention_bubble_names})
+                .assign(bubble_name = lambda df: df[intervention_bubble_names]
+                        .fillna('')
+                        .apply(lambda row: '\n'.join(row), axis=1))
+            )
+            
+            df_bubble_final.apply(lambda x: ax.annotate(s = x.bubble_name,
+                                                        xy = x.centroid.coords[0],
+                                                        size = 7), 
+                                  axis=1)
+                
+            # ax.annotate('bubble',
+            #                 xy=(2., -1), xycoords='data',
+            #                 xytext=(55, 0), textcoords='offset points',
+            #                 size=20, va="center",
+            #                 bbox=dict(boxstyle="round", fc=(1.0, 0.7, 0.7), ec="none"),
+            #                 arrowprops=dict(arrowstyle="wedge,tail_width=1.",
+            #                                 fc=(1.0, 0.7, 0.7), ec="none",
+            #                                 patchA=None,
+            #                                 patchB=el,
+            #                                 relpos=(0.2, 0.5)))        
         ax.set_title(title)
         ax.set_xticklabels([])
         ax.set_xticks([])
