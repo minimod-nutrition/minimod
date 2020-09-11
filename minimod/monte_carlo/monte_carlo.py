@@ -2,14 +2,17 @@ from minimod.solvers import Minimod
 from minimod.utils.plotting import Plotter
 from minimod.utils.summary import OptimizationSummary
 
-from numpy.random import normal, uniform
-
+import numpy as np
 import pandas as pd
-from progressbar import progressbar
+from tqdm import tqdm
+from pqdm.processes import pqdm
 
 import matplotlib.pyplot as plt
 
 from functools import reduce
+from multiprocessing import Pool
+from functools import partial
+import matplotlib.ticker as mtick
 
 
 class MonteCarloMinimod:
@@ -31,8 +34,6 @@ class MonteCarloMinimod:
         print("""Monte Carlo Simulator""")
 
         self.solver_type = solver_type
-
-        self.dist = normal
 
         self.data = data.set_index([intervention_col, space_col, time_col])
 
@@ -56,9 +57,11 @@ class MonteCarloMinimod:
 
         self.cost_col = cost_col
 
-    def _construct_benefit_sample(self):
+    def _construct_benefit_sample(self, seed):
         """ For normal, it doesn't require transformation, so just return mean and sd"""
 
+        random = np.random.default_rng(seed=seed)
+        
         df_mean_sd = self.data[
             [self.benefit_mean_col, self.benefit_sd_col, self.pop_weight_col]
         ]
@@ -66,22 +69,24 @@ class MonteCarloMinimod:
         df = df_mean_sd.pipe(self._drop_nan_benefits).assign(
             weight_mean=lambda df: df[self.benefit_mean_col] * df[self.pop_weight_col],
             weight_sd=lambda df: df[self.benefit_sd_col] * df[self.pop_weight_col],
-            benefit_random_draw=lambda df: self.dist(
+            benefit_random_draw=lambda df: random.normal(
                 df["weight_mean"], df["weight_sd"]
             ),
         )
 
         return df["benefit_random_draw"]
 
-    def _construct_cost_sample(self):
+    def _construct_cost_sample(self,seed):
         """For costs we assume uniform and deviate by some percentage."""
+
+        random= np.random.default_rng(seed=seed)
 
         df_costs = self.data[self.cost_col]
         df_costs_low = (1 - self.cost_uniform_perc) * self.data[self.cost_col]
         df_costs_high = (1 + self.cost_uniform_perc) * self.data[self.cost_col]
 
         df = df_costs.to_frame().assign(
-            cost_random_draw=uniform(df_costs_low, df_costs_high)
+            cost_random_draw=random.uniform(df_costs_low, df_costs_high)
         )
 
         return df["cost_random_draw"]
@@ -92,83 +97,99 @@ class MonteCarloMinimod:
 
         return df
 
-    def _merge_samples(self):
+    def _merge_samples(self, seed):
 
-        benefit_sample = self._construct_benefit_sample()
-        cost_sample = self._construct_cost_sample()
+        benefit_sample = self._construct_benefit_sample(seed=seed)
+        cost_sample = self._construct_cost_sample(seed=seed)
 
         return benefit_sample.to_frame().merge(
             cost_sample, left_index=True, right_index=True
         )
+        
+    def fit_one_sample(self, 
+                       seed,
+                       all_space,
+                       all_time,
+                       space_subset,
+                       time_subset,
+                       strict,
+                       **kwargs):
+        df = self._merge_samples(seed=seed) # Needs to be inside loop to get different draw each time
+
+        minimod = Minimod(
+            solver_type=self.solver_type,
+            data=df,
+            intervention_col=self.intervention_col,
+            space_col=self.space_col,
+            time_col=self.time_col,
+            benefit_col="benefit_random_draw",
+            cost_col="cost_random_draw",
+            all_space=all_space,
+            all_time=all_time,
+            space_subset=space_subset,
+            time_subset=time_subset,
+            show_output=False,
+            strict=strict,
+            benefit_title="Effective Coverage",
+            **kwargs,
+        )
+
+        minimod.fit()
+
+        iteration_dict = {
+            "status": minimod.status,
+            "opt_objective": minimod.opt_df['opt_costs'].sum(),
+            "opt_constraint": minimod.opt_df["opt_benefit"].sum(),
+            "num_vars": minimod.num_cols,
+            "constraints": minimod.num_rows,
+            "solutions": minimod.num_solutions,
+            "num_int": minimod.num_int,
+            "num_nz": minimod.num_nz,
+            "opt_df": minimod.opt_df,
+            "sense" : minimod.sense,
+            "solver_name" : minimod.solver_name,
+            "minimum_benefit" : minimod.minimum_benefit,
+            "benefit_title" : minimod.benefit_title,
+        }
+        
+        return iteration_dict
 
     def fit_all_samples(
         self,
+        n_jobs = 5,
         N=None,
         all_space=None,
         all_time=None,
         space_subset=None,
         time_subset=None,
         strict=False,
-        show_progress=True,
-        **kwargs,
+        # show_progress=True,
+        **kwargs
     ):
+        
         if N is None:
             N = 10
 
         sim_dict = {}
 
-        if show_progress:
-            sample_range = progressbar(range(N))
-        else:
-            sample_range = range(N)
 
         print(f"""Running with {N} Samples""")
+        
+        partial_fit_sample = partial(self.fit_one_sample, 
+                                     all_space=all_space,
+                                     all_time=all_time,
+                                     space_subset=space_subset,
+                                     time_subset = time_subset,
+                                     strict=strict,
+                                     **kwargs)
+        
+        sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs)
+            
+        self.N = N
 
-        for i in sample_range:
+        self.sim_results = pd.DataFrame(sim_dict)
 
-            df = self._merge_samples()
-
-            self.minimod = Minimod(
-                solver_type=self.solver_type,
-                data=df,
-                intervention_col=self.intervention_col,
-                space_col=self.space_col,
-                time_col=self.time_col,
-                benefit_col="benefit_random_draw",
-                cost_col="cost_random_draw",
-                all_space=all_space,
-                all_time=all_time,
-                space_subset=space_subset,
-                time_subset=time_subset,
-                show_output=False,
-                strict=strict,
-                benefit_title="Effective Coverage",
-                **kwargs,
-            )
-
-            self.minimod.fit()
-
-            iteration_dict = {
-                "status": self.minimod.status,
-                "opt_objective": self.minimod.objective_value,
-                "opt_constraint": self.minimod.opt_df["opt_benefit"].sum(),
-                "num_vars": self.minimod.num_cols,
-                "constraints": self.minimod.num_rows,
-                "solutions": self.minimod.num_solutions,
-                "num_int": self.minimod.num_int,
-                "num_nz": self.minimod.num_nz,
-                "opt_df": self.minimod.opt_df,
-            }
-
-            sim_dict[i] = iteration_dict
-
-            self.N = N
-
-        print("Done.")
-
-        self.sim_results = pd.DataFrame(sim_dict).T
-
-        return pd.DataFrame(sim_dict).T
+        return pd.DataFrame(sim_dict)
 
     def _all_opt_df(self):
         """Appends the dataframe from all simulation iterations together
@@ -230,14 +251,14 @@ class MonteCarloMinimod:
     ):
 
         perc_opt = self.sim_results["status"].value_counts(normalize=True)[0] * 100
-        avg = self.sim_results.mean()
+        avg = self.sim_results.convert_dtypes().mean()
 
         s = OptimizationSummary(self)
 
         header = [
             ("MiniMod Solver Results", ""),
-            ("Method:", str(self.minimod.sense)),
-            ("Solver:", str(self.minimod.solver_name)),
+            ("Method:", str(self.sim_results['sense'].min())),
+            ("Solver:", str(self.sim_results['solver_name'].min())),
             ("Percentage Optimized:", perc_opt),
             ("Average Number Solutions Found:", avg["solutions"]),
         ]
@@ -249,7 +270,7 @@ class MonteCarloMinimod:
             ("No. of Non-zeros in Constr.", avg["num_nz"]),
         ]
 
-        results_benefits = [("Minimum Benefit", self.minimod.minimum_benefit)]
+        results_benefits = [("Minimum Benefit", self.sim_results.minimum_benefit.mean())]
 
         stats = [
             ("Statistics for Benefits and Costs", ""),
@@ -322,7 +343,7 @@ class MonteCarloMinimod:
         p = Plotter(self)
 
         costs = "Optimal Costs"
-        benefits = self.minimod.benefit_title
+        benefits = self.sim_results['benefit_title'].min()
 
         if self.solver_type == "costmin":
 
@@ -343,6 +364,10 @@ class MonteCarloMinimod:
             save=save,
         )
 
+        benefit_plot.xaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
+        cost_plot.xaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
+
+
         benefit_xlims = benefit_plot.get_xlim()
         benefit_ylims = benefit_plot.get_ylim()
 
@@ -351,11 +376,11 @@ class MonteCarloMinimod:
 
         # offset by 10% of length of x-axis
         text_x = (
-            self.minimod.minimum_benefit + (benefit_xlims[1] - benefit_xlims[0]) * 0.1
+            self.sim_results['minimum_benefit'].mean() + (benefit_xlims[1] - benefit_xlims[0]) * 0.1
         )
 
-        benefit_plot.axvline(self.minimod.minimum_benefit, color="red")
-        benefit_plot.text(text_x, text_y, "Minimum\nBenefit\nConstraint")
+        benefit_plot.axvline(self.sim_results['minimum_benefit'].mean(), color="red")
+        benefit_plot.text(text_x, text_y, "Mean\nMinimum\nBenefit\nConstraint")
 
         return fig, (benefit_plot, cost_plot)
 
@@ -375,7 +400,7 @@ class MonteCarloMinimod:
 
             iter_df = (
                 self.sim_results.loc[i]["opt_df"][col_of_interest]
-                .groupby(self.minimod.time_col)
+                .groupby(self.time_col)
                 .sum()
             )
 
@@ -385,10 +410,12 @@ class MonteCarloMinimod:
 
         # Now get mean trajectory
 
-        df_all.mean().plot(ax=ax, color="red")
+        df_all.mean().plot(ax=ax, color="black")
 
         plt.figtext(0, 0, "Bold line represents mean trajectory.")
         ax.set_title("Trajectories of all Simulations")
+        
+        ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
 
         if save is not None:
             plt.savefig(save, dpi=160)

@@ -3,6 +3,7 @@ from minimod.utils.exceptions import NotPandasDataframe, MissingColumn
 from minimod.utils.summary import OptimizationSummary
 
 from minimod.base.bau_constraint import BAUConstraintCreator
+from minimod.base.model import Model
 
 
 import pandas as pd
@@ -11,13 +12,20 @@ import numpy as np
 
 
 class CostSolver(BaseSolver):
-    def __init__(self, 
-                 minimum_benefit=None, 
-                 drop_bau = False, 
+    def __init__(self,         
+                 all_time=None, 
+                 all_space=None, 
+                 time_subset = None, 
+                 space_subset = None,
+                 strict = False,
                  main_constraint_over = None, 
+                 minimum_benefit =None,
+                 drop_bau = False,
                  **kwargs):
 
         super().__init__(sense=mip.MINIMIZE, **kwargs)
+        
+        self.bau = BAUConstraintCreator()
 
         if isinstance(minimum_benefit, float) or isinstance(minimum_benefit, int):
             self.minimum_benefit = minimum_benefit
@@ -34,6 +42,7 @@ class CostSolver(BaseSolver):
             self.minimum_benefit = self.bau.create_bau_constraint(
                 self._df, minimum_benefit, "discounted_benefits", over
             )
+        
 
         self.bau_df = self.bau.bau_df(
             self._df,
@@ -46,8 +55,24 @@ class CostSolver(BaseSolver):
             ],
         )
         
+        summed_bau_df = self.bau_df.sum()
+        
+        self.cost_per_benefit = summed_bau_df[self.cost_col]/summed_bau_df[self.benefit_col]
+        
         if drop_bau:
             self._df = self._df.drop(minimum_benefit, level=self.intervention_col)
+                   
+        self.model = Model(data = self._df, sense = self.sense, solver_name=self.solver_name, show_output=self.show_output)
+        
+        ## Create base model
+        self.model.base_model_create(self.intervention_col, 
+                                    self.space_col, 
+                                    self.time_col, 
+                                    all_time=all_time, 
+                                    all_space=all_space, 
+                                    time_subset = time_subset, 
+                                    space_subset = space_subset,
+                                    strict = strict)
 
         # Add objective and constraint
         self.model.add_objective(self._objective())

@@ -344,16 +344,16 @@ class Model:
             opt_costs_discounted=lambda df: df["discounted_costs"] * df["opt_vals"],
             opt_benefit_discounted=lambda df: df["discounted_benefits"]* df["opt_vals"],
             cumulative_discounted_benefits = lambda df: (df
-                                                         .groupby([intervention_col, space_col])['opt_benefit_discounted']
+                                                         .groupby([space_col])['opt_benefit_discounted']
                                                          .transform('cumsum')),
             cumulative_discounted_costs = lambda df: (df
-                                                         .groupby([intervention_col, space_col])['opt_costs_discounted']
+                                                         .groupby([space_col])['opt_costs_discounted']
                                                          .transform('cumsum')),
             cumulative_benefits = lambda df: (df
-                                                         .groupby([intervention_col, space_col])['opt_benefit']
+                                                         .groupby([space_col])['opt_benefit']
                                                          .transform('cumsum')),
             cumulative_costs = lambda df: (df
-                                                         .groupby([intervention_col, space_col])['opt_costs']
+                                                         .groupby([space_col])['opt_costs']
                                                          .transform('cumsum'))
         )[
             [

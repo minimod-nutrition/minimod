@@ -217,21 +217,31 @@ class Plotter:
                 **kwargs)
         
         if intervention_bubbles:
-            el = Ellipse((2, -1), 0.5, 0.5)
             
-            df_bubble = (
-                df
-                .merge(self.model._intervention_list_space_time
-                       .loc[(slice(None), time)], on = self.model.space_col)
-                .assign(centroid = lambda df: df['geometry'].centroid)
+            if isinstance(intervention_bubbles, bool):
+            
+                df_bubble = (
+                    df
+                    .merge(self.model._intervention_list_space_time
+                        .loc[(slice(None), time)], on = self.model.space_col)
+                    .assign(centroid = lambda df: df['geometry'].centroid)
 
-            )            
+                )         
             
+            elif intervention_bubbles == 'bau':
+                df_bubble = (
+                    df
+                    .merge(self.model.bau_list
+                        .loc[(slice(None), time)], on = self.model.space_col)
+                    .assign(centroid = lambda df: df['geometry'].centroid)
+
+                ) 
+                
             df_bubble_final = (
                 df_bubble
                 .assign(**{k : df_bubble['int_appeared']
-                           .str.extract(f'(?P<{k}>{k})') \
-                               for k in intervention_bubble_names})
+                        .str.extract(f'(?P<{k}>{k})') \
+                            for k in intervention_bubble_names})
                 .assign(bubble_name = lambda df: df[intervention_bubble_names]
                         .fillna('')
                         .apply(lambda row: '\n'.join(row), axis=1))
@@ -239,7 +249,8 @@ class Plotter:
             
             df_bubble_final.apply(lambda x: ax.annotate(s = x.bubble_name,
                                                         xy = x.centroid.coords[0],
-                                                        size = 7), 
+                                                        size = 7,
+                                                        color ='red'), 
                                   axis=1)
       
         ax.set_title(title)

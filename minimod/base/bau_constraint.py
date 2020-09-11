@@ -16,6 +16,8 @@ class BAUConstraintCreator:
                slice(None)),:][discounted_variable]
          )
         
+        summed_bau_df = df.sum()
+                        
         return df
         
     
@@ -34,3 +36,4 @@ class BAUConstraintCreator:
             )
         
         return minimum_constraint
+    

@@ -11,9 +11,6 @@ from minimod.utils.summary import OptimizationSummary
 from minimod.utils.plotting import Plotter
 from minimod.utils.suppress_messages import suppress_stdout_stderr
 
-from minimod.base.bau_constraint import BAUConstraintCreator
-from minimod.base.model import Model
-
 import matplotlib.pyplot as plt
 
 import pandas as pd
@@ -36,11 +33,6 @@ class BaseSolver:
         intervention_col = 'intervention',
         space_col = 'space',
         time_col = 'time',
-        all_time=None, 
-        all_space=None, 
-        time_subset = None, 
-        space_subset = None,
-        strict = False,
         interest_rate_cost=0.0,  # Discount factor for costs
         interest_rate_benefit=0.03,  # Discount factor for benefits 
         va_weight=1.0,  # VA Weight
@@ -114,7 +106,6 @@ class BaseSolver:
             costs=cost_col,
         )
         
-        self.model = Model(data = self._df, sense = sense, solver_name=self.solver_name, show_output=self.show_output)
         
         self.benefit_col = benefit_col
         self.cost_col = cost_col
@@ -125,20 +116,9 @@ class BaseSolver:
         if self.show_output:
             print("[Note]: Creating Base Model with constraints")
             
-        self.bau = BAUConstraintCreator()
         
         self.minimum_benefit = None
         self.total_funds = None
-
-        ## Create base model
-        self.model.base_model_create(intervention_col, 
-                                    space_col, 
-                                    time_col, 
-                                    all_time=all_time, 
-                                    all_space=all_space, 
-                                    time_subset = time_subset, 
-                                    space_subset = space_subset,
-                                    strict = strict)
         
         if self.show_output:
             print(
@@ -160,12 +140,6 @@ class BaseSolver:
         :return: ``mip`` Expression
         :rtype: ``mip.LinExpr``
         """        
-
-        # eq = mip.xsum(
-        #     self._df["mip_vars"].loc[k, j, t] * data.loc[k, j, t]
-        #     for (k, j, t) in data.index.values
-        # )
-        ## Pass string of column name, not this stuff
         
         eq = (self._df['mip_vars'] * self._df[col_name]).agg(mip.xsum)
 
@@ -295,6 +269,8 @@ class BaseSolver:
          self.num_nz, 
          self.status) = self.model.get_model_results()
         
+        return self
+        
     def write(self, filename="model.lp"):
         
         self.model.write(filename)
@@ -348,6 +324,18 @@ class BaseSolver:
             ['int_appeared']
             .agg(set)
             .str.join('')
+        )
+        
+        return df
+    
+    @property
+    def bau_list(self):
+        
+        df = (
+            self.bau_df
+            .reset_index(level=self.intervention_col)
+            .rename({self.intervention_col : 'int_appeared'}, axis=1)
+            ['int_appeared']
         )
         
         return df
@@ -427,18 +415,55 @@ class BaseSolver:
             opt = 'opt_costs'
             bau_col = self.cost_col
             title = "Optimal Costs vs. BAU"
+        elif opt_variable == 'cdb':
+            opt = 'cumulative_discounted_benefits'
+            bau_col = 'discounted_benefits'
+            title = 'Cumulative Discounted ' + self.benefit_title
+        elif opt_variable == 'cdc':
+            opt = 'cumulative_discounted_costs'
+            bau_col = 'discounted_costs'
+            title = 'Cumulative Discounted Costs'
+        elif opt_variable == 'cb':
+            opt = 'cumulative_benefits'
+            bau_col = self.benefit_col
+            title = 'Cumulative ' + self.benefit_title      
+        elif opt_variable == 'cc':
+            opt = 'cumulative_costs'
+            bau_col = self.cost_col
+            title = 'Cumulative Costs'
+        else:
+            raise Exception("Not one of the allowed variables for map plotting. Try again.")
+        
+        if opt_variable in ['cdb', 'cdc', 'cb', 'cc']:
+            
+            bench_df = (
+                self.bau_df
+                .groupby([self.time_col])
+                .sum().cumsum()
+                .assign(bench_col = lambda df: df[bau_col])
+                )
+            
+        else:
+            bench_df = (
+                self.bau_df
+                .assign(bench_col = lambda df: df[bau_col])
+                .groupby([self.time_col])
+                .sum()
+                        )
 
         p._plot_lines(to_plot = opt,
                     title= title,
                     xlabel = 'Time',
-                    save = save,
                     figure=fig,
                     axis=ax)
         
-        self.bau_df.groupby([self.time_col])[bau_col].sum().plot(ax=ax)
+        bench_df['bench_col'].plot(ax=ax)
         
         ax.legend(['Optimal', 'BAU'])
         ax.set_xlabel('Time')
+
+        if save is not None:
+            plt.savefig(save)
 
     def plot_opt_val_hist(self, 
                           fig = None, 
@@ -578,6 +603,8 @@ class BaseSolver:
                            intervention_in_title = True,
                            intervention_bubbles = False,
                            intervention_bubble_names = None,
+                           millions = True,
+                           bau_intervention_bubble_names = None
                            ):
         """Maps the the optimal level on a map against a benchmark, optionally the BAU level chosen from ``minimum_benefit`` or ``total_funds``.
 
@@ -653,14 +680,14 @@ class BaseSolver:
             
         if optimum_interest in ['cdb', 'cdc', 'cb', 'cc']:
             
-            bench_df = self._df.assign(bench_col = lambda df: (df
+            bench_df = self.bau_df.assign(bench_col = lambda df: (df
                                                             .groupby([self.intervention_col, 
                                                                     self.space_col])
                                                             [bench_col]
                                                             .transform('cumsum')))
             
         else:
-            bench_df = self._df.assign(bench_col = lambda df: df[bench_col])
+            bench_df = self.bau_df.assign(bench_col = lambda df: df[bench_col])
         
         y = 1.05
         
@@ -680,6 +707,11 @@ class BaseSolver:
         
         vmax = max(opt_max, bench_max)
         vmin = min(opt_min, bench_min)
+        
+        if intervention_bubbles:
+            bau_intervention_bubbles = 'bau'
+        else:
+            bau_intervention_bubbles = False
         
         
         plotter(data = self.opt_df,
@@ -707,15 +739,25 @@ class BaseSolver:
                         aggfunc = 'sum',
                         ax = bench,
                         show_legend = False,
-                        title = f"Benchmark Scenario\n(using {bench_intervention})",
+                        title = f"BAU* Scenario",
                          vmin = vmin,
                         vmax = vmax,
-                        intervention_bubbles = False,
-                        intervention_bubble_names = None)
+                        intervention_bubbles = bau_intervention_bubbles,
+                        intervention_bubble_names = bau_intervention_bubble_names)
         
         plt.tight_layout()
         
+        fig_text = 'Note: Colors describe ' + title
+        
+        if millions:
+            fig_text = fig_text + ' (in millions)'
+        
+        # if intervention_bubble_names:
+        #     fig_text = fig_text + '\nBAU* scenario made up of ' + ', '.join(intervention_bubble_names)
+        
+        fig.text(0.5,-.05, fig_text, ha='center')
+                
         if save is not None:
-            plt.savefig(save, dpi = p.dpi)
+            plt.savefig(save, dpi = p.dpi, bbox_inches="tight")
             
                     
