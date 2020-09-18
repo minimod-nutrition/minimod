@@ -195,59 +195,36 @@ class MonteCarloMinimod:
         """Appends the dataframe from all simulation iterations together
         """
 
-        opt_df_list = [
-            self.sim_results.stack()  # Get results  # stack so columns become index
-            .loc[(slice(None), "opt_df")][i]  # Get only opt_df
-            .assign(iteration=i)  # Create variable for iteration
-            for i in range(self.N)
-        ]
-
-        all_opt_df = reduce(lambda i, j: i.append(j), opt_df_list)
+        all_opt_df = pd.concat(self.sim_results.apply(lambda x: x['opt_df'].assign(iteration = x.name), axis=1).tolist())
 
         return all_opt_df
 
-    def _perc_int_df(self, data, grouper_col = None):
-        """Creates a dataframe of intervention appearances in simulations
-        """
-        
-        if grouper_col is None:
-            grouper_col = self.intervention_col
-        else:
-            if isinstance(grouper_col, str):
-                grouper_col = [self.intervention_col] + [grouper_col]
-            else:
-                grouper_col = [self.intervention_col] + grouper_col
-
-        perc_int = (
-            data
-            .assign(val_appeared=lambda df: (df["opt_vals"] > 0).astype(int))[
-                "val_appeared"
-            ]
-            .groupby(grouper_col)
-            .sum()
-        ) 
-
-        return perc_int
-
-    def _get_intervention_group(self, perc_int, intervention):
+    def _get_intervention_group(self, data, intervention):
         
 
         int_group = (
-            perc_int
+            data
             .loc[lambda df: df.index.
                  get_level_values(level= self.intervention_col)
                  .str.contains(intervention)]
         )
 
         return int_group
+    
+    def _get_indicator_if_in_intervention(self, name):
+        
+        return (self._get_intervention_group(self._all_opt_df(), name)
+                .reset_index()
+                [['opt_vals', 'iteration', self.intervention_col, self.space_col, self.time_col]]
+                .groupby('iteration')
+                .agg(lambda x: 1 if x.sum() > 1 else 0)
+                )
 
     def report(
         self,
         avg_time=False,
         avg_space=False,
-        perc_intervention_appeared=False,
-        show_percint_full=False,
-        intervention_group=None,
+        intervention_group=None
     ):
 
         perc_opt = self.sim_results["status"].value_counts(normalize=True)[0] * 100
@@ -287,37 +264,20 @@ class MonteCarloMinimod:
         )
         print(stats_df)
 
-        all_opt_df = self._all_opt_df()
-        
-        grouped_all_opt_df = (
-            all_opt_df
-            .groupby([self.intervention_col, "iteration"])
-            .sum()
-            )
+        if intervention_group is not None:
 
-        if perc_intervention_appeared:
+            s.print_generic([(f"% Appearance of:", "")])
 
-            perc_int = (self._perc_int_df(grouped_all_opt_df)/self.N)*100
+            for i in intervention_group:
 
-            s.print_generic([("Percentage Appeared in Simulations", "")])
+                int_group = (self._get_indicator_if_in_intervention(i).sum()/self.N*100)['opt_vals']
 
-            if show_percint_full:
-                print(perc_int.to_markdown())
-
-            if intervention_group is not None:
-
-                s.print_generic([(f"% Appearance of:", "")])
-
-                for i in intervention_group:
-
-                    int_group = self._get_intervention_group(perc_int, i).sum()/perc_int.sum()
-
-                    s.print_generic([(f"{i}", f"{int_group}")])
+                s.print_generic([(f"{i}", f"{int_group}")])
 
         if avg_time:
 
             time_df = (
-                all_opt_df.groupby([self.time_col, "iteration"])
+                self._all_opt_df().groupby([self.time_col, "iteration"])
                 .sum()
                 .groupby(self.time_col)
                 .mean()[["opt_benefit", "opt_costs"]]
@@ -329,7 +289,7 @@ class MonteCarloMinimod:
         if avg_space:
 
             space_df = (
-                all_opt_df.groupby([self.space_col, "iteration"])
+                self._all_opt_df().groupby([self.space_col, "iteration"])
                 .sum()
                 .groupby(self.space_col)
                 .mean()[["opt_benefit", "opt_costs"]]
@@ -412,7 +372,7 @@ class MonteCarloMinimod:
 
         df_all.mean().plot(ax=ax, color="black")
 
-        plt.figtext(0, 0, "Bold line represents mean trajectory.")
+        # plt.figtext(0, 0, "Bold line represents mean trajectory.")
         ax.set_title("Trajectories of all Simulations")
         
         ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
@@ -426,27 +386,23 @@ class MonteCarloMinimod:
         
         fig, ax = plt.subplots()
 
-        all_opt_df = (
-            self._all_opt_df()
-            .groupby([self.intervention_col, self.time_col])
-            .sum()
-            )
-
-        perc_int = self._perc_int_df(all_opt_df, 
-                                     grouper_col=self.time_col)
-
-        int_groups = {
-            name: self._get_intervention_group(perc_int, name).groupby(self.time_col).sum()
-            for name in intervention_group
-        }
+        all_opt_df = (self._all_opt_df()
+                      .groupby(['intervention', 'time', 'iteration'])
+                      ['opt_vals']
+                      .sum()
+                      .to_frame()
+                      .assign(opt_vals = lambda df: (df['opt_vals']>0).astype(int))
+                      )
         
-        int_groups_df = pd.DataFrame(int_groups)
-                
-        (
-            int_groups_df
-            .apply(lambda x: x/int_groups_df.sum(axis=1))
-            .plot.bar(ax = ax, stacked = True)
-            )
+        int_group = (
+            all_opt_df[all_opt_df['opt_vals']>0]
+            .reset_index(level=self.intervention_col)
+            [self.intervention_col]
+            .str.extractall('|'.join([f"(?P<{i}>{i})" for i in intervention_group]))
+         )             
+        
+        int_group.groupby(self.time_col).count().apply(lambda x: x/x.sum(), axis=1).plot.bar(stacked=True, ax=ax)
+                   
         
         ax.legend(loc = 'lower left', bbox_to_anchor=(1.0, 0.5))
         ax.set_ylabel("% of Occurrences")
