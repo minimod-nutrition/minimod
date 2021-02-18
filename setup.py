@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
+from sys import version
+import versioneer
 
 from setuptools import setup, find_packages
-from minimod.version import __version__
 
 with open("reqs/base-requirements.txt") as f:
     REQUIREMENTS = f.read().splitlines()
@@ -31,7 +32,8 @@ PYTHON_REQ = ">=3.5"
 
 setup(
     name=NAME,
-    version=__version__,
+    version=versioneer.get_version(),
+    cmdclass = versioneer.get_cmdclass(),
     author=AUTHOR_NAME,
     author_email=AUTHOR_EMAIL,
     description=DESCRIPTION,

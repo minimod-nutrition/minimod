@@ -1,2 +1,4 @@
 include *.txt
-recursive-include docs *.txt
+recursive-include docs *.txtinclude versioneer.py
+include minimod/_version.py
+include versioneer.py
