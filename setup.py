@@ -26,7 +26,7 @@ CLASSIFIERS = [
 ]
 LICENSE = "GPLv3"
 DESCRIPTION = "A Mixed Integer Solver for spatio-temporal nutrition interventions"
-URL = "https://github.com/amichuda/minimod"
+URL = "https://github.com/minimod-nutrition/minimod"
 PYTHON_REQ = ">=3.5"
 
 setup(
@@ -42,6 +42,5 @@ setup(
     long_description_content_type=LONG_DESC_TYPE,
     classifiers=CLASSIFIERS,
     install_requires=REQUIREMENTS,
-    setup_requires=REQUIREMENTS,
     packages=find_packages(),
 )

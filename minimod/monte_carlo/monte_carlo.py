@@ -199,21 +199,33 @@ class MonteCarloMinimod:
 
         return all_opt_df
 
-    def _get_intervention_group(self, data, intervention):
+    def _get_intervention_group(self, data, intervention, strict=False):
         
-
-        int_group = (
-            data
-            .loc[lambda df: df.index.
-                 get_level_values(level= self.intervention_col)
-                 .str.contains(intervention)]
-        )
+        if strict:
+            
+            int_group = (
+                data
+                .loc[lambda df: df.index.
+                    get_level_values(level= self.intervention_col)
+                    .isin(intervention)]
+            )
+        
+        else:
+            int_group = (
+                data
+                .loc[lambda df: df.index.
+                    get_level_values(level= self.intervention_col)
+                    .str.contains(intervention)]
+            )
 
         return int_group
     
-    def _get_indicator_if_in_intervention(self, name):
+    def _get_indicator_if_in_intervention(self, name, indicator_spec = None, strict=False):
         
-        return (self._get_intervention_group(self._all_opt_df(), name)
+        if indicator_spec is None:
+            indicator_spec = 1
+        
+        return (self._get_intervention_group(self._all_opt_df(), name, strict=strict)
                 .reset_index()
                 [['opt_vals', 'iteration', self.intervention_col, self.space_col, self.time_col]]
                 .groupby('iteration')
@@ -224,7 +236,9 @@ class MonteCarloMinimod:
         self,
         avg_time=False,
         avg_space=False,
-        intervention_group=None
+        intervention_group=None,
+        indicator_spec = None,
+        strict=False
     ):
 
         perc_opt = self.sim_results["status"].value_counts(normalize=True)[0] * 100
@@ -270,7 +284,9 @@ class MonteCarloMinimod:
 
             for i in intervention_group:
 
-                int_group = (self._get_indicator_if_in_intervention(i).sum()/self.N*100)['opt_vals']
+                int_group = (self._get_indicator_if_in_intervention(i, 
+                                                                    indicator_spec=indicator_spec,
+                                                                    strict=strict).sum()/self.N*100)['opt_vals']
 
                 s.print_generic([(f"{i}", f"{int_group}")])
 
@@ -382,7 +398,7 @@ class MonteCarloMinimod:
 
         return ax
 
-    def plot_intervention_stacked(self, intervention_group=None):
+    def plot_intervention_stacked(self, intervention_group=None, intervention_names = None):
         
         fig, ax = plt.subplots()
 
@@ -398,7 +414,7 @@ class MonteCarloMinimod:
             all_opt_df[all_opt_df['opt_vals']>0]
             .reset_index(level=self.intervention_col)
             [self.intervention_col]
-            .str.extractall('|'.join([f"(?P<{i}>{i})" for i in intervention_group]))
+            .str.extractall('|'.join([f"(?P<{j}>{i})" for i, j in zip(intervention_group, intervention_names)]))
          )             
         
         int_group.groupby(self.time_col).count().apply(lambda x: x/x.sum(), axis=1).plot.bar(stacked=True, ax=ax)

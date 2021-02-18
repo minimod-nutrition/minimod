@@ -23,6 +23,7 @@ excel_file = "examples/data/raw/Katie_VA_Benefits_and_Costs_1_8_2019.xlsx"
 
 # %%
 
+
 df_benefit = (pd.read_excel(excel_file,
                            sheet_name = 'Benefits',
                            header = 2)
