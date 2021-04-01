@@ -12,7 +12,7 @@ with open("README.md") as f:
     LONG_DESCRIPTION, LONG_DESC_TYPE = f.read(), "text/markdown"
 
 NAME = "minimod"
-AUTHOR_NAME, AUTHOR_EMAIL = "Aleksandr Michuda, Michael Jarvis and Steve Vosti", "amichuda@ucdavis.edu"
+AUTHOR_NAME, AUTHOR_EMAIL = "Aleksandr Michuda, Steve Vosti, Michael Jarvis and Katie Pittenger-Adams", "amichuda@ucdavis.edu"
 CLASSIFIERS = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: GPLv3",
