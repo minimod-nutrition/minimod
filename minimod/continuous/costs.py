@@ -1,52 +1,11 @@
 # %%
+from typing import Callable
 import pandas as pd
 import math
-import warnings
-
-class DataProcessor:
-    
-    def __init__(self, 
-                 data: pd.DataFrame,
-                 vehicle: str,
-                 compound: list,
-                 vehicle_col: str = None,
-                 nutrient_col : str = None,
-                 compound_col : str = None,
-                 activity_col : str = None,
-                 fort_level_col :  str = None,
-                 overage_col : str = None,
-                 price_col : str = None):
-                
-        self.vehicle_col = vehicle_col if vehicle_col is not None else 'vehicle'
-        self.nutrient_col = nutrient_col if nutrient_col is not None else 'nutrient'
-        self.compound_col = compound_col if compound_col is not None else 'compound'
-        self.activity_col = activity_col if activity_col is not None else 'activity'
-        self.fort_level_col = fort_level_col if fort_level_col is not None else 'fort_level'
-        self.overage_col = overage_col if overage_col is not None else 'overage'
-        self.price_col = price_col if price_col is not None else 'price'
-        
-        self._data = (
-            data
-            .loc[lambda df: df[self.vehicle_col] == vehicle]
-            .loc[lambda df: df[self.compound_col].isin(compound)]
-            .set_index([self.nutrient_col, self.compound_col])
-            )
-        
-        self.nutrient = self._data.index.get_level_values(self.nutrient_col)
-        self.compound = self._data.index.get_level_values(self.compound_col)
-        self.activity = self._data[self.activity_col]
-        self.fort_level = self._data[self.fort_level_col]
-        self.overage = self._data[self.overage_col]
-        self.price = self._data[self.price_col]
-        
-    @property
-    def data(self):
-        return self._data
-        
-    @property
-    def amt_fort(self):
-        return (self.fort_level + (self.fort_level * self.overage))/self.activity
-        
+import  numpy as np
+import matplotlib.pyplot as plt
+from . import DataProcessor
+import scipy.optimize as opt
         
 class PremixCostCalculator:
     
@@ -100,6 +59,10 @@ class PremixCostCalculator:
             raise ValueError("New value's length doesn't equal length of amt_fort")
             
         self._amt_fort.loc[:] = value
+        
+    def reset_amt_fort(self):
+        
+        self._amt_fort = self._d.amt_fort
         
     @property
     def excipient(self):
@@ -158,9 +121,47 @@ class PremixCostCalculator:
         }
 
         return pd.DataFrame(data = cost_summary.values(), 
-                            index = cost_summary.keys())
+                            index = cost_summary.keys())     
 
+        
 
-    
-    
+if __name__ == '__main__':
 # %%
+# Check if we change Iron
+
+    compounds = ['Micronized ferric pyrophosphate',
+    'Retinyl Palmitate- 250,000 IU/g (dry)',
+    'Zinc Oxide',
+    'Vit. B-12 0.1% WS',
+    'Folic Acid'
+    ]
+
+    p = PremixCostCalculator(
+        data = df,
+        vehicle= 'Bouillon',
+        compound=compounds,
+        vehicle_col='vehicle',
+        nutrient_col='nutrient',
+        compound_col='compound',
+        activity_col = 'fort_prop',
+        fort_level_col = 'fort_level',
+        overage_col = 'fort_over',
+        price_col='price'
+
+    )
+
+    amt_fort_list = []
+
+    for i in np.linspace(1, 20000, 1000):
+        
+        new_amt_fort = p.amt_fort
+        
+        new_amt_fort[1] = i
+        
+        p.amt_fort = new_amt_fort
+        
+        amt_fort_list.append(p.total_cost)
+
+
+    plt.plot(np.linspace(1, 20000, 1000), amt_fort_list)
+
