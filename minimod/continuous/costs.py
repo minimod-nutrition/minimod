@@ -3,49 +3,23 @@ from typing import Callable
 import pandas as pd
 import math
 import  numpy as np
-import matplotlib.pyplot as plt
-from . import DataProcessor
+from data import CostDataProcessor
 import scipy.optimize as opt
         
 class PremixCostCalculator:
     
     def __init__(self, 
-                 name: str = None,
-                 data: pd.DataFrame = None,
-                 vehicle: str = None,
-                 compound: list = None,
-                 vehicle_col: str = None,
-                 nutrient_col : str = None,
-                 compound_col : str = None,
-                 activity_col : str = None,
-                 fort_level_col :  str = None,
-                 overage_col : str = None,
-                 price_col : str = None,
-                 upcharge : float = 1.0,
-                 excipient_price : float = 1.5):
+                 data: CostDataProcessor = None,
+                 upcharge: int = None,
+                 excipient_price: float= None):
         
-        self.upcharge = upcharge
-        self.name = name
-        self.excipient_price = excipient_price
+        self.upcharge = upcharge if not None else 1
+        self.excipient_price = excipient_price if not None else 1.5
         
-        self.nutrient_col = nutrient_col
-        self.compound_col = compound_col
+        self.data = data
         
-        d = DataProcessor(data,
-                          vehicle,
-                          compound,
-                          vehicle_col,
-                          nutrient_col,
-                          compound_col,
-                          activity_col,
-                          fort_level_col,
-                          overage_col,
-                          price_col)
-        
-        self._d = d
-        
-        self._amt_fort = d.amt_fort
-        self.price = d.price
+        self._amt_fort = data.amt_fort
+        self.price = data.price
         
         self.nutrient_subtotal = self.amt_fort.sum()
         
@@ -121,47 +95,69 @@ class PremixCostCalculator:
         }
 
         return pd.DataFrame(data = cost_summary.values(), 
-                            index = cost_summary.keys())     
+                            index = cost_summary.keys()) 
+    
+    def line_fit(self, func : Callable=None):
+        """Fits benefits data to `func`     
 
+        Args:
+            func (Callable, optional): Function to fit data to. If None, line is chosen. Defaults to None.
+        """        
         
-
+        if func is None:
+            func = lambda x, m, b: m*x + b
+            
+        y = []
+        x = np.linspace(1, 20000, 10)
+            
+        for i in np.linspace(1, 20000, 10):
+        
+            new_amt_fort = self.amt_fort
+            new_amt_fort[1] = i
+            
+            self.amt_fort = new_amt_fort
+            
+            y.append(self.total_cost)
+                    
+        popt, pcov = opt.curve_fit(func, x, y)
+        
+        def f(x):
+            return func(x, *popt)
+        
+        return f, popt, pcov
+            
 if __name__ == '__main__':
-# %%
+
+    import matplotlib.pyplot as plt
+
+    # Load data from github
+    df = pd.read_csv("example/cost_data.csv")
 # Check if we change Iron
 
-    compounds = ['Micronized ferric pyrophosphate',
+    fortificants = ['Micronized ferric pyrophosphate',
     'Retinyl Palmitate- 250,000 IU/g (dry)',
     'Zinc Oxide',
     'Vit. B-12 0.1% WS',
     'Folic Acid'
     ]
-
-    p = PremixCostCalculator(
+    
+    d = CostDataProcessor(
         data = df,
-        vehicle= 'Bouillon',
-        compound=compounds,
-        vehicle_col='vehicle',
-        nutrient_col='nutrient',
-        compound_col='compound',
+        vehicle = 'Bouillon',
+        fortificant_col = 'compound',
+        fortificant=fortificants,
         activity_col = 'fort_prop',
-        fort_level_col = 'fort_level',
-        overage_col = 'fort_over',
-        price_col='price'
-
+        overage_col = 'fort_over'
     )
 
-    amt_fort_list = []
+    p = PremixCostCalculator(
+        data = d
+    )
 
-    for i in np.linspace(1, 20000, 1000):
-        
-        new_amt_fort = p.amt_fort
-        
-        new_amt_fort[1] = i
-        
-        p.amt_fort = new_amt_fort
-        
-        amt_fort_list.append(p.total_cost)
+    f, params, cov = p.line_fit()
+
+    x = np.linspace(1, 20000, 10)
+    plt.plot(x, f(x))
 
 
-    plt.plot(np.linspace(1, 20000, 1000), amt_fort_list)
-
+# %%

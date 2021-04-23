@@ -9,8 +9,6 @@ from functools import partial
 class Benefits:
     
     def __init__(self,
-                 name :  str, 
-                 fortificant: str,
                  data: pd.DataFrame,
                  benefit_col: str,
                  increment_col: str
@@ -18,21 +16,15 @@ class Benefits:
         """A class to create the functional relationship between benefits and the amount of fortification.
 
         Args:
-            name (str): name of the vehicle
-            fortificant (str): name of fortificant
             data (pd.DataFrame): Dataframe with benefits across different levels of fortification
             benefit_col (str): name of benefit column in `data`
             increment_col (str): name of column with levels of fortificant
         """        
         
-        self.name = name
-        self.fortificant = fortificant
-        
         self.data = data
         self.benefit_col = benefit_col
         self.increment_col = increment_col
-        
-        
+    
     @property
     def increment(self):
         """Checks if increment is equal across all levels of fortification
@@ -54,7 +46,6 @@ class Benefits:
         """        
         
         if func is None:
-            
             func = lambda x, L, k, x0: L/(1 + np.exp(-k*(x - x0)))
             
         x = self.data[self.increment_col]
@@ -72,23 +63,9 @@ class Benefits:
 if __name__ == '__main__':
     
     import matplotlib.pyplot as plt
+    from example.example_data import benefits, increment, df
     
-    # create benefits data
-    func = lambda x, L, k, x0: L/(1 + np.exp(-k*(x - x0)))
-
-    increment= np.linspace(0,10,100)
-    
-    np.random.seed(1729)
-    noise = 0.2 * np.random.normal(size=increment.size)
-    
-    benefits = func(increment, 5, .1, 2) + noise
-    
-    df = pd.DataFrame({'increment' : increment,
-                       'benefits' : benefits})
-    
-    b = Benefits(name = "wheat flour", 
-                 fortificant='iron',
-                 data=df,
+    b = Benefits(data=df,
                  benefit_col='benefits',
                  increment_col='increment')
     
@@ -96,4 +73,6 @@ if __name__ == '__main__':
     
     plt.scatter(increment, benefits)
     plt.plot(increment, f(increment), color='tab:red')
+
+
 # %%

@@ -1,0 +1,104 @@
+,Unnamed: 0,vehicle,nutrient,compound,nut,fort,fort_prop,price,fort_level,fort_over,upper_bound
+0,0,Bouillon,Calcium,Calcium Carbonate,Calcium,Calcium Carbonate,0.4,1.2799999999999998,0.0,0.0,1000
+1,1,Maize Flour,Calcium,Calcium Carbonate,Calcium,Calcium Carbonate,0.4,1.2799999999999998,0.0,0.0,1000
+2,2,Rice,Calcium,Calcium Carbonate,Calcium,Calcium Carbonate,0.4,1.2799999999999998,0.0,0.0,1000
+3,3,Salt,Calcium,Calcium Carbonate,Calcium,Calcium Carbonate,0.4,1.2799999999999998,0.0,0.0,1000
+4,4,Wheat Flour,Calcium,Calcium Carbonate,Calcium,Calcium Carbonate,0.4,1.2799999999999998,0.0,0.0,1000
+5,5,Bouillon,Fluoride,Potassium fluoride (for wet method),Fluoride,Potassium fluoride (for wet method),0.33,6.0,0.0,0.0,1000
+6,6,Salt,Fluoride,Potassium fluoride (for wet method),Fluoride,Potassium fluoride (for wet method),0.33,6.0,0.0,0.0,1000
+7,7,Bouillon,Fluoride,Sodium fluoride (for dry method),Fluoride,Sodium fluoride (for dry method),0.45,11.0,0.0,0.0,1000
+8,8,Salt,Fluoride,Sodium fluoride (for dry method),Fluoride,Sodium fluoride (for dry method),0.45,11.0,0.0,0.0,1000
+9,9,Bouillon,Folate,Folic Acid,Folate,Folic Acid,0.9,60.0,80.0,0.0,1000
+10,10,Maize Flour,Folate,Folic Acid,Folate,Folic Acid,0.9,60.0,2.5,0.0,1000
+11,11,Rice,Folate,Folic Acid,Folate,Folic Acid,0.9,60.0,0.0,0.0,1000
+12,12,Salt,Folate,Folic Acid,Folate,Folic Acid,0.9,60.0,0.0,0.0,1000
+13,13,Wheat Flour,Folate,Folic Acid,Folate,Folic Acid,0.9,60.0,2.5,0.0,1000
+14,14,Bouillon,Iodine,Potassium Iodate,Iodine,Potassium Iodate,0.59,24.0,0.0,0.0,1000
+15,15,Salt,Iodine,Potassium Iodate,Iodine,Potassium Iodate,0.59,24.0,0.0,0.0,1000
+16,16,Bouillon,Iodine,Potassium iodide (for refined salt),Iodine,Potassium iodide (for refined salt),0.76,12.0,0.0,0.0,1000
+17,17,Salt,Iodine,Potassium iodide (for refined salt),Iodine,Potassium iodide (for refined salt),0.76,12.0,0.0,0.0,1000
+18,18,Bouillon,Iron,Electrolytic iron,Iron,Electrolytic iron,0.97,7.6,0.0,0.0,1000
+19,19,Maize Flour,Iron,Electrolytic iron,Iron,Electrolytic iron,0.97,7.6,0.0,0.0,1000
+20,20,Rice,Iron,Electrolytic iron,Iron,Electrolytic iron,0.97,7.6,0.0,0.0,1000
+21,21,Wheat Flour,Iron,Electrolytic iron,Iron,Electrolytic iron,0.97,7.6,0.0,0.0,1000
+22,22,Bouillon,Iron,Encapsulated ferrous sulfate ET-50%,Iron,Encapsulated ferrous sulfate ET-50%,0.16,13.0,0.0,0.0,1000
+23,23,Maize Flour,Iron,Encapsulated ferrous sulfate ET-50%,Iron,Encapsulated ferrous sulfate ET-50%,0.16,13.0,0.0,0.0,1000
+24,24,Salt,Iron,Encapsulated ferrous sulfate ET-50%,Iron,Encapsulated ferrous sulfate ET-50%,0.16,13.0,0.0,0.0,1000
+25,25,Wheat Flour,Iron,Encapsulated ferrous sulfate ET-50%,Iron,Encapsulated ferrous sulfate ET-50%,0.16,13.0,0.0,0.0,1000
+26,26,Bouillon,Iron,Ferrous bisglycinate,Iron,Ferrous bisglycinate,0.2,20.0,0.0,0.0,1000
+27,27,Maize Flour,Iron,Ferrous bisglycinate,Iron,Ferrous bisglycinate,0.2,20.0,0.0,0.0,1000
+28,28,Wheat Flour,Iron,Ferrous bisglycinate,Iron,Ferrous bisglycinate,0.2,20.0,0.0,0.0,1000
+29,29,Bouillon,Iron,Ferrous fumarate,Iron,Ferrous fumarate,0.32,6.08,0.0,0.0,1000
+30,30,Maize Flour,Iron,Ferrous fumarate,Iron,Ferrous fumarate,0.32,6.08,60.0,0.0,1000
+31,31,Salt,Iron,Ferrous fumarate,Iron,Ferrous fumarate,0.32,6.08,0.0,0.0,1000
+32,32,Wheat Flour,Iron,Ferrous fumarate,Iron,Ferrous fumarate,0.32,6.08,60.0,0.0,1000
+33,33,Bouillon,Iron,Ferrous gluconate,Iron,Ferrous gluconate,0.12,7.970000000000001,0.0,0.0,1000
+34,34,Maize Flour,Iron,Ferrous gluconate,Iron,Ferrous gluconate,0.12,7.970000000000001,0.0,0.0,1000
+35,35,Wheat Flour,Iron,Ferrous gluconate,Iron,Ferrous gluconate,0.12,7.970000000000001,0.0,0.0,1000
+36,36,Bouillon,Iron,Micronized ferric pyrophosphate,Iron,Micronized ferric pyrophosphate,0.25,10.8,4000.0,0.0,1000
+37,37,Maize Flour,Iron,Micronized ferric pyrophosphate,Iron,Micronized ferric pyrophosphate,0.25,10.8,0.0,0.0,1000
+38,38,Rice,Iron,Micronized ferric pyrophosphate,Iron,Micronized ferric pyrophosphate,0.25,10.8,0.0,0.0,1000
+39,39,Salt,Iron,Micronized ferric pyrophosphate,Iron,Micronized ferric pyrophosphate,0.25,10.8,0.0,0.0,1000
+40,40,Wheat Flour,Iron,Micronized ferric pyrophosphate,Iron,Micronized ferric pyrophosphate,0.25,10.8,0.0,0.0,1000
+41,41,Bouillon,Iron,NaFeEDTA,Iron,NaFeEDTA,0.13,8.0,0.0,0.0,1000
+42,42,Maize Flour,Iron,NaFeEDTA,Iron,NaFeEDTA,0.13,8.0,0.0,0.0,1000
+43,43,Wheat Flour,Iron,NaFeEDTA,Iron,NaFeEDTA,0.13,8.0,0.0,0.0,1000
+44,44,Bouillon,Magnesium,Magnesium Carbonate,Magnesium,Magnesium Carbonate,0.25,1.8200000000000003,0.0,0.0,1000
+45,45,Maize Flour,Magnesium,Magnesium Carbonate,Magnesium,Magnesium Carbonate,0.25,1.8200000000000003,0.0,0.0,1000
+46,46,Rice,Magnesium,Magnesium Carbonate,Magnesium,Magnesium Carbonate,0.25,1.8200000000000003,0.0,0.0,1000
+47,47,Salt,Magnesium,Magnesium Carbonate,Magnesium,Magnesium Carbonate,0.25,1.8200000000000003,0.0,0.0,1000
+48,48,Wheat Flour,Magnesium,Magnesium Carbonate,Magnesium,Magnesium Carbonate,0.25,1.8200000000000003,0.0,0.0,1000
+49,49,Bouillon,Vitamin A,Retinyl Palmitate- 1.7 m IU/g (oil),Vitamin A,Retinyl Palmitate- 1.7 m IU/g (oil),0.51,117.0,0.0,0.0,1000
+50,50,Refined Oil,Vitamin A,Retinyl Palmitate- 1.7 m IU/g (oil),Vitamin A,Retinyl Palmitate- 1.7 m IU/g (oil),0.51,117.0,17.5,0.0,1000
+51,51,Bouillon,Vitamin A,"Retinyl Palmitate- 250,000 IU/g (dry)",Vitamin A,"Retinyl Palmitate- 250,000 IU/g (dry)",0.075,40.0,200.0,1.0,1000
+52,52,Maize Flour,Vitamin A,"Retinyl Palmitate- 250,000 IU/g (dry)",Vitamin A,"Retinyl Palmitate- 250,000 IU/g (dry)",0.075,40.0,0.0,0.0,1000
+53,53,Rice,Vitamin A,"Retinyl Palmitate- 250,000 IU/g (dry)",Vitamin A,"Retinyl Palmitate- 250,000 IU/g (dry)",0.075,40.0,0.0,0.0,1000
+54,54,Wheat Flour,Vitamin A,"Retinyl Palmitate- 250,000 IU/g (dry)",Vitamin A,"Retinyl Palmitate- 250,000 IU/g (dry)",0.075,40.0,0.0,0.0,1000
+55,55,Bouillon,Vitamin B1 (Thiamine),Thiamin mononitrate,Vitamin B1 (Thiamine),Thiamin mononitrate,0.81,24.5,0.0,0.0,1000
+56,56,Maize Flour,Vitamin B1 (Thiamine),Thiamin mononitrate,Vitamin B1 (Thiamine),Thiamin mononitrate,0.81,24.5,0.0,0.0,1000
+57,57,Rice,Vitamin B1 (Thiamine),Thiamin mononitrate,Vitamin B1 (Thiamine),Thiamin mononitrate,0.81,24.5,0.0,0.0,1000
+58,58,Wheat Flour,Vitamin B1 (Thiamine),Thiamin mononitrate,Vitamin B1 (Thiamine),Thiamin mononitrate,0.81,24.5,0.0,0.0,1000
+59,59,Bouillon,Vitamin B12,Vit. B-12 0.1% WS,Vitamin B12,Vit. B-12 0.1% WS,0.001,42.0,1.2,0.0,1000
+60,60,Maize Flour,Vitamin B12,Vit. B-12 0.1% WS,Vitamin B12,Vit. B-12 0.1% WS,0.001,42.0,0.0,0.0,1000
+61,61,Wheat Flour,Vitamin B12,Vit. B-12 0.1% WS,Vitamin B12,Vit. B-12 0.1% WS,0.001,42.0,0.0,0.0,1000
+62,62,Bouillon,Vitamin B2 (Riboflavin),Riboflavin,Vitamin B2 (Riboflavin),Riboflavin,1.0,38.0,0.0,0.0,1000
+63,63,Maize Flour,Vitamin B2 (Riboflavin),Riboflavin,Vitamin B2 (Riboflavin),Riboflavin,1.0,38.0,0.0,0.0,1000
+64,64,Rice,Vitamin B2 (Riboflavin),Riboflavin,Vitamin B2 (Riboflavin),Riboflavin,1.0,38.0,0.0,0.0,1000
+65,65,Wheat Flour,Vitamin B2 (Riboflavin),Riboflavin,Vitamin B2 (Riboflavin),Riboflavin,1.0,38.0,0.0,0.0,1000
+66,66,Bouillon,Vitamin B3 (Niacin),Niacinamide,Vitamin B3 (Niacin),Niacinamide,0.99,11.5,0.0,0.0,1000
+67,67,Maize Flour,Vitamin B3 (Niacin),Niacinamide,Vitamin B3 (Niacin),Niacinamide,0.99,11.5,0.0,0.0,1000
+68,68,Rice,Vitamin B3 (Niacin),Niacinamide,Vitamin B3 (Niacin),Niacinamide,0.99,11.5,0.0,0.0,1000
+69,69,Wheat Flour,Vitamin B3 (Niacin),Niacinamide,Vitamin B3 (Niacin),Niacinamide,0.99,11.5,0.0,0.0,1000
+70,70,Bouillon,Vitamin B6,Pyridoxine hydrochloride,Vitamin B6,Pyridoxine hydrochloride,0.82,33.0,0.0,0.0,1000
+71,71,Maize Flour,Vitamin B6,Pyridoxine hydrochloride,Vitamin B6,Pyridoxine hydrochloride,0.82,33.0,0.0,0.0,1000
+72,72,Rice,Vitamin B6,Pyridoxine hydrochloride,Vitamin B6,Pyridoxine hydrochloride,0.82,33.0,0.0,0.0,1000
+73,73,Wheat Flour,Vitamin B6,Pyridoxine hydrochloride,Vitamin B6,Pyridoxine hydrochloride,0.82,33.0,0.0,0.0,1000
+74,74,Bouillon,Vitamin D,"D-3  100,000 IU/g (dry)",Vitamin D,"D-3  100,000 IU/g (dry)",0.0025,37.0,0.0,0.0,1000
+75,75,Maize Flour,Vitamin D,"D-3  100,000 IU/g (dry)",Vitamin D,"D-3  100,000 IU/g (dry)",0.0025,37.0,0.0,0.0,1000
+76,76,Rice,Vitamin D,"D-3  100,000 IU/g (dry)",Vitamin D,"D-3  100,000 IU/g (dry)",0.0025,37.0,0.0,0.0,1000
+77,77,Wheat Flour,Vitamin D,"D-3  100,000 IU/g (dry)",Vitamin D,"D-3  100,000 IU/g (dry)",0.0025,37.0,0.0,0.0,1000
+78,78,Bouillon,Vitamin D,D-3 1.0 m IU/g (oil),Vitamin D,D-3 1.0 m IU/g (oil),0.025,90.0,0.0,0.0,1000
+79,79,Refined Oil,Vitamin D,D-3 1.0 m IU/g (oil),Vitamin D,D-3 1.0 m IU/g (oil),0.025,90.0,0.0,0.0,1000
+80,80,Bouillon,Vitamin E,all rac-a-tocopheryl acetate (dry),Vitamin E,all rac-a-tocopheryl acetate (dry),0.23,33.0,0.0,0.0,1000
+81,81,Maize Flour,Vitamin E,all rac-a-tocopheryl acetate (dry),Vitamin E,all rac-a-tocopheryl acetate (dry),0.23,33.0,0.0,0.0,1000
+82,82,Rice,Vitamin E,all rac-a-tocopheryl acetate (dry),Vitamin E,all rac-a-tocopheryl acetate (dry),0.23,33.0,0.0,0.0,1000
+83,83,Wheat Flour,Vitamin E,all rac-a-tocopheryl acetate (dry),Vitamin E,all rac-a-tocopheryl acetate (dry),0.23,33.0,0.0,0.0,1000
+84,84,Bouillon,Vitamin E,all rac-a-tocopheryl acetate (oil),Vitamin E,all rac-a-tocopheryl acetate (oil),0.45,24.0,0.0,0.0,1000
+85,85,Refined Oil,Vitamin E,all rac-a-tocopheryl acetate (oil),Vitamin E,all rac-a-tocopheryl acetate (oil),0.45,24.0,0.0,0.0,1000
+86,86,Bouillon,Zinc,Zinc Oxide,Zinc,Zinc Oxide,0.8,6.75,3000.0,0.0,1000
+87,87,Maize Flour,Zinc,Zinc Oxide,Zinc,Zinc Oxide,0.8,6.75,0.0,0.0,1000
+88,88,Rice,Zinc,Zinc Oxide,Zinc,Zinc Oxide,0.8,6.75,0.0,0.0,1000
+89,89,Salt,Zinc,Zinc Oxide,Zinc,Zinc Oxide,0.8,6.75,0.0,0.0,1000
+90,90,Wheat Flour,Zinc,Zinc Oxide,Zinc,Zinc Oxide,0.8,6.75,0.0,0.0,1000
+91,91,Bouillon,Zinc,"Zinc Sulfate, dried",Zinc,"Zinc Sulfate, dried",0.36,10.19,0.0,0.0,1000
+92,92,Maize Flour,Zinc,"Zinc Sulfate, dried",Zinc,"Zinc Sulfate, dried",0.36,10.19,0.0,0.0,1000
+93,93,Rice,Zinc,"Zinc Sulfate, dried",Zinc,"Zinc Sulfate, dried",0.36,10.19,0.0,0.0,1000
+94,94,Salt,Zinc,"Zinc Sulfate, dried",Zinc,"Zinc Sulfate, dried",0.36,10.19,0.0,0.0,1000
+95,95,Wheat Flour,Zinc,"Zinc Sulfate, dried",Zinc,"Zinc Sulfate, dried",0.36,10.19,0.0,0.0,1000
+96,96,Maize Flour,Iron,Ferrous sulfate dried,Iron,Ferrous sulfate dried,0.32,5.13,0.0,0.0,1000
+97,97,Salt,Iron,Ferrous sulfate dried,Iron,Ferrous sulfate dried,0.32,5.13,0.0,0.0,1000
+98,98,Wheat Flour,Iron,Ferrous sulfate dried,Iron,Ferrous sulfate dried,0.32,5.13,0.0,0.0,1000
+99,99,Maize Flour,Magnesium,Magnesium Oxide,Magnesium,Magnesium Oxide,0.58,4.46,0.0,0.0,1000
+100,100,Rice,Magnesium,Magnesium Oxide,Magnesium,Magnesium Oxide,0.58,4.46,0.0,0.0,1000
+101,101,Salt,Magnesium,Magnesium Oxide,Magnesium,Magnesium Oxide,0.58,4.46,0.0,0.0,1000
+102,102,Wheat Flour,Magnesium,Magnesium Oxide,Magnesium,Magnesium Oxide,0.58,4.46,0.0,0.0,1000
