@@ -25,7 +25,7 @@ class CostDataProcessor:
         self._data = (
             data
             .loc[lambda df: df[self.vehicle_col] == vehicle]
-            .loc[lambda df: df[fortificant_col].isin(fortificant)]
+            .loc[lambda df: df[self.fortificant_col].isin([f[1] for f in fortificant])]
             .set_index([self.nutrient_col, self.fortificant_col])
             )
         

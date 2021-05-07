@@ -111,13 +111,15 @@ class CostSolver(BaseSolver):
             obj_values = self.objective_values
 
         sum_costs = self.opt_df["opt_costs_discounted"].sum()
-        sum_benefits = self.opt_df["opt_benefit_discounted"].sum()
+        sum_benefits = self.opt_df['opt_benefit_discounted'].sum()
+        sum_benefits_undiscounted = self.opt_df["opt_benefit"].sum()
 
         results = [
             ("Minimum Benefit", self.minimum_benefit),
             ("Objective Bounds", obj_values),
             ("Total Cost", sum_costs),
             ("Total " + self.benefit_title, sum_benefits),
+            ("Total " + self.benefit_title + " (Undiscounted)", sum_benefits_undiscounted)
         ]
 
         s.print_generic(results)

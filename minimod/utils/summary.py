@@ -213,12 +213,13 @@ class PreOptimizationDataSummary:
         
 class OptimizationSummary:
 
-    def __init__(self, model, table_fmt = "psql", decimals = 3, **kwargs):
+    def __init__(self, model, table_fmt = "psql", decimals = 3, floatfmt = ",.0f", **kwargs):
 
         
         self.model = model
         self.table_fmt = table_fmt
         self.decimals = decimals
+        self.floatfmt = floatfmt
 
     def _print_specific_style(self, style, data):
         if style == "html":
@@ -282,13 +283,13 @@ class OptimizationSummary:
         except TypeError:
             ratio = "NaN"
             
-        print(tabulate([(name, ratio)], tablefmt=self.table_fmt))
+        print(tabulate([(name, ratio)], tablefmt=self.table_fmt, floatfmt=self.floatfmt))
         
         return ratio
     
     def print_grouper(self, name, show_group = True, **kwargs):
         
-        print(tabulate([(name, "")], tablefmt=self.table_fmt))
+        print(tabulate([(name, "")], tablefmt=self.table_fmt, floatfmt=self.floatfmt))
         
         if show_group:
             self._group_summarizer(**kwargs)    
@@ -297,11 +298,11 @@ class OptimizationSummary:
 
         for table in args:
             
-            print(tabulate(table, tablefmt=self.table_fmt))
+            print(tabulate(table, tablefmt=self.table_fmt, floatfmt=self.floatfmt))
             
     def print_df(self, data):
         
-        print(tabulate(data, headers = data.columns, tablefmt=self.table_fmt))
+        print(tabulate(data, headers = data.columns, tablefmt=self.table_fmt, floatfmt=self.floatfmt))
             
          
             

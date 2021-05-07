@@ -32,5 +32,9 @@ class NoObjective(Exception):
     pass
 
 class OptimizationNotInitialized(Exception):
-    """Riases when fitter hasn't been called yet."""
+    """Raises when fitter hasn't been called yet."""
+    pass
+
+class MergeError(Exception):
+    """Raises when there's something wrong with the merge."""
     pass

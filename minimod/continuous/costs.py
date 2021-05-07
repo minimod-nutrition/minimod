@@ -97,7 +97,7 @@ class PremixCostCalculator:
         return pd.DataFrame(data = cost_summary.values(), 
                             index = cost_summary.keys()) 
     
-    def line_fit(self, func : Callable=None):
+    def line_fit(self, nutrient : str, compound : str, func : Callable=None):
         """Fits benefits data to `func`     
 
         Args:
@@ -105,17 +105,15 @@ class PremixCostCalculator:
         """        
         
         if func is None:
-            func = lambda x, m, b: m*x + b
+            func = lambda x, m, b: (m*x) + b
             
         y = []
         x = np.linspace(1, 20000, 10)
             
-        for i in np.linspace(1, 20000, 10):
-        
-            new_amt_fort = self.amt_fort
-            new_amt_fort[1] = i
+        for i in x:
+            self.amt_fort.loc[(nutrient, compound)] = i
             
-            self.amt_fort = new_amt_fort
+            self.nutrient_subtotal = self.amt_fort.sum()
             
             y.append(self.total_cost)
                     

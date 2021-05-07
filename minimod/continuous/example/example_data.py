@@ -15,7 +15,16 @@ benefits = func_benefits(increment, 5, .1, 2) + noise
 
 costs = func_costs(increment, 5, 1000) + noise
 
+
+
 df = pd.DataFrame({'increment' : increment,
                     'benefits' : benefits,
                     'costs' : costs,
-                    'vehicle' : 'bouillon'})
+                    'vehicle' : 'Bouillon'})
+
+## Add wheat flour
+
+df = df.append(pd.DataFrame({'increment' : increment + .2,
+                    'benefits' : benefits*.9,
+                    'costs' : costs*1.2,
+                    'vehicle' : 'Maize Flour'}))

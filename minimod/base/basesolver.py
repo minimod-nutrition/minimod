@@ -5,7 +5,9 @@ from minimod.utils.exceptions import (
     MissingOptimizationMethod,
 )
 
-from minimod.version import __version__
+from .._version import get_versions
+__version__ = get_versions()['version']
+del get_versions
 
 from minimod.utils.summary import OptimizationSummary
 from minimod.utils.plotting import Plotter
