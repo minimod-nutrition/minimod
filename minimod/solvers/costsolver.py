@@ -22,6 +22,10 @@ class CostSolver(BaseSolver):
                  minimum_benefit =None,
                  drop_bau = False,
                  **kwargs):
+        
+        """
+        [jpodhtpshgthsjdhtlkjshltkh]
+        """
 
         super().__init__(sense=mip.MINIMIZE, **kwargs)
         
@@ -111,6 +115,7 @@ class CostSolver(BaseSolver):
             obj_values = self.objective_values
 
         sum_costs = self.opt_df["opt_costs_discounted"].sum()
+        sum_costs_undiscounted = self.opt_df["opt_costs"].sum()
         sum_benefits = self.opt_df['opt_benefit_discounted'].sum()
         sum_benefits_undiscounted = self.opt_df["opt_benefit"].sum()
 
@@ -118,6 +123,7 @@ class CostSolver(BaseSolver):
             ("Minimum Benefit", self.minimum_benefit),
             ("Objective Bounds", obj_values),
             ("Total Cost", sum_costs),
+            ("Total Costs (Undiscounted)", sum_costs_undiscounted),
             ("Total " + self.benefit_title, sum_benefits),
             ("Total " + self.benefit_title + " (Undiscounted)", sum_benefits_undiscounted)
         ]
