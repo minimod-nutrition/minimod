@@ -80,6 +80,11 @@ class CostSolver(BaseSolver):
         
 
     def _objective(self):
+        """sdfjsdhfkjhds
+
+        Returns:
+            sdlkjfslkdjf: lkjdlkfjsldkjf
+        """        
 
         cost = "discounted_costs"
 
