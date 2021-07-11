@@ -28,3 +28,6 @@ df = df.append(pd.DataFrame({'increment' : increment + .2,
                     'benefits' : benefits*.9,
                     'costs' : costs*1.2,
                     'vehicle' : 'Maize Flour'}))
+
+"""Okay this is only for checking if I entered the right branch
+"""
