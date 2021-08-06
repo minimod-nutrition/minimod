@@ -7,7 +7,6 @@ from typing import Callable
 from functools import partial
 
 class Benefits:
-    
     def __init__(self,
                  data: pd.DataFrame,
                  benefit_col: str,

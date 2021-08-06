@@ -205,6 +205,7 @@ class PremixCostCalculator:
         """
     
     def line_fit(self, nutrient : str, compound : str, func : Callable=None):
+        
         """Fits costs data to `func` ????     
 
         Args:
