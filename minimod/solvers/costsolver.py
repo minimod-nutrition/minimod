@@ -99,11 +99,11 @@ class CostSolver(BaseSolver):
     def fit(self, sol_num=None, **kwargs):
         return self._fit(**kwargs)
 
-    def report(self, intervention_groups = False):
+    def report(self, sol_num = None, intervention_groups = False):
 
         s = OptimizationSummary(self)
 
-        super().report()
+        super().report(sol_num=sol_num)
 
         if self.num_solutions == 1:
             obj_values = self.objective_value
