@@ -5,7 +5,9 @@ from minimod.utils.exceptions import (
     MissingOptimizationMethod,
 )
 
-from minimod.version import __version__
+from .._version import get_versions
+__version__ = get_versions()['version'] + 'hello'
+del get_versions
 
 from minimod.utils.summary import OptimizationSummary
 from minimod.utils.plotting import Plotter
@@ -254,11 +256,6 @@ class BaseSolver:
 
         self.model.optimize(**kwargs)  
         
-        self.opt_df = self.model.process_results(self.benefit_col, 
-                                                 self.cost_col, 
-                                                 self.intervention_col,
-                                                 self.space_col)
-        
         (self.objective_value,
          self.objective_values, 
          self.objective_bound, 
@@ -275,9 +272,15 @@ class BaseSolver:
         
         self.model.write(filename)
 
-    def report(self):
+    def report(self, sol_num=None):
         """Prints out a report of optimal model parameters and useful statistics.
         """        
+        
+        self.opt_df = self.model.process_results(self.benefit_col, 
+                                            self.cost_col, 
+                                            self.intervention_col,
+                                            self.space_col,
+                                            sol_num=sol_num)
 
         header = [
             ('MiniMod Solver Results', ""),

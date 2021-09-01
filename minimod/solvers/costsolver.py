@@ -96,7 +96,7 @@ class CostSolver(BaseSolver):
         ## Make benefits constraint be at least as large as the one from the minimum benefit intervention
         return self._discounted_sum_all(benefit)
 
-    def fit(self, **kwargs):
+    def fit(self, sol_num=None, **kwargs):
         return self._fit(**kwargs)
 
     def report(self, intervention_groups = False):

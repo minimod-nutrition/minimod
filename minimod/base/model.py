@@ -335,7 +335,7 @@ class Model:
             elif self.status == mip.OptimizationStatus.INFEASIBLE:
                 print("[Warning]: Infeasible Solution Found")
 
-    def process_results(self, benefit_col, cost_col, intervention_col, space_col):
+    def process_results(self, benefit_col, cost_col, intervention_col, space_col, sol_num = None):
 
         opt_df = self._df.copy(deep=True).assign(
             opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.x),
@@ -368,6 +368,9 @@ class Model:
                 "cumulative_costs"
             ]
         ]
+        
+        if isinstance(sol_num, int):
+            opt_df = opt_df.assign(opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.xi(sol_num)))
 
         return opt_df
 
