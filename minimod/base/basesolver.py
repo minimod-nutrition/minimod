@@ -271,16 +271,19 @@ class BaseSolver:
     def write(self, filename="model.lp"):
         
         self.model.write(filename)
-
-    def report(self, sol_num=None):
-        """Prints out a report of optimal model parameters and useful statistics.
-        """        
+        
+    def process_results(self, sol_num=None):
         
         self.opt_df = self.model.process_results(self.benefit_col, 
                                             self.cost_col, 
                                             self.intervention_col,
                                             self.space_col,
                                             sol_num=sol_num)
+    def report(self, sol_num=None):
+        """Prints out a report of optimal model parameters and useful statistics.
+        """        
+        
+        self.opt_df = self.process_results(sol_num=sol_num)
 
         header = [
             ('MiniMod Solver Results', ""),

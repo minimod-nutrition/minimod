@@ -336,9 +336,14 @@ class Model:
                 print("[Warning]: Infeasible Solution Found")
 
     def process_results(self, benefit_col, cost_col, intervention_col, space_col, sol_num = None):
+        
+        if isinstance(sol_num, int):
+            opt_df = self._df.copy(deep=True).assign(opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.xi(sol_num)))
+        else:
+            opt_df = self._df.copy(deep=True).assign(
+                opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.x))
 
-        opt_df = self._df.copy(deep=True).assign(
-            opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.x),
+        opt_df = opt_df.assign(
             opt_benefit=lambda df: df[benefit_col] * df["opt_vals"],
             opt_costs=lambda df: df[cost_col] * df["opt_vals"],
             opt_costs_discounted=lambda df: df["discounted_costs"] * df["opt_vals"],
@@ -365,12 +370,11 @@ class Model:
                 "cumulative_discounted_benefits",
                 "cumulative_discounted_costs",
                 "cumulative_benefits",
-                "cumulative_costs"
+                "cumulative_costs",
+                "mip_vars"
             ]
         ]
-        
-        if isinstance(sol_num, int):
-            opt_df = opt_df.assign(opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.xi(sol_num)))
+    
 
         return opt_df
 

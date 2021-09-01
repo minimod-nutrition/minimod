@@ -98,7 +98,7 @@ class CostSolver(BaseSolver):
 
     def fit(self, sol_num=None, **kwargs):
         return self._fit(**kwargs)
-
+    
     def report(self, sol_num = None, intervention_groups = False):
 
         s = OptimizationSummary(self)
