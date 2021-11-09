@@ -232,7 +232,7 @@ class MonteCarloMinimod:
                 .reset_index()
                 [['opt_vals', 'iteration', self.intervention_col, self.space_col, self.time_col]]
                 .groupby('iteration')
-                .agg(lambda x: 1 if x.sum() > 1 else 0)
+                .agg(lambda x: 1 if x.sum() > indicator_spec else 0)
                 )
 
     def report(

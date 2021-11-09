@@ -343,11 +343,13 @@ class Model:
             opt_df = self._df.copy(deep=True).assign(
                 opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.x))
 
-        opt_df = opt_df.assign(
+        opt_df = (opt_df.assign(
             opt_benefit=lambda df: df[benefit_col] * df["opt_vals"],
             opt_costs=lambda df: df[cost_col] * df["opt_vals"],
             opt_costs_discounted=lambda df: df["discounted_costs"] * df["opt_vals"],
-            opt_benefit_discounted=lambda df: df["discounted_benefits"]* df["opt_vals"],
+            opt_benefit_discounted=lambda df: df["discounted_benefits"]* df["opt_vals"])
+                  .infer_objects()
+                  .assign(
             cumulative_discounted_benefits = lambda df: (df
                                                          .groupby([space_col])['opt_benefit_discounted']
                                                          .transform('cumsum')),
@@ -372,7 +374,7 @@ class Model:
                 "cumulative_benefits",
                 "cumulative_costs"
                 ]
-        ]
+        ])
     
 
         return opt_df
