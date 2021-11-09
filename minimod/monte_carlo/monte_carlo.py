@@ -135,6 +135,9 @@ class MonteCarloMinimod:
         )
 
         minimod.fit()
+        
+        # Run `minimod.report` to get opt_df for iteration
+        minimod.report(quiet=True)
 
         iteration_dict = {
             "status": minimod.status,

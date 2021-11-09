@@ -95,7 +95,7 @@ class Model:
 
             if strict:
                 subset_dict[i[0]] = self._df.loc[
-                    lambda df: df.index.get_level_values(level=intervention).isin(i)
+                    lambda df: df.index.get_level_values(level=intervention).isin([i])
                 ]
 
                 if subset_dict[i[0]].empty:
@@ -370,9 +370,8 @@ class Model:
                 "cumulative_discounted_benefits",
                 "cumulative_discounted_costs",
                 "cumulative_benefits",
-                "cumulative_costs",
-                "mip_vars"
-            ]
+                "cumulative_costs"
+                ]
         ]
     
 

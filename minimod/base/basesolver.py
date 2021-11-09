@@ -279,12 +279,19 @@ class BaseSolver:
                                             self.intervention_col,
                                             self.space_col,
                                             sol_num=sol_num)
-    def report(self, sol_num=None):
+        
+    def report(self, sol_num=None, quiet=False):
         """Prints out a report of optimal model parameters and useful statistics.
         """        
         
-        self.opt_df = self.process_results(sol_num=sol_num)
+        self.opt_df = self.model.process_results(self.benefit_col, 
+                                            self.cost_col, 
+                                            self.intervention_col,
+                                            self.space_col,
+                                            sol_num=sol_num)
 
+        if quiet:
+            return
         header = [
             ('MiniMod Solver Results', ""),
             ("Method:" , str(self.sense)),
@@ -300,6 +307,7 @@ class BaseSolver:
             ("No. of Constraints", str(self.num_rows)),
             ("No. of Non-zeros in Constr.", str(self.num_nz))
         ]
+        
         s = OptimizationSummary(self)
 
         s.print_generic(header, features)
