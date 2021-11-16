@@ -8,4 +8,4 @@ python_docx
 numpy
 docx
 mip==1.9.3
-pqdm
+pqdm @ git+git://github.com/niedakh/pqdm.git
