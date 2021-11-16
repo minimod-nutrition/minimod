@@ -167,6 +167,7 @@ class MonteCarloMinimod:
         time_subset=None,
         strict=False,
         # show_progress=True,
+        exception_behavior = 'immediate',
         **kwargs
     ):
         
@@ -186,7 +187,7 @@ class MonteCarloMinimod:
                                      strict=strict,
                                      **kwargs)
         
-        sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs)
+        sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs, exception_behaviour=exception_behavior)
             
         self.N = N
 
@@ -345,7 +346,7 @@ class MonteCarloMinimod:
 
         benefit_plot.xaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
         cost_plot.xaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
-
+    
 
         benefit_xlims = benefit_plot.get_xlim()
         benefit_ylims = benefit_plot.get_ylim()
@@ -360,6 +361,8 @@ class MonteCarloMinimod:
 
         benefit_plot.axvline(self.sim_results['minimum_benefit'].mean(), color="red")
         benefit_plot.text(text_x, text_y, "Mean\nMinimum\nBenefit\nConstraint")
+        
+        cost_plot.axvline
 
         return fig, (benefit_plot, cost_plot)
 
@@ -401,7 +404,7 @@ class MonteCarloMinimod:
 
         return ax
 
-    def plot_intervention_stacked(self, intervention_group=None, intervention_names = None):
+    def plot_intervention_stacked(self, intervention_group=None, intervention_names = None, indicator_spec=3):
         
         fig, ax = plt.subplots()
 
@@ -410,11 +413,11 @@ class MonteCarloMinimod:
                       ['opt_vals']
                       .sum()
                       .to_frame()
-                      .assign(opt_vals = lambda df: (df['opt_vals']>0).astype(int))
+                      .assign(opt_vals = lambda df: (df['opt_vals']>indicator_spec).astype(int))
                       )
         
         int_group = (
-            all_opt_df[all_opt_df['opt_vals']>0]
+            all_opt_df[all_opt_df['opt_vals']>indicator_spec]
             .reset_index(level=self.intervention_col)
             [self.intervention_col]
             .str.extractall('|'.join([f"(?P<{j}>{i})" for i, j in zip(intervention_group, intervention_names)]))
@@ -428,4 +431,5 @@ class MonteCarloMinimod:
         ax.set_xlabel("Time")
         
         return ax
-        
+
+    
