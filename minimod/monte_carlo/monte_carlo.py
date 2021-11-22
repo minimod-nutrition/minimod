@@ -192,11 +192,15 @@ class MonteCarloMinimod:
                                      **kwargs)
         
         sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs, exception_behaviour=exception_behavior)
+        
+        sim_df = pd.DataFrame(sim_dict)
+        
+        self.perc_opt = sim_df["status"].value_counts(normalize=True)[0] * 100
 
         if only_optimal:
-            self.sim_results = pd.DataFrame(sim_dict).loc[lambda df: df['status'] == OptimizationStatus.OPTIMAL]
+            self.sim_results = sim_df.loc[lambda df: df['status'] == OptimizationStatus.OPTIMAL]
         else:
-            self.sim_results = pd.DataFrame(sim_dict)
+            self.sim_results = sim_df
 
         self.N = self.sim_results.shape[0]
 
@@ -253,7 +257,6 @@ class MonteCarloMinimod:
         strict=False
     ):
 
-        perc_opt = self.sim_results["status"].value_counts(normalize=True)[0] * 100
         avg = self.sim_results.convert_dtypes().mean()
 
         s = OptimizationSummary(self)
@@ -262,7 +265,7 @@ class MonteCarloMinimod:
             ("MiniMod Solver Results", ""),
             ("Method:", str(self.sim_results['sense'].min())),
             ("Solver:", str(self.sim_results['solver_name'].min())),
-            ("Percentage Optimized:", perc_opt),
+            ("Percentage Optimized:", self.perc_opt),
             ("Average Number Solutions Found:", avg["solutions"]),
         ]
 
