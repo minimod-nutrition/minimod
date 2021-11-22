@@ -1,6 +1,7 @@
 from minimod.solvers import Minimod
 from minimod.utils.plotting import Plotter
 from minimod.utils.summary import OptimizationSummary
+from mip import OptimizationStatus
 
 import numpy as np
 import pandas as pd
@@ -35,6 +36,7 @@ class MonteCarloMinimod:
 
         self.solver_type = solver_type
 
+
         self.data = data.set_index([intervention_col, space_col, time_col])
 
         self.intervention_col = intervention_col
@@ -56,6 +58,7 @@ class MonteCarloMinimod:
             self.cost_uniform_perc = cost_uniform_perc
 
         self.cost_col = cost_col
+
 
     def _construct_benefit_sample(self, seed):
         """ For normal, it doesn't require transformation, so just return mean and sd"""
@@ -168,6 +171,7 @@ class MonteCarloMinimod:
         strict=False,
         # show_progress=True,
         exception_behavior = 'immediate',
+        only_optimal=False,
         **kwargs
     ):
         
@@ -188,12 +192,15 @@ class MonteCarloMinimod:
                                      **kwargs)
         
         sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs, exception_behaviour=exception_behavior)
-            
-        self.N = N
 
-        self.sim_results = pd.DataFrame(sim_dict)
+        if only_optimal:
+            self.sim_results = pd.DataFrame(sim_dict).loc[lambda df: df['status'] == OptimizationStatus.OPTIMAL]
+        else:
+            self.sim_results = pd.DataFrame(sim_dict)
 
-        return pd.DataFrame(sim_dict)
+        self.N = self.sim_results.shape[0]
+
+        return self.sim_results
 
     def _all_opt_df(self):
         """Appends the dataframe from all simulation iterations together
@@ -204,6 +211,7 @@ class MonteCarloMinimod:
         return all_opt_df
 
     def _get_intervention_group(self, data, intervention, strict=False):
+
         
         if strict:
             
