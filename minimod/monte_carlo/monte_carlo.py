@@ -1,6 +1,7 @@
 from minimod.solvers import Minimod
 from minimod.utils.plotting import Plotter
 from minimod.utils.summary import OptimizationSummary
+from mip import OptimizationStatus
 
 import numpy as np
 import pandas as pd
@@ -35,6 +36,7 @@ class MonteCarloMinimod:
 
         self.solver_type = solver_type
 
+
         self.data = data.set_index([intervention_col, space_col, time_col])
 
         self.intervention_col = intervention_col
@@ -56,6 +58,7 @@ class MonteCarloMinimod:
             self.cost_uniform_perc = cost_uniform_perc
 
         self.cost_col = cost_col
+
 
     def _construct_benefit_sample(self, seed):
         """ For normal, it doesn't require transformation, so just return mean and sd"""
@@ -168,6 +171,7 @@ class MonteCarloMinimod:
         strict=False,
         # show_progress=True,
         exception_behavior = 'immediate',
+        only_optimal=False,
         **kwargs
     ):
         
@@ -188,12 +192,19 @@ class MonteCarloMinimod:
                                      **kwargs)
         
         sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs, exception_behaviour=exception_behavior)
-            
-        self.N = N
+        
+        sim_df = pd.DataFrame(sim_dict)
+        
+        self.perc_opt = sim_df["status"].value_counts(normalize=True)[0] * 100
 
-        self.sim_results = pd.DataFrame(sim_dict)
+        if only_optimal:
+            self.sim_results = sim_df.loc[lambda df: df['status'] == OptimizationStatus.OPTIMAL]
+        else:
+            self.sim_results = sim_df
 
-        return pd.DataFrame(sim_dict)
+        self.N = self.sim_results.shape[0]
+
+        return self.sim_results
 
     def _all_opt_df(self):
         """Appends the dataframe from all simulation iterations together
@@ -204,6 +215,7 @@ class MonteCarloMinimod:
         return all_opt_df
 
     def _get_intervention_group(self, data, intervention, strict=False):
+
         
         if strict:
             
@@ -245,7 +257,6 @@ class MonteCarloMinimod:
         strict=False
     ):
 
-        perc_opt = self.sim_results["status"].value_counts(normalize=True)[0] * 100
         avg = self.sim_results.convert_dtypes().mean()
 
         s = OptimizationSummary(self)
@@ -254,7 +265,7 @@ class MonteCarloMinimod:
             ("MiniMod Solver Results", ""),
             ("Method:", str(self.sim_results['sense'].min())),
             ("Solver:", str(self.sim_results['solver_name'].min())),
-            ("Percentage Optimized:", perc_opt),
+            ("Percentage Optimized:", self.perc_opt),
             ("Average Number Solutions Found:", avg["solutions"]),
         ]
 
@@ -374,25 +385,13 @@ class MonteCarloMinimod:
             col_of_interest = "opt_benefit"
         elif data_of_interest == "costs":
             col_of_interest = "opt_costs"
-
-        df_all = pd.DataFrame()
-
-        # All trajectories
-        for i in range(self.N):
-
-            iter_df = (
-                self.sim_results.loc[i]["opt_df"][col_of_interest]
-                .groupby(self.time_col)
-                .sum()
-            )
-
-            iter_df.plot(ax=ax, color="red", alpha=0.09)
-
-            df_all = df_all.append(iter_df)
+        
+        df_all = self.sim_results['opt_df'].apply(lambda x: x[col_of_interest].groupby(self.time_col).sum()).T
 
         # Now get mean trajectory
 
-        df_all.mean().plot(ax=ax, color="black")
+        df_all.plot(color='red', alpha=0.09, ax=ax, legend=False)
+        df_all.mean(axis=1).plot(ax=ax, color="black")
 
         # plt.figtext(0, 0, "Bold line represents mean trajectory.")
         ax.set_title("Trajectories of all Simulations")
