@@ -382,25 +382,13 @@ class MonteCarloMinimod:
             col_of_interest = "opt_benefit"
         elif data_of_interest == "costs":
             col_of_interest = "opt_costs"
-
-        df_all = pd.DataFrame()
-
-        # All trajectories
-        for i in range(self.N):
-
-            iter_df = (
-                self.sim_results.loc[i]["opt_df"][col_of_interest]
-                .groupby(self.time_col)
-                .sum()
-            )
-
-            iter_df.plot(ax=ax, color="red", alpha=0.09)
-
-            df_all = df_all.append(iter_df)
+        
+        df_all = self.sim_results['opt_df'].apply(lambda x: x[col_of_interest].groupby(self.time_col).sum()).T
 
         # Now get mean trajectory
 
-        df_all.mean().plot(ax=ax, color="black")
+        df_all.plot(color='red', alpha=0.09, ax=ax, legend=False)
+        df_all.mean(axis=1).plot(ax=ax, color="black")
 
         # plt.figtext(0, 0, "Bold line represents mean trajectory.")
         ax.set_title("Trajectories of all Simulations")
