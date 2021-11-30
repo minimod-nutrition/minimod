@@ -156,6 +156,7 @@ class MonteCarloMinimod:
             "solver_name" : minimod.solver_name,
             "minimum_benefit" : minimod.minimum_benefit,
             "benefit_title" : minimod.benefit_title,
+            "bau_draw" : minimod.bau_df
         }
         
         return iteration_dict
@@ -373,7 +374,8 @@ class MonteCarloMinimod:
         benefit_plot.axvline(self.sim_results['minimum_benefit'].mean(), color="red")
         benefit_plot.text(text_x, text_y, "Mean\nMinimum\nBenefit\nConstraint")
         
-        cost_plot.axvline
+        # Get total cost for a draw 
+        cost_plot.axvline(self.sim_results['bau_draw'].apply(lambda x: x['discounted_costs'].sum()).mean())
 
         return fig, (benefit_plot, cost_plot)
 
