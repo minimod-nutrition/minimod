@@ -156,6 +156,7 @@ class MonteCarloMinimod:
             "solver_name" : minimod.solver_name,
             "minimum_benefit" : minimod.minimum_benefit,
             "benefit_title" : minimod.benefit_title,
+            "bau_draw" : minimod.bau_df
         }
         
         return iteration_dict
@@ -346,10 +347,16 @@ class MonteCarloMinimod:
             objective_title = benefits
             constraint_title = costs
 
+
+        self.sim_results['opt_constraint2']=self.sim_results['opt_constraint']/1000
+        self.sim_results['opt_objective2']=self.sim_results['opt_objective']/1000
+
         fig, (benefit_plot, cost_plot) = p._plot_sim_hist(
             data=self.sim_results,
-            benefit_col="opt_constraint",
-            cost_col="opt_objective",
+            benefit_col="opt_constraint2",
+            cost_col="opt_objective2",
+            #benefit_col="opt_constraint",
+            #cost_col="opt_objective",
             cost_title=objective_title,
             benefit_title=constraint_title,
             save=save,
@@ -358,6 +365,8 @@ class MonteCarloMinimod:
         benefit_plot.xaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
         cost_plot.xaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
     
+        benefit_plot.set_xlabel("Thousands of Individuals")
+        cost_plot.set_xlabel("Thousands of 2019 USD")
 
         benefit_xlims = benefit_plot.get_xlim()
         benefit_ylims = benefit_plot.get_ylim()
@@ -367,13 +376,26 @@ class MonteCarloMinimod:
 
         # offset by 10% of length of x-axis
         text_x = (
-            self.sim_results['minimum_benefit'].mean() + (benefit_xlims[1] - benefit_xlims[0]) * 0.1
+            self.sim_results['minimum_benefit'].mean()/1000 + (benefit_xlims[1] - benefit_xlims[0]) * 0.1
         )
 
-        benefit_plot.axvline(self.sim_results['minimum_benefit'].mean(), color="red")
+        benefit_plot.axvline(self.sim_results['minimum_benefit'].mean()/1000, color="red")
         benefit_plot.text(text_x, text_y, "Mean\nMinimum\nBenefit\nConstraint")
         
-        cost_plot.axvline
+        # Get total cost for a draw 
+        cost_xlims = cost_plot.get_xlim()
+        cost_ylims = cost_plot.get_ylim()
+
+        # Put text at midpoint of y
+        cost_plot.axvline(self.sim_results['bau_draw'].apply(lambda x: x['discounted_costs'].sum()).mean()/1000, color='red')
+
+        text_y2 = (cost_ylims[1] - cost_ylims[0]) / 2
+
+        # offset by 10% of length of x-axis
+        text_x2 = (
+            self.sim_results['bau_draw'].apply(lambda x: x['discounted_costs'].sum()).mean()/1000 + (cost_xlims[1] - cost_xlims[0]) * 0.1
+        )
+        cost_plot.text(text_x2, text_y2, "Mean\nBAU\nCost")
 
         return fig, (benefit_plot, cost_plot)
 
@@ -383,8 +405,10 @@ class MonteCarloMinimod:
 
         if data_of_interest == "benefits":
             col_of_interest = "opt_benefit"
+            ylabel_interest = "Individuals"
         elif data_of_interest == "costs":
             col_of_interest = "opt_costs"
+            ylabel_interest = "2019 USD"
         
         df_all = self.sim_results['opt_df'].apply(lambda x: x[col_of_interest].groupby(self.time_col).sum()).T
 
@@ -397,6 +421,7 @@ class MonteCarloMinimod:
         ax.set_title("Trajectories of all Simulations")
         
         ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
+        ax.set_ylabel(ylabel_interest)
 
         if save is not None:
             plt.savefig(save, dpi=160)
