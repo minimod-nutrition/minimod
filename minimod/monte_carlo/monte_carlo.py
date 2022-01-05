@@ -144,8 +144,8 @@ class MonteCarloMinimod:
 
         iteration_dict = {
             "status": minimod.status,
-            "opt_objective": minimod.opt_df['opt_costs'].sum(),
-            "opt_constraint": minimod.opt_df["opt_benefit"].sum(),
+            "opt_objective": minimod.opt_df['opt_costs_discounted'].sum(),
+            "opt_constraint": minimod.opt_df["opt_benefit_discounted"].sum(),
             "num_vars": minimod.num_cols,
             "constraints": minimod.num_rows,
             "solutions": minimod.num_solutions,
