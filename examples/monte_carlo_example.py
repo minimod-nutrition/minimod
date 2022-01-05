@@ -6,6 +6,8 @@ import sys
 import pandas as pd
 import geopandas as gpd
 import os
+
+from sympy import minimum
 import minimod as mm
 
 # %%
@@ -67,10 +69,15 @@ vasoilold_constraint = 15958219.409955183
 #     )
 import os; print(os.getcwd())
 df = (
-    pd.read_csv("examples/data/processed/example1.csv")
+    pd.read_csv("data/processed/example1.csv")
     .assign(benefit_sd = lambda df: df['benefit']/2,
             costs_sd = lambda df: df['costs']/2)
     )
+
+cube = ["cube", "vascube", "oilcube", "cubemaize", "vascubemaize", "vasoilcube", "oilcubemaize", "vasoilcubemaize"]
+oil = ["oil", "vasoil", "oilcube", "oilmaize", "vasoilmaize", "vasoilcube", "oilcubemaize", "vasoilcubemaize"]
+maize = ["maize", "vasmaize", "oilmaize", "cubemaize", "vascubemaize", "vasoilmaize", "oilcubemaize", "vasoilcubemaize" ]
+
 
 # %%
 a = mm.MonteCarloMinimod(solver_type = 'costmin', 
@@ -80,10 +87,12 @@ a = mm.MonteCarloMinimod(solver_type = 'costmin',
                         time_col='time',
                         benefit_mean_col = 'benefit',
                         benefit_sd_col= 'benefit_sd',
-                        cost_col='costs',
-                        minimum_benefit = vasoilold_constraint)
+                        cost_col='costs')
 
-sim = a.fit_all_samples(N = 100)
+def benefit_no_change(seed, benefit_col, data):
+    return data[benefit_col]
+
+sim = a.fit_all_samples(N = 100, all_space=oil, all_time=cube, time_subset=[1,2,3], minimum_benefit='vasoilold', benefit_callable=benefit_no_change, benefit_kwargs={'benefit_col' : 'benefit'})
 
 
 # %%

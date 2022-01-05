@@ -63,9 +63,6 @@ class MonteCarloMinimod:
         """ For normal, it doesn't require transformation, so just return mean and sd"""
 
         random = np.random.default_rng(seed=seed)
-
-        if data is None:
-            data = self.data
         
         df_mean_sd = data[
             [self.benefit_mean_col, self.benefit_sd_col, self.pop_weight_col]
@@ -83,9 +80,6 @@ class MonteCarloMinimod:
 
     def _construct_cost_sample(self, seed, data=None, cost_col='cost_random_draw'):
         """For costs we assume uniform and deviate by some percentage."""
-
-        if data is None:
-            data = self.data
 
         random= np.random.default_rng(seed=seed)
 
@@ -105,17 +99,7 @@ class MonteCarloMinimod:
 
         return df
 
-    def _merge_samples(self, seed, benefit_callable=None, cost_callable=None,  cost_kwargs=None, benefit_kwargs=None):
-
-        if benefit_callable is None:
-            benefit_callable = self._construct_benefit_sample
-        if cost_callable is None:
-            cost_callable = self._construct_cost_sample
-
-        if cost_kwargs is None:
-            cost_kwargs = {'seed' : seed}
-        if benefit_kwargs is None:
-            benefit_kwargs = {'seed' : seed}
+    def _merge_samples(self, benefit_callable, cost_callable,  cost_kwargs, benefit_kwargs):
 
         benefit_sample = benefit_callable(**benefit_kwargs)
         cost_sample = cost_callable(**cost_kwargs)
@@ -136,8 +120,25 @@ class MonteCarloMinimod:
                        cost_kwargs=None,
                        benefit_kwargs=None,
                        **kwargs):
+        
+        if benefit_callable is None:
+            benefit_callable = self._construct_benefit_sample
+        if cost_callable is None:
+            cost_callable = self._construct_cost_sample
+
+        cost_kwargs_default = {'seed' : seed, 'cost_col' : 'cost_random_draw', 'data' : self.data}
+        benefit_kwargs_default = {'seed' : seed, 'benefit_col' : 'benefit_random_draw', 'data' : self.data}
+        
+        if cost_kwargs is not None:
+            cost_kwargs_default.update(cost_kwargs)
+        if benefit_kwargs is not None:
+            benefit_kwargs_default.update(benefit_kwargs)
+
                        
-        df = self._merge_samples(seed=seed) # Needs to be inside loop to get different draw each time
+        df = self._merge_samples(benefit_callable=benefit_callable,
+                                 cost_callable=cost_callable,
+                                 benefit_kwargs=benefit_kwargs_default,
+                                 cost_kwargs=cost_kwargs_default) 
 
         minimod = Minimod(
             solver_type=self.solver_type,
@@ -145,8 +146,8 @@ class MonteCarloMinimod:
             intervention_col=self.intervention_col,
             space_col=self.space_col,
             time_col=self.time_col,
-            benefit_col="benefit_random_draw",
-            cost_col="cost_random_draw",
+            benefit_col=benefit_kwargs_default.get('benefit_col'),
+            cost_col=cost_kwargs_default.get('cost_col'),
             all_space=all_space,
             all_time=all_time,
             space_subset=space_subset,
@@ -218,7 +219,7 @@ class MonteCarloMinimod:
                                      benefit_kwargs=benefit_kwargs,
                                      cost_kwargs=cost_kwargs,
                                      **kwargs)
-        
+                
         sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs, exception_behaviour=exception_behavior)
         
         sim_df = pd.DataFrame(sim_dict)
