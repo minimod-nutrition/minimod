@@ -92,6 +92,7 @@ a = mm.MonteCarloMinimod(solver_type = 'costmin',
 def benefit_no_change(seed, benefit_col, data):
     return data[benefit_col]
 
+
 sim = a.fit_all_samples(N = 100, all_space=oil, all_time=cube, time_subset=[1,2,3], minimum_benefit='vasoilold', benefit_callable=benefit_no_change, benefit_kwargs={'benefit_col' : 'benefit'})
 
 

@@ -19,7 +19,7 @@ import minimod as mm
 # Data
 
 # This is how the data was processed, assuming we use the Katie_VA_Benefits_and_Costs_1_8_2019.xlsx file.
-excel_file = "examples/data/raw/Katie_VA_Benefits_and_Costs_1_8_2019.xlsx"
+excel_file = "data/raw/Katie_VA_Benefits_and_Costs_1_8_2019.xlsx"
 
 # %%
 
@@ -58,11 +58,11 @@ df = (df_benefit
 )
 
 # Then we save the data. The finished data can be found in the `/examples/data` folder.
-df.to_csv("examples/data/processed/example1.csv")
+# df.to_csv("examples/data/processed/example1.csv")
 
 
 # %%
-df = pd.read_csv("examples/data/processed/example1.csv")
+# df = pd.read_csv("examples/data/processed/example1.csv")
 # %% [markdown]
 
 # ## Running the model
@@ -82,10 +82,10 @@ c = mm.Minimod(solver_type = 'costmin',
             intervention_col = 'intervention',
             space_col = 'space',
             time_col = 'time',
-            all_space = [cube, oil, maize], 
-            all_time = [maize, cube],
+            all_space = cube + oil + maize, 
+            all_time = maize + cube,
             time_subset = [1,2,3],
-            strict = True,
+            strict = False,
             drop_bau = True)
 
 # %%
