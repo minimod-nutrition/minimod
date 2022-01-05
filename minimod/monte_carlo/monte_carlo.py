@@ -59,12 +59,12 @@ class MonteCarloMinimod:
         self.cost_col = cost_col
 
 
-    def _construct_benefit_sample(self, seed):
+    def _construct_benefit_sample(self, seed, data=None, benefit_col = 'benefit_random_draw'):
         """ For normal, it doesn't require transformation, so just return mean and sd"""
 
         random = np.random.default_rng(seed=seed)
         
-        df_mean_sd = self.data[
+        df_mean_sd = data[
             [self.benefit_mean_col, self.benefit_sd_col, self.pop_weight_col]
         ]
 
@@ -76,22 +76,22 @@ class MonteCarloMinimod:
             ),
         )
 
-        return df["benefit_random_draw"]
+        return df[benefit_col]
 
-    def _construct_cost_sample(self,seed):
+    def _construct_cost_sample(self, seed, data=None, cost_col='cost_random_draw'):
         """For costs we assume uniform and deviate by some percentage."""
 
         random= np.random.default_rng(seed=seed)
 
-        df_costs = self.data[self.cost_col]
-        df_costs_low = (1 - self.cost_uniform_perc) * self.data[self.cost_col]
-        df_costs_high = (1 + self.cost_uniform_perc) * self.data[self.cost_col]
+        df_costs = data[self.cost_col]
+        df_costs_low = (1 - self.cost_uniform_perc) * data[self.cost_col]
+        df_costs_high = (1 + self.cost_uniform_perc) * data[self.cost_col]
 
         df = df_costs.to_frame().assign(
             cost_random_draw=random.uniform(df_costs_low, df_costs_high)
         )
 
-        return df["cost_random_draw"]
+        return df[cost_col]
 
     def _drop_nan_benefits(self, data):
 
@@ -99,10 +99,10 @@ class MonteCarloMinimod:
 
         return df
 
-    def _merge_samples(self, seed):
+    def _merge_samples(self, benefit_callable, cost_callable,  cost_kwargs, benefit_kwargs):
 
-        benefit_sample = self._construct_benefit_sample(seed=seed)
-        cost_sample = self._construct_cost_sample(seed=seed)
+        benefit_sample = benefit_callable(**benefit_kwargs)
+        cost_sample = cost_callable(**cost_kwargs)
 
         return benefit_sample.to_frame().merge(
             cost_sample, left_index=True, right_index=True
@@ -115,9 +115,30 @@ class MonteCarloMinimod:
                        space_subset,
                        time_subset,
                        strict,
+                       benefit_callable=None,
+                       cost_callable=None,
+                       cost_kwargs=None,
+                       benefit_kwargs=None,
                        **kwargs):
+        
+        if benefit_callable is None:
+            benefit_callable = self._construct_benefit_sample
+        if cost_callable is None:
+            cost_callable = self._construct_cost_sample
+
+        cost_kwargs_default = {'seed' : seed, 'cost_col' : 'cost_random_draw', 'data' : self.data}
+        benefit_kwargs_default = {'seed' : seed, 'benefit_col' : 'benefit_random_draw', 'data' : self.data}
+        
+        if cost_kwargs is not None:
+            cost_kwargs_default.update(cost_kwargs)
+        if benefit_kwargs is not None:
+            benefit_kwargs_default.update(benefit_kwargs)
+
                        
-        df = self._merge_samples(seed=seed) # Needs to be inside loop to get different draw each time
+        df = self._merge_samples(benefit_callable=benefit_callable,
+                                 cost_callable=cost_callable,
+                                 benefit_kwargs=benefit_kwargs_default,
+                                 cost_kwargs=cost_kwargs_default) 
 
         minimod = Minimod(
             solver_type=self.solver_type,
@@ -125,8 +146,8 @@ class MonteCarloMinimod:
             intervention_col=self.intervention_col,
             space_col=self.space_col,
             time_col=self.time_col,
-            benefit_col="benefit_random_draw",
-            cost_col="cost_random_draw",
+            benefit_col=benefit_kwargs_default.get('benefit_col'),
+            cost_col=cost_kwargs_default.get('cost_col'),
             all_space=all_space,
             all_time=all_time,
             space_subset=space_subset,
@@ -170,9 +191,12 @@ class MonteCarloMinimod:
         space_subset=None,
         time_subset=None,
         strict=False,
-        # show_progress=True,
         exception_behavior = 'immediate',
         only_optimal=False,
+        benefit_callable=None,
+        cost_callable=None,
+        benefit_kwargs=None,
+        cost_kwargs=None,
         **kwargs
     ):
         
@@ -190,8 +214,12 @@ class MonteCarloMinimod:
                                      space_subset=space_subset,
                                      time_subset = time_subset,
                                      strict=strict,
+                                     benefit_callable=benefit_callable,
+                                     cost_callable=cost_callable,
+                                     benefit_kwargs=benefit_kwargs,
+                                     cost_kwargs=cost_kwargs,
                                      **kwargs)
-        
+                
         sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs, exception_behaviour=exception_behavior)
         
         sim_df = pd.DataFrame(sim_dict)
