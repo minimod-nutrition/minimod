@@ -36,7 +36,6 @@ class MonteCarloMinimod:
 
         self.solver_type = solver_type
 
-
         self.data = data.set_index([intervention_col, space_col, time_col])
 
         self.intervention_col = intervention_col
@@ -117,6 +116,7 @@ class MonteCarloMinimod:
                        time_subset,
                        strict,
                        **kwargs):
+                       
         df = self._merge_samples(seed=seed) # Needs to be inside loop to get different draw each time
 
         minimod = Minimod(
@@ -144,8 +144,8 @@ class MonteCarloMinimod:
 
         iteration_dict = {
             "status": minimod.status,
-            "opt_objective": minimod.opt_df['opt_costs'].sum(),
-            "opt_constraint": minimod.opt_df["opt_benefit"].sum(),
+            "opt_objective": minimod.opt_df['opt_costs_discounted'].sum(),
+            "opt_constraint": minimod.opt_df["opt_benefit_discounted"].sum(),
             "num_vars": minimod.num_cols,
             "constraints": minimod.num_rows,
             "solutions": minimod.num_solutions,
