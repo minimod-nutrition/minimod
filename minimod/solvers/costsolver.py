@@ -134,9 +134,9 @@ class CostSolver(BaseSolver):
         print()
         print("Optimal Interventions")
         print()
-        opt_chosen = self.opt_df.loc[lambda df: df['opt_vals']>0]['opt_vals']
+        opt_chosen = self.opt_df.loc[lambda df: df['opt_vals']>0]['opt_vals'].unstack(level='time').fillna(0)
         
-        s.print_df(opt_chosen.unstack(level='time').fillna(0))
+        s.print_df(opt_chosen)
         
         if isinstance(intervention_groups, dict):
             opt_chosen_reset = opt_chosen.reset_index()
@@ -158,6 +158,7 @@ class CostSolver(BaseSolver):
             # a = intervention_grouper_df.reset_index(level='region')[list(range(1,11))].mul(intervention_grouper_df.reset_index(level='region')['region'], axis='index')
             # b = a.groupby(a.index).agg(list)
 
+        return opt_chosen
         
         
         

@@ -161,18 +161,26 @@ class MonteCarloMinimod:
         minimod.fit()
         
         # Run `minimod.report` to get opt_df for iteration
-        minimod.report(quiet=True)
-
+        # Also save the opt_chosen dataframes in case there are multiple solutions
+        
+        opt_df_list = []
+        
+        for i in range(minimod.num_solutions):
+            minimod.report(sol_num=i, quiet=True)
+            opt_df_list.append(minimod.opt_df)
+            
+        #TODO: add lowest cost per life saved index into iteration dict
+            
         iteration_dict = {
             "status": minimod.status,
-            "opt_objective": minimod.opt_df['opt_costs_discounted'].sum(),
-            "opt_constraint": minimod.opt_df["opt_benefit_discounted"].sum(),
+            "opt_objective": [df['opt_costs_discounted'].sum() for df in opt_df_list],
+            "opt_constraint": [df["opt_benefit_discounted"].sum() for df in opt_df_list],
             "num_vars": minimod.num_cols,
             "constraints": minimod.num_rows,
             "solutions": minimod.num_solutions,
             "num_int": minimod.num_int,
             "num_nz": minimod.num_nz,
-            "opt_df": minimod.opt_df,
+            "opt_df": opt_df_list,
             "sense" : minimod.sense,
             "solver_name" : minimod.solver_name,
             "minimum_benefit" : minimod.minimum_benefit,
@@ -235,11 +243,22 @@ class MonteCarloMinimod:
 
         return self.sim_results
 
-    def _all_opt_df(self):
+    def _all_opt_df(self, sol_filter=None):
         """Appends the dataframe from all simulation iterations together
         """
-
-        all_opt_df = pd.concat(self.sim_results.apply(lambda x: x['opt_df'].assign(iteration = x.name), axis=1).tolist())
+        #TODO: #28 Allow for concatenation of a combination of solutions, or all
+        
+        # First get sim_results so that `opt_df` is a series of dataframes
+        # Turn list into numpy since it has a `take` method
+        
+        if sol_filter=='min_cb':
+            # Find the solution with the highest benefit/cost ratio
+            sol_num_all_opt_df = self.sim_results.assign(best_solution  = lambda df: df.apply(lambda df: (np.array(df['opt_objective'])/np.array(df['opt_constraint'])).argmin(), axis=1),
+                                       new_opt_df = lambda df: df.apply(lambda x: x['opt_df'][x['best_solution']], axis=1))
+        else:
+            sol_num_all_opt_df = self.sim_results.assign(new_opt_df = lambda df: df['opt_df'].apply(lambda x: pd.concat(x)))
+        
+        all_opt_df = pd.concat(sol_num_all_opt_df.apply(lambda x: x['new_opt_df'].assign(iteration = x.name), axis=1).tolist())
 
         return all_opt_df
 
@@ -376,8 +395,8 @@ class MonteCarloMinimod:
             constraint_title = costs
 
 
-        self.sim_results['opt_constraint2']=self.sim_results['opt_constraint']/1000
-        self.sim_results['opt_objective2']=self.sim_results['opt_objective']/1000
+        self.sim_results['opt_constraint2']=self.sim_results['opt_constraint'].apply(lambda x: x[0]/1000)
+        self.sim_results['opt_objective2']=self.sim_results['opt_objective'].apply(lambda x: x[0]/1000)
 
         fig, (benefit_plot, cost_plot) = p._plot_sim_hist(
             data=self.sim_results,
