@@ -17,7 +17,6 @@ import minimod as mm
 # %% 
 
 # Data
-
 # This is how the data was processed, assuming we use the Katie_VA_Benefits_and_Costs_1_8_2019.xlsx file.
 excel_file = "data/raw/Katie_VA_Benefits_and_Costs_1_8_2019.xlsx"
 
