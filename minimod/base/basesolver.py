@@ -139,15 +139,15 @@ class BaseSolver:
 
         return eq
 
-    def _discounted_sum_over(self, col_name: str, over: str):
-        """_summary_
+    def _discounted_sum_over(self, col_name: str, over: str) -> pd.DataFrame :
+        """Abstract function used for constructing the objective function and main constraint of the model
 
         Args:
             col_name (str): name of column with benefits or costs data
             over (str): attribute used to group data by (e.g. time)
 
         Returns:
-            (): _description_
+            (pd.Dataframe): pd.Dataframe with mip variables as observations
         """
         
         # Merge data with self._df   
@@ -249,11 +249,14 @@ class BaseSolver:
         pass
         
 
-    def _fit(self, **kwargs:int) -> str:
+    def _fit(self, **kwargs) -> str:
         """Fits data to model. The instantiation of the class creates the base model. Uses ``mip.optimize`` to find the optimal point.
 
+        Args:
+            *kwargs: Other parameters to send to mip.optimize
+
         Returns:
-            str: new name for self???
+            str: return self
         """
       
 
@@ -275,16 +278,16 @@ class BaseSolver:
         return self
         
     def write(self, filename:str="model.lp"):
-        """_summary_
+        """Save model to file
 
         Args:
-            filename (str, optional): _description_. Defaults to "model.lp".
+            filename (str, optional):name of the file. Defaults to "model.lp".
         """
         
         self.model.write(filename)
         
     def process_results(self, sol_num:int=None):
-        """_summary_
+        """Processes results of optimization to be used in visualization and reporting functions
 
         Args:
             sol_num (None, optional): _description_. Defaults to None.
@@ -336,7 +339,7 @@ class BaseSolver:
         print("Interventions Chosen:")
         
     @property
-    def optimal_interventions(self) -> list:
+    def optimal_interventions(self) -> pd.DataFrame:
         opt_intervention = (
             self.opt_df
             .loc[lambda df: df['opt_vals']>0]
@@ -345,11 +348,21 @@ class BaseSolver:
             .unique()
             .tolist()
         )
+        """_summary_
+
+        Returns:
+            _type_: _description_
+        """
         
         return opt_intervention
     
     @property
     def _intervention_list_space_time(self) -> pd.DataFrame:
+        """_summary_
+
+        Returns:
+            pd.DataFrame: _description_
+        """
         
         df = (
             self.opt_df['opt_vals']
@@ -365,6 +378,11 @@ class BaseSolver:
     
     @property
     def bau_list(self) -> pd.DataFrame:
+        """_summary_
+
+        Returns:
+            pd.DataFrame: _description_
+        """
         
         df = (
             self.bau_df
@@ -385,7 +403,7 @@ class BaseSolver:
         """Plots optimal benefits and costs across time after model optimization
 
         Args:
-            fig (matplotlibfigure, optional): matplotlib figure. Defaults to None.
+            fig (matplotlib.figure, optional): matplotlib figure. Defaults to None.
             ax (matplotlib.axis, optional): matplotlib axis to use. Defaults to None.
             save (str, optional): path to save the figure. Defaults to None.
             cumulative (bool, optional): whether to plot cumulative benefits or costs. Defaults to False.
@@ -674,8 +692,6 @@ class BaseSolver:
             millions (bool, optional): True if values displayed in millions. Defaults to True.
             bau_intervention_bubble_names (Union[str,list], optional): name for bau intervention bubble. Defaults to None.
 
-        Raises:
-            Exception: _description_
         """
                 
         if intervention is None:
