@@ -339,7 +339,7 @@ class BaseSolver:
         print("Interventions Chosen:")
         
     @property
-    def optimal_interventions(self) -> pd.DataFrame:
+    def optimal_interventions(self) -> list:
         opt_intervention = (
             self.opt_df
             .loc[lambda df: df['opt_vals']>0]
@@ -348,20 +348,20 @@ class BaseSolver:
             .unique()
             .tolist()
         )
-        """_summary_
+        """Outputs the unique set of optimal interventions as a list
 
         Returns:
-            _type_: _description_
+            list: The list of optimal interventions
         """
         
         return opt_intervention
     
     @property
     def _intervention_list_space_time(self) -> pd.DataFrame:
-        """_summary_
+        """Returns a data frame with multindex (space_col, time_col) where each row is the optimal intervention.
 
         Returns:
-            pd.DataFrame: _description_
+            pd.DataFrame: A dataframe where each row is the optimal intervention for each time period and space
         """
         
         df = (
@@ -378,10 +378,10 @@ class BaseSolver:
     
     @property
     def bau_list(self) -> pd.DataFrame:
-        """_summary_
+        """Returns a dataframe with the name of the bau intervention. Mostly done for compatibility with other methods.
 
         Returns:
-            pd.DataFrame: _description_
+            pd.DataFrame: dataframe with the name of the bau intervention
         """
         
         df = (
