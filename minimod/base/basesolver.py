@@ -1,4 +1,5 @@
 # Imports for local packages
+from time import time
 from minimod.utils.exceptions import (
     MissingData,
     NotPandasDataframe,
@@ -23,6 +24,7 @@ import re
 import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.gridspec as gridspec
+import matplotlib.ticker as tick
 
 
 class BaseSolver:
@@ -773,5 +775,160 @@ class BaseSolver:
                 
         if save is not None:
             plt.savefig(save, dpi = p.dpi, bbox_inches="tight")
+    
+    @classmethod  
+    def supply_curve(cls, data, 
+                    full_population,
+                    all_space,
+                    all_time,
+                    time_subset,
+                    solver_type='costmin',
+                    benefit_col='effective_coverage',
+                    cost_col='cost',
+                    intervention_col='intervention',
+                    space_col='space',
+                    time_col='time',
+                    ec_range=None,
+                    above_ul = False,
+                    **kwargs): 
+        
+        if ec_range is None:
+            ec_range = np.arange(.1,1,.1)
+        
+        ratio_to_constraint = lambda ratio: ratio*full_population
+        
+        model_dict = {}
+
+        for _, benefit_constraint in enumerate(ec_range):
             
-                    
+            c = cls(solver_type = solver_type, 
+                        minimum_benefit = ratio_to_constraint(benefit_constraint),
+                        data = data, 
+                        benefit_col = benefit_col,
+                        cost_col = cost_col,
+                        intervention_col = intervention_col,
+                        space_col = space_col,
+                        time_col = time_col,
+                        all_space =all_space, 
+                        all_time = all_time,
+                        time_subset = time_subset,
+                        **kwargs)
+
+
+            opt = c.fit()
+            
+            model_dict[benefit_constraint] = opt
+            
+        results_dict = {'opt_benefits' : [],
+                        'opt_costs' : [],
+                        'opt_interventions' : []}
+        
+        for benefit_constraint, model in model_dict.items():
+
+            model.report(quiet=True)
+            results_dict['opt_benefits'].append(model.opt_df.opt_benefit_discounted.sum())
+            results_dict['opt_costs'].append(model.opt_df.opt_costs_discounted.sum())
+            results_dict['opt_interventions'].append(model.optimal_interventions)
+            
+            if above_ul:
+                results_dict['opt_above_ul'] = []
+                
+                above_ul = (
+                        data['above_ul']
+                        .reset_index()
+                        .assign(intervention = lambda df: df[intervention_col].str.lower())
+                        .set_index([intervention_col, space_col, time_col])
+                        )
+                
+                opt_above_ul = (model.opt_df['opt_vals'] * above_ul['above_ul']).sum()
+                
+                results_dict['opt_above_ul'].append(opt_above_ul)
+
+            return pd.DataFrame(results_dict, index=ec_range) 
+    
+    @classmethod      
+    def plot_supply_curve(cls, data, 
+                    full_population,
+                    all_space,
+                    all_time,
+                    time_subset,
+                    solver_type='costmin',
+                    benefit_col='effective_coverage',
+                    cost_col='cost',
+                    intervention_col='intervention',
+                    space_col='space',
+                    time_col='time',
+                    ec_range=None,
+                    above_ul = False,
+                    ec_thousands = 1_000,
+                    ul_thousands = 1_000,
+                    save=None,
+                    **kwargs):
+        
+        
+        results_df = cls.supply_curve(
+                    data=data, 
+                    full_population=full_population,
+                    all_space=all_space,
+                    all_time=all_time,
+                    time_subset=time_subset,
+                    solver_type=solver_type,
+                    benefit_col=benefit_col,
+                    cost_col=cost_col,
+                    intervention_col=intervention_col,
+                    space_col=space_col,
+                    time_col=time_col,
+                    ec_range=ec_range,
+                    above_ul = above_ul,
+                    **kwargs
+                    )
+        
+        fig, ax = plt.subplots()
+      
+        ax2 = ax.twinx()
+                
+        markers = [r"$\alpha$", r"$\beta$", r"$\gamma$", r"$\delta$", r"$\epsilon$", r"$\pi$", r"$\rho$", r"$\zeta$"]
+        
+        results_df['opt_costs'].plot(ax=ax)
+
+        ax.set_xlim([0,1])
+        ax.set_xlabel('Effective Coverage')
+
+        ax.set_xticks(list(ec_range))
+        
+        ax.set_xticklabels([f"{x*100:.0f}%" for x in list(ec_range)])
+        
+        ax.ticklabel_format(axis='y', useMathText=True)
+        
+        ax.yaxis.set_major_formatter(tick.FuncFormatter(lambda y, _: f"{y/ec_thousands:,.0f}"))
+        
+        ax.set_ylabel(f'Total Cost (x {ec_thousands:,.0f})')
+        
+        if above_ul:
+            # Now get above_ul
+            results_df['opt_above_ul'].plot(ax=ax2, color='tab:red')
+            ax2.yaxis.set_major_formatter(tick.FuncFormatter(lambda y, _: f"{y/ul_thousands:,.0f}"))
+            ax2.set_ylabel(f'Population Above UL (x {ul_thousands:,.0f})')
+        
+        popped_markers = markers.copy()
+        
+        results_df.apply(lambda df: ax.text(df.name+.01, df['opt_costs'],
+                                            s=popped_markers.pop(), color='black'), axis=1)
+        
+        intervention_with_marker = []
+
+        for m,i in zip(list(reversed(markers)), [', '.join(i) for i in results_df['opt_interventions'].values.tolist()]):
+                intervention_with_marker.append(m + ': ' + i)
+        
+        fig_text_start = f"""Note: Letters markers describe interventions as:"""
+        
+        fig.text(0,-.3, s=fig_text_start+'\n' + '\n'.join(intervention_with_marker))
+        
+        fig.legend(labels=['Costs', 'Above UL'])
+        
+        plt.tight_layout()
+        
+        if save is not None:
+            plt.savefig(save, dpi=300, bbox_inches='tight')
+        
+        
