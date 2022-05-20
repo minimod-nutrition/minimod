@@ -29,6 +29,7 @@ class CostSolver(BaseSolver):
 
         if isinstance(minimum_benefit, float) or isinstance(minimum_benefit, int):
             self.minimum_benefit = minimum_benefit
+            over=None
         elif isinstance(minimum_benefit, str):
             # Get sum of benefits for interventions
             if main_constraint_over == 'space':
@@ -43,24 +44,23 @@ class CostSolver(BaseSolver):
                 self._df, minimum_benefit, "discounted_benefits", over
             )
         
-
-        self.bau_df = self.bau.bau_df(
-            self._df,
-            minimum_benefit,
-            [
-                self.benefit_col,
-                self.cost_col,
-                "discounted_benefits",
-                "discounted_costs",
-            ],
-        )
-        
-        summed_bau_df = self.bau_df.sum()
-        
-        self.cost_per_benefit = summed_bau_df[self.cost_col]/summed_bau_df[self.benefit_col]
-        
-        if drop_bau:
-            self._df = self._df.drop(minimum_benefit, level=self.intervention_col)
+            self.bau_df = self.bau.bau_df(
+                self._df,
+                minimum_benefit,
+                [
+                    self.benefit_col,
+                    self.cost_col,
+                    "discounted_benefits",
+                    "discounted_costs",
+                ],
+            )
+            
+            summed_bau_df = self.bau_df.sum()
+            
+            self.cost_per_benefit = summed_bau_df[self.cost_col]/summed_bau_df[self.benefit_col]
+            
+            if drop_bau:
+                self._df = self._df.drop(minimum_benefit, level=self.intervention_col)
                    
         self.model = Model(data = self._df, sense = self.sense, solver_name=self.solver_name, show_output=self.show_output)
         
