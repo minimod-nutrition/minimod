@@ -3,13 +3,13 @@ from minimod.solvers.benefitsolver import BenefitSolver
 
 class Minimod:
     
-    def __new__(self, solver_type = None, **kwargs):
+    def __new__(self, solver_type = None):
         
         if solver_type == 'covmax':
             
-            return BenefitSolver(**kwargs)
+            return BenefitSolver
         
         elif solver_type == 'costmin':
             
-            return CostSolver(**kwargs)
+            return CostSolver
         

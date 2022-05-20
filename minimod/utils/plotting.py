@@ -12,6 +12,7 @@ class Plotter:
     """This class is in charge of plotting the results of the `minimod`. 
     """     
     
+    @staticmethod
     def plot_context(func):
         
         @functools.wraps(func)
