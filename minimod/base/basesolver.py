@@ -57,13 +57,13 @@ class BaseSolver:
 
         Args:
                 data (pd.DataFrame): dataframe with benefits and cost data.
-                benefit_col (str, optional):benefit data column. Defaults to 'benefits'.
-                cost_col (str, optional): cost data column. Defaults to 'costs'.
-                intervention_col (str, optional): intervention data column. Defaults to 'intervention'.
-                space_col (str, optional): space/region data column. Defaults to 'space'.
-                time_col (str, optional): time period data column. Defaults to 'time'.
+                benefit_col (str, optional): name of dataframe's column with benefit data. Defaults to 'benefits'.
+                cost_col (str, optional): name of dataframe's column with cost data. Defaults to 'costs'.
+                intervention_col (str, optional): name of dataframe's column with intervention data. Defaults to 'intervention'.
+                space_col (str, optional): name of dataframe's column with space/region data . Defaults to 'space'.
+                time_col (str, optional): name of dataframe's column with time period data . Defaults to 'time'.
                 interest_rate_cost (float, optional): interest rate of costs. Defaults to 0.0.
-                benefit_title (str, optional): title for benefits to put in plots and reports. Defaults to "Benefits".
+                benefit_title (str, optional): title for benefits to use in plots and reports. Defaults to "Benefits".
         
         ``BaseSolver`` is inherited by ``CostSolver`` and ``BenefitSolver`` to then run optimizations.
         """        
@@ -129,7 +129,7 @@ class BaseSolver:
         """Multiply each ``mip_var`` in the data by benefits or costs (``data``) and then create a ``mip`` expression from it.
 
         Args:
-            col_name (str): name of column with benefits or costs data
+            col_name (str): name of dataframe's column with benefits or costs data
 
         Returns:
             mip.LinExpr: ``mip`` Expression
@@ -143,8 +143,8 @@ class BaseSolver:
         """Abstract function used for constructing the objective function and main constraint of the model
 
         Args:
-            col_name (str): name of column with benefits or costs data
-            over (str): attribute used to group data by (e.g. time)
+            col_name (str): name of dataframe's column with benefits or costs data
+            over (str): name of dataframe's column with attribute used to group data by (e.g. time)
 
         Returns:
             (pd.Dataframe): pd.Dataframe with mip variables as observations
@@ -184,15 +184,15 @@ class BaseSolver:
         """Processes the input data by creating discounted benefits and costs.
 
         Args:
-            data (pd.DataFrame, optional): data. Defaults to None.
-            intervention (str, optional):intervention column. Defaults to "intervention".
-            space (str, optional): space/region column. Defaults to "space".
-            time (str, optional): time period column. Defaults to "time".
-            benefits (str, optional): benefits column. Defaults to "benefits".
-            costs (str, optional): cost column. Defaults to "costs".
+            data (pd.DataFrame, optional): data with XX. Defaults to None.
+            intervention (str, optional): name of dataframe's column with intervention data. Defaults to "intervention".
+            space (str, optional): name of dataframe's column with space/region data. Defaults to "space".
+            time (str, optional): name of dataframe's column with time period data. Defaults to "time".
+            benefits (str, optional): name of dataframe's column with benefits data. Defaults to "benefits".
+            costs (str, optional): name of dataframe's column with cost data. Defaults to "costs".
         
         Returns:
-            (): dataframe ready to be used in the problem
+            (pd.DataFrame): dataframe ready to be used in the problem
 
         
         |k     | j   |t   | benefits   | costs |
@@ -290,7 +290,7 @@ class BaseSolver:
         """Processes results of optimization to be used in visualization and reporting functions
 
         Args:
-            sol_num (None, optional): _description_. Defaults to None.
+            sol_num (int, optional): XX. Defaults to None.
         """
         
         self.opt_df = self.model.process_results(self.benefit_col, 
@@ -304,7 +304,7 @@ class BaseSolver:
         """Prints out a report of optimal model parameters and useful statistics.
 
         Args:
-            sol_num (int, optional): _description_. Defaults to None.
+            sol_num (int, optional): XX. Defaults to None.
             quiet (bool, optional): whether we want the report printed out or not. Defaults to False.
         """
              
@@ -460,7 +460,7 @@ class BaseSolver:
         """Plots benefits and costs of optimal and benchark interventions across time 
 
         Args:
-            opt_variable (str, optional): _description_. Defaults to 'b'.
+            opt_variable (str, optional): XX is this optimal intervention?XX. Defaults to 'b'.
             fig (matplotlib.figure, optional): matplotlib figure. Defaults to None.
             ax (matplotlib.axis, optional):matplotlib axis to use. Defaults to None.
             save (str, optional): path to save the figure. Defaults to None.
@@ -572,12 +572,12 @@ class BaseSolver:
         If more than one intervention is specified, then aggregates them. If more than one time period is specified, then creates a subplots of len(time) and show each.
 
         Args:
-            intervention (str, optional): interventions to use. Defaults to None.
+            intervention (str, optional): intervention to use. Defaults to None.
             time (Union[int,list], optional): time periods to plot. Defaults to None.
             optimum_interest (str, optional): optimal variable to use (Options include: 'b' for optimal benefits, 'c' for optimal costs, and 'v' for optimal variable). Defaults to 'b'.
             map_df (geopandas.GeoDataFrame, optional): geopandas dataframe with geometry information. Defaults to None.
-            merge_key (Union[str,list], optional): _description_. Defaults to None.
-            intervention_bubbles (bool, optional): _description_. Defaults to False.
+            merge_key (Union[str,list], optional): XX. Defaults to None.
+            intervention_bubbles (bool, optional): XX. Defaults to False.
             intervention_bubble_names (Union[str,list], optional): key to merge on to geo dataframe. Defaults to None.
             save (str, optional): path to save map. Defaults to None.
 

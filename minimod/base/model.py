@@ -1,3 +1,4 @@
+from typing import Any
 import mip
 import pandas as pd
 
@@ -8,18 +9,18 @@ from itertools import combinations, permutations
 
 
 class Model:
-    def __init__(self, data, sense, solver_name, show_output):
-        """A class that instantiates a `mip` model. 
 
-        :param data: The input dataframe that includes benefit/cost data
-        :type data: pandas.DataFrame
-        :param sense: Whether the model should minimize or maximize
-        :type sense: mip.MAXIMIZE or mip.MINIMIZE
-        :param solver_name: The solver type (CBC or some other mip solver   )
-        :type solver_name: mip.CBC
-        :param show_output: Whether to show output of model construction
-        :type show_output: bool
+
+    def __init__(self, data:pd.DataFrame, sense:str, solver_name:str, show_output:bool):
+        """A class that instantiates a `mip` model.
+
+        Args:
+            data (pd.DataFrame): The input dataframe that includes benefit/cost data
+            sense (str): Whether the model should minimize (MINIMIZE) or maximize (MAXIMIZE)
+            solver_name (str): The solver type (CBC or some other mip solver)
+            show_output (bool):  Whether to show output of model construction
         """
+       
 
         ## Tell the fitter whether to maximize or minimize
         self.model = mip.Model(sense=sense, solver_name=solver_name)
@@ -52,7 +53,15 @@ class Model:
         self.model.lp_method = -1
         self.cut_passes = 1
 
-    def _stringify_tuple(self, tup):
+    def _stringify_tuple(self, tup:tuple)->str:
+        """This function converts all the items of a tuple into one string
+
+        Args:
+            tup (tuple): general tuple 
+
+        Returns:
+            str: output string generated from all items in the tuple
+        """
 
         strings = [str(x) for x in tup]
 
@@ -69,8 +78,13 @@ class Model:
             axis=1,
         )
 
-    def _base_constraint(self, space, time):
-        
+    def _base_constraint(self, space:str, time:str):
+        """XX
+
+        Args:
+            space (str): name of dataframe's column with information on regions/locations
+            time (str): name of dataframe's column with information on time/years
+        """
         grouped_df = self._df["mip_vars"].groupby([space, time]).agg(mip.xsum)
 
         base_constrs = grouped_df.values
@@ -87,7 +101,17 @@ class Model:
 
             self.model += constr <= 1, "ones_" + name
 
-    def _intervention_subset(self, intervention, strict, subset_names=[]):
+    def _intervention_subset(self, intervention:str, strict:bool, subset_names:list =[])-> dict:
+        """This function creates a dictionary for the subset of specified interventions
+
+        Args:
+            intervention (str): name of dataframe's column with set of interventions 
+            strict (bool): whether XX
+            subset_names (list, optional): XX. Defaults to [].
+
+        Returns:
+            dict: dictionary with subset of interventions
+        """
 
         subset_dict = {}
 
@@ -115,14 +139,25 @@ class Model:
 
     def _all_constraint(
         self,
-        strict,
-        intervention=None,
-        space=None,
-        time=None,
-        subset_names=None,
-        over=None,
-        subset_list=None,
+        strict:bool,
+        intervention:str=None,
+        space:str=None,
+        time:str=None,
+        subset_names:list=None,
+        over:str=None,
+        subset_list:list=None,
     ):
+        """XX
+
+        Args:
+            strict (bool): whether XX
+            intervention (str, optional): name of dataframe's column with set of interventions. Defaults to None.
+            space (str, optional): name of dataframe's column with information on regions/locations. Defaults to None.
+            time (str, optional): name of dataframe's column with information on time/year. Defaults to None.
+            subset_names (list, optional): XX. Defaults to None.
+            over (str, optional): name of dataframe's column  with attribute used to group data by (e.g., time, region). Defaults to None.
+            subset_list (list, optional): XX. Defaults to None.
+        """
 
         subset_dict = self._intervention_subset(
             intervention=intervention, strict=strict, subset_names=subset_names
@@ -160,14 +195,28 @@ class Model:
 
     def _all_space_constraint(
         self,
-        strict,
-        intervention=None,
-        space=None,
-        time=None,
-        subset_names=None,
-        over=None,
-        subset_list=None,
-    ):
+        strict:bool,
+        intervention:str=None,
+        space:str=None,
+        time:str=None,
+        subset_names:list=None,
+        over:str=None,
+        subset_list:list=None,
+    )->Any:
+        """This function invokes the function `_all_constraint'
+
+        Args:
+            strict (bool): whether XX
+            intervention (str, optional): name of dataframe's column with set of interventions. Defaults to None.
+            space (str, optional): name of dataframe's column with informaiton on regions/locations. Defaults to None.
+            time (str, optional): name of dataframe's column with information on time/year. Defaults to None.
+            subset_names (list, optional): XX. Defaults to None.
+            over (str, optional): name of dataframe's column  with attribute used to group data by (e.g., time, region). Defaults to None.
+            subset_list (list, optional): XX. Defaults to None.
+
+        Returns:
+            Any: XX
+        """
 
         return self._all_constraint(
             strict,
@@ -181,14 +230,28 @@ class Model:
 
     def _all_time_constraint(
         self,
-        strict,
-        intervention=None,
-        space=None,
-        time=None,
-        subset_names=None,
-        over=None,
-        subset_list=None,
-    ):
+        strict:bool,
+        intervention:str=None,
+        space:str=None,
+        time:str=None,
+        subset_names:list=None,
+        over:str=None,
+        subset_list:list=None,
+    )->Any:
+        """This function invokes the function `_all_constraint'
+
+        Args:
+            strict (bool): whether XX
+            intervention (str, optional): name of dataframe's column with set of interventions. Defaults to None.
+            space (str, optional): name of dataframe's column with information on regions/locations. Defaults to None.
+            time (str, optional): name of dataframe's column with information on time/year. Defaults to None.
+            subset_names (list, optional): XX. Defaults to None.
+            over (str, optional): name of dataframe's column  with attribute used to group data by (e.g., time, region). Defaults to None.
+            subset_list (list, optional): XX. Defaults to None.
+
+        Returns:
+            Any: XX
+        """
 
         return self._all_constraint(
             strict,
@@ -200,14 +263,16 @@ class Model:
             subset_list=subset_list,
         )
 
-    def get_equation(self, name=None, show=True):
-        """Returns a constraint by its name. If no name is specified, returns all constraints
-        
-        Arguments:
-            name {str} -- a string corresponding to the name of the constraint
-        
+    
+    def get_equation(self, name:str=None, show:bool=True)->str or mip.LinExpr or mip.Constr :
+        """This function returns a constraint by its name. If no name is specified, returns all constraints
+
+        Args:
+            name (str, optional): a string corresponding to the name of the constraint. Defaults to None.
+            show (bool, optional): whether to return the contraint in string type or not. Defaults to True.
+
         Returns:
-            mip.Constr -- A `mip` constraint object
+            str or mip.LinExpr or mip.Constr: A `mip` constraint object
         """
 
         if name is None:
@@ -223,11 +288,24 @@ class Model:
             else:
                 return self.model.constr_by_name(name)
 
-    def add_objective(self, eq):
+    def add_objective(self, eq:mip.LinExpr):
+        """Sets the objective function of the problem as a linear expression
+
+        Args:
+            eq (mip.LinExpr): equation defining the objective function
+        """
 
         self.model.objective = eq
 
-    def add_constraint(self, eq, constraint, way="ge", name=""):
+    def add_constraint(self, eq:mip.LinExpr, constraint:mip.LinExpr, way:str="ge", name:str=""):
+        """This function merges the objective function of the model with its constraint
+
+        Args:
+            eq (mip.LinExpr): equation defining the objective function
+            constraint (mip.LinExpr):equation defining the constraint function
+            way (str, optional): whether greater or equal (ge), less or equal(le), or equal(eq). Defaults to "ge".
+            name (str, optional): optional name for XX. Defaults to "".
+        """
         
         if isinstance(constraint, pd.Series):
             # Merge equation with constraint
@@ -252,15 +330,28 @@ class Model:
 
     def base_model_create(
         self,
-        intervention,
-        space,
-        time,
-        all_time=None,
-        all_space=None,
-        time_subset=None,
-        space_subset=None,
-        strict=False,
+        intervention:str,
+        space:str,
+        time:str,
+        all_time:list=None,
+        all_space:list=None,
+        time_subset:list=None,
+        space_subset:list=None,
+        strict:bool=False,
     ):
+        """XX
+
+        Args:
+            intervention (str): name of dataframe's column with set of interventions
+            space (str): name of dataframe's column with information on regions/locations
+            time (str): name of dataframe's column with information on time/years
+            all_time (list, optional): list of intervention vehicles that are active during all periods (e.g., cube, oil). Defaults to None.
+            all_space (list, optional): list of intervention vehicles that are targeted at a country-wide level (e.g., cube, oil). Defaults to None.
+            time_subset (list, optional): list with subset of periods. Defaults to None.
+            space_subset (list, optional):list with subset of regions/locations. Defaults to None.
+            strict (bool, optional): whether XX . Defaults to False.
+
+        """
 
         ## Now we create the choice variable, x, which is binary and is the size of the dataset.
         ## In this case, it should just be a column vector with the rows equal to the data:
@@ -302,6 +393,11 @@ class Model:
             )
 
     def optimize(self, **kwargs):
+        """This function conducts the optimization procedure 
+
+        Args:
+            **kwargs: Other parameters for optimization procedure using `mip.optimize' (max_seconds, max_nodes, max_solutions)
+        """
 
         self.status = None
 
@@ -335,7 +431,20 @@ class Model:
             elif self.status == mip.OptimizationStatus.INFEASIBLE:
                 print("[Warning]: Infeasible Solution Found")
 
-    def process_results(self, benefit_col, cost_col, intervention_col, space_col, sol_num = None):
+    def process_results(self, benefit_col:str, cost_col:str, intervention_col:str, space_col:str, sol_num:int = None)->pd.DataFrame:
+        """This function creates a dataframe with information on benefits and costs for the optimal interventions
+
+        Args:
+            benefit_col (str): name of dataframe's column with benefits
+            cost_col (str): name of dataframe's column with costs
+            intervention_col (str): name of dataframe's column with set of interventions
+            space_col (str): name of dataframe's column with information on regions/locations
+            sol_num (int, optional): XX. Defaults to None.
+
+        Returns:
+            pd.DataFrame: dataframe with optimal interventions
+        """
+
         
         if isinstance(sol_num, int):
             opt_df = self._df.copy(deep=True).assign(opt_vals=lambda df: df["mip_vars"].apply(lambda y: y.xi(sol_num)))
@@ -379,10 +488,20 @@ class Model:
 
         return opt_df
 
-    def write(self, filename="model.lp"):
+    def write(self, filename:str="model.lp"):
+        """Thi function saves model to file
+
+        Args:
+            filename (str, optional): name of file. Defaults to "model.lp".
+        """
         self.model.write(filename)
 
-    def get_model_results(self):
+    def get_model_results(self)->list:
+        """This function returns a list with additional results of the optimization procedure
+
+        Returns:
+            list: model's results
+        """
 
         return (
             self.model.objective_value,
