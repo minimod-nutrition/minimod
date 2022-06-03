@@ -184,7 +184,7 @@ class BaseSolver:
         """Processes the input data by creating discounted benefits and costs.
 
         Args:
-            data (pd.DataFrame, optional): data with XX. Defaults to None.
+            data (pd.DataFrame, optional): raw data to be processed. Defaults to None.
             intervention (str, optional): name of dataframe's column with intervention data. Defaults to "intervention".
             space (str, optional): name of dataframe's column with space/region data. Defaults to "space".
             time (str, optional): name of dataframe's column with time period data. Defaults to "time".
@@ -290,7 +290,7 @@ class BaseSolver:
         """Processes results of optimization to be used in visualization and reporting functions
 
         Args:
-            sol_num (int, optional): XX. Defaults to None.
+            sol_num (int, optional): index of solution. Defaults to None.
         """
         
         self.opt_df = self.model.process_results(self.benefit_col, 
@@ -304,7 +304,7 @@ class BaseSolver:
         """Prints out a report of optimal model parameters and useful statistics.
 
         Args:
-            sol_num (int, optional): XX. Defaults to None.
+            sol_num (int, optional): index of solution to be displayed. Defaults to None.
             quiet (bool, optional): whether we want the report printed out or not. Defaults to False.
         """
              
@@ -460,7 +460,14 @@ class BaseSolver:
         """Plots benefits and costs of optimal and benchark interventions across time 
 
         Args:
-            opt_variable (str, optional): XX is this optimal intervention?XX. Defaults to 'b'.
+            opt_variable (str, optional): optimal variable to be plotted, where
+                b = optimal benefits
+                c = 'optimal costs
+                cdb = cumulative discounted benefits
+                cdc = cumulative discounted costs
+                cb = cumulative benefits
+                cc = cumulative costs
+            Defaults to 'b'.
             fig (matplotlib.figure, optional): matplotlib figure. Defaults to None.
             ax (matplotlib.axis, optional):matplotlib axis to use. Defaults to None.
             save (str, optional): path to save the figure. Defaults to None.
@@ -576,8 +583,8 @@ class BaseSolver:
             time (Union[int,list], optional): time periods to plot. Defaults to None.
             optimum_interest (str, optional): optimal variable to use (Options include: 'b' for optimal benefits, 'c' for optimal costs, and 'v' for optimal variable). Defaults to 'b'.
             map_df (geopandas.GeoDataFrame, optional): geopandas dataframe with geometry information. Defaults to None.
-            merge_key (Union[str,list], optional): XX. Defaults to None.
-            intervention_bubbles (bool, optional): XX. Defaults to False.
+            merge_key (Union[str,list], optional): column to merge geo-dataframe. Defaults to None.
+            intervention_bubbles (bool, optional): whether to show optimal intervention names in map. Defaults to False.
             intervention_bubble_names (Union[str,list], optional): key to merge on to geo dataframe. Defaults to None.
             save (str, optional): path to save map. Defaults to None.
 
