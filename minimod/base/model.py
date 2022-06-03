@@ -79,7 +79,7 @@ class Model:
         )
 
     def _base_constraint(self, space:str, time:str):
-        """XX
+        """Constraint making the 'ones' constraint, making an intervention a binary intervention.
 
         Args:
             space (str): name of dataframe's column with information on regions/locations
@@ -106,8 +106,8 @@ class Model:
 
         Args:
             intervention (str): name of dataframe's column with set of interventions 
-            strict (bool): whether XX
-            subset_names (list, optional): XX. Defaults to [].
+            strict (bool): whether to look for specific intervention names (using DataFrame.isin) or whether to look for a regex (using DataFrame.str.contains)
+            subset_names (list, optional): Which intervention names to look for. Defaults to [].
 
         Returns:
             dict: dictionary with subset of interventions
@@ -147,16 +147,23 @@ class Model:
         over:str=None,
         subset_list:list=None,
     ):
-        """XX
-
+        """A constraint across space or time, where an intervention is tied to other interventions across space time (for a given subset). For instance, if you wanted to
+        create a national intervention, for some intervention X, with 2 regions, this constraint would do the following:
+        
+        $X_{region1,t} == X_{region2,t}$ -> _all_constraint(over='space', subset_names=None)
+        
+        If you wanted to make sure that interventions were tied across time so that period 2 could only be used if period 1 was used:
+        
+        $X_{region1, 1} == X_{region1, 2}$
+       
         Args:
-            strict (bool): whether XX
+            strict (bool): whether to look for specific intervention names (using DataFrame.isin) or whether to look for a regex (using DataFrame.str.contains)
             intervention (str, optional): name of dataframe's column with set of interventions. Defaults to None.
             space (str, optional): name of dataframe's column with information on regions/locations. Defaults to None.
             time (str, optional): name of dataframe's column with information on time/year. Defaults to None.
-            subset_names (list, optional): XX. Defaults to None.
+            subset_names (list, optional): Which intervention names to look for. Defaults to None.
             over (str, optional): name of dataframe's column  with attribute used to group data by (e.g., time, region). Defaults to None.
-            subset_list (list, optional): XX. Defaults to None.
+            subset_list (list, optional): A list of interventions that are being constrained. Defaults to None.
         """
 
         subset_dict = self._intervention_subset(
@@ -202,20 +209,17 @@ class Model:
         subset_names:list=None,
         over:str=None,
         subset_list:list=None,
-    )->Any:
-        """This function invokes the function `_all_constraint'
+    )->None:
+        """This function invokes the function `_all_constraint' to create national interventions
 
         Args:
-            strict (bool): whether XX
+            strict (bool): whether to look for specific intervention names (using DataFrame.isin) or whether to look for a regex (using DataFrame.str.contains)
             intervention (str, optional): name of dataframe's column with set of interventions. Defaults to None.
             space (str, optional): name of dataframe's column with informaiton on regions/locations. Defaults to None.
             time (str, optional): name of dataframe's column with information on time/year. Defaults to None.
-            subset_names (list, optional): XX. Defaults to None.
+            subset_names (list, optional): Which intervention names to look for. Defaults to None.
             over (str, optional): name of dataframe's column  with attribute used to group data by (e.g., time, region). Defaults to None.
-            subset_list (list, optional): XX. Defaults to None.
-
-        Returns:
-            Any: XX
+            subset_list (list, optional): A list of interventions that are being constrained. Defaults to None.
         """
 
         return self._all_constraint(
@@ -237,20 +241,17 @@ class Model:
         subset_names:list=None,
         over:str=None,
         subset_list:list=None,
-    )->Any:
+    )->None:
         """This function invokes the function `_all_constraint'
 
         Args:
-            strict (bool): whether XX
+            strict (bool): whether to look for specific intervention names (using DataFrame.isin) or whether to look for a regex (using DataFrame.str.contains)
             intervention (str, optional): name of dataframe's column with set of interventions. Defaults to None.
             space (str, optional): name of dataframe's column with information on regions/locations. Defaults to None.
             time (str, optional): name of dataframe's column with information on time/year. Defaults to None.
-            subset_names (list, optional): XX. Defaults to None.
+            subset_names (list, optional): Which intervention names to look for. Defaults to None.
             over (str, optional): name of dataframe's column  with attribute used to group data by (e.g., time, region). Defaults to None.
-            subset_list (list, optional): XX. Defaults to None.
-
-        Returns:
-            Any: XX
+            subset_list (list, optional): A list of interventions that are being constrained. Defaults to None.
         """
 
         return self._all_constraint(
@@ -304,7 +305,7 @@ class Model:
             eq (mip.LinExpr): equation defining the objective function
             constraint (mip.LinExpr):equation defining the constraint function
             way (str, optional): whether greater or equal (ge), less or equal(le), or equal(eq). Defaults to "ge".
-            name (str, optional): optional name for XX. Defaults to "".
+            name (str, optional): optional name for the constraint. Defaults to "".
         """
         
         if isinstance(constraint, pd.Series):
@@ -339,7 +340,7 @@ class Model:
         space_subset:list=None,
         strict:bool=False,
     ):
-        """XX
+        """A function   
 
         Args:
             intervention (str): name of dataframe's column with set of interventions
@@ -349,7 +350,7 @@ class Model:
             all_space (list, optional): list of intervention vehicles that are targeted at a country-wide level (e.g., cube, oil). Defaults to None.
             time_subset (list, optional): list with subset of periods. Defaults to None.
             space_subset (list, optional):list with subset of regions/locations. Defaults to None.
-            strict (bool, optional): whether XX . Defaults to False.
+            strict (bool, optional): whether to look for specific intervention names (using DataFrame.isin) or whether to look for a regex (using DataFrame.str.contains). Defaults to False.
 
         """
 
@@ -439,7 +440,7 @@ class Model:
             cost_col (str): name of dataframe's column with costs
             intervention_col (str): name of dataframe's column with set of interventions
             space_col (str): name of dataframe's column with information on regions/locations
-            sol_num (int, optional): XX. Defaults to None.
+            sol_num (int, optional): index of solution. Defaults to None.
 
         Returns:
             pd.DataFrame: dataframe with optimal interventions
