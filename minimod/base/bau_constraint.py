@@ -7,15 +7,15 @@ class BAUConstraintCreator:
         pass
     
     def bau_df(self, data:pandas.DataFrame, constraint:str, discounted_variable:str = None) -> pandas.DataFrame:
-        """XX
+        """A dataframe of costs and benefits for the BAU (business as usual) intervention
 
         Args:
-            data (pandas.DataFrame): dataframe with XX
-            constraint (str): name of dataframe's column with information on XX
-            discounted_variable (str, optional): name of dataframe's column with information on XX. Defaults to None.
+            data (pandas.DataFrame): input data
+            constraint (str): name of dataframe BAU column
+            discounted_variable (str, optional): outputs a series of the variable of interest. Defaults to None.
 
         Returns:
-            pandas.DataFrame: XX
+            pandas.DataFrame
         """
      
         if discounted_variable is None:
@@ -37,9 +37,9 @@ class BAUConstraintCreator:
             If the option `over' is provided, the function sums across groups as well
 
         Args:
-            data (pandas.DataFrame): dataframe with XX
-            constraint (str): name of dataframe's column with information on XX
-            discounted_variable (str): name of dataframe's column with information on XX
+            data (pandas.DataFrame): input data
+            constraint (str): name of dataframe's column with information BAU
+            discounted_variable (str): column of interest.
             over (str, optional): name of dataframe's column  with attribute used to group data by (e.g., time, region). Defaults to None.
 
         Returns:
