@@ -8,117 +8,77 @@
 #!%load_ext autoreload
 # %%
 #!%autoreload 2
-import sys
 import pandas as pd
-import geopandas as gpd
-
 import minimod as mm
+import numpy as np
 
 # %% 
 
 # Data
 
 # This is how the data was processed, assuming we use the Katie_VA_Benefits_and_Costs_1_8_2019.xlsx file.
-excel_file = "data/raw/Katie_VA_Benefits_and_Costs_1_8_2019.xlsx"
+excel_file = "data/processed/supply_curve_example.xlsx"
 
 # %%
 
+benefits_vars = ['effective_coverage', 'costs', 'above_ul']
 
-df_benefit = (pd.read_excel(excel_file,
-                           sheet_name = 'Benefits',
-                           header = 2)
-              .set_index(['intervention', 'space'])
-              .stack()
-              .to_frame()
-              .reset_index()
-              .rename({'level_2' : 'time',
-                       0 : 'benefit'}, axis=1)
-              .set_index(['intervention', 'space', 'time'])
-              )
+df_dict = (
+      pd.read_excel(excel_file, sheet_name=None)
+)
 
-df_cost = (pd.read_excel(excel_file,
-                           sheet_name = 'Costs',
-                           header = 2)
-              .set_index(['intervention', 'space'])
-              .stack()
-              .to_frame()
-              .reset_index()
-              .rename({'level_2' : 'time',
-                       0 : 'costs'}, axis=1)
-              .set_index(['intervention', 'space', 'time'])
-              )
-
-
-
-# %% [markdown]
-# Then we merge the cost and benefit data together.
-df = (df_benefit
-      .merge(df_cost, left_index=True, right_index=True)
+df = (
+      df_dict['ec']
+      .merge(df_dict['pop']
+             .set_index('region')
+             .stack()
+             .to_frame()
+             .reset_index()
+             .rename({'level_1' : 'time', 0 : 'pop'}, axis=1),
+       on=['region'])
+      .assign(effective_coverage = lambda df: df['effective_coverage']*df['pop'],
+              costs = lambda df: df['costs']*df['pop'],
+              above_ul = lambda df: df['above_ul']*df['pop'],
+              intervention = lambda df: df['intervention'].str.lower())
+      .set_index(['intervention', 'region', 'time'])
+      .sort_index()
 
 )
 
-# Then we save the data. The finished data can be found in the `/examples/data` folder.
-# df.to_csv("examples/data/processed/example1.csv")
+full_population = df_dict['pop'].set_index('region').sum(axis=1).sum()
 
 
 # %%
-# df = pd.read_csv("examples/data/processed/example1.csv")
-# %% [markdown]
 
-# ## Running the model
 
-# Now we instantiate the model, and then run `fit` and get the report.
+supply_curve = mm.Minimod('costmin').supply_curve(
+      df, 
+      full_population,
+      bau = 'current fortification',
+      all_space=  ['Cube', 'Oil', 'current'],
+      all_time =  ['Cube', 'Oil', 'current'],
+      time_subset = [1,2,3],
+      cost_col='costs',
+      space_col='region',
+      ec_range=np.linspace(.01,.99,20),
+      above_ul = True,
+      show_output=False
+)
 
-cube = ["cube", "vascube", "oilcube", "cubemaize", "vascubemaize", "vasoilcube", "oilcubemaize", "vasoilcubemaize"]
-oil = ["oil", "vasoil", "oilcube", "oilmaize", "vasoilmaize", "vasoilcube", "oilcubemaize", "vasoilcubemaize"]
-maize = ["maize", "vasmaize", "oilmaize", "cubemaize", "vascubemaize", "vasoilmaize", "oilcubemaize", "vasoilcubemaize" ]
+
+
+
+# %%
+mm.Minimod('costmin').plot_supply_curve(supply_curve, 
+                                    ec_thousands = 1_000_000_000,
+                                    ul_thousands = 1_000,
+                                    above_ul=True,
+                                    splitter=' + ',
+                                    save=None)
 
 # %%
 
-# Create copy of data
-
-df_supply = df.copy(deep=True)
-
-model_dict = {}
-
-for i, benefit_constraint in enumerate([1, 1.5, 2, 2.5, 3]):
-      
-      df_loop = df_supply
-      
-      df_loop.loc[('vasoilold', slice(None), slice(None))] = \
-            benefit_constraint*df_loop.loc[('vasoilold', slice(None), slice(None))].values
-      
-      c = mm.Minimod(solver_type = 'costmin', 
-                  minimum_benefit = 'vasoilold',
-                  data = df_loop, 
-                  benefit_col = 'benefit',
-                  cost_col = 'costs',
-                  intervention_col = 'intervention',
-                  space_col = 'space',
-                  time_col = 'time',
-                  all_space = cube + oil + maize, 
-                  all_time = maize + cube,
-                  time_subset = [1,2,3],
-                  strict = False,
-                  drop_bau = True)
-
-
-      opt = c.fit()
-      
-      model_dict[benefit_constraint] = opt
-      
-
-# %%
-for benefit_constraint, value in model_dict.items():
-      print(benefit_constraint)
-      value.report()
-
-# %%
-
-c.report()
-
-
-
-
-
-
+# Two point here worth mentioning:
+#     - There need not be a consistent increase in some interventions
+#     - Adding these interventions like this makes it seem like there a decrease in interventions, 
+#           but it really might be to due to the fact that more expensive interventions are being used for longer

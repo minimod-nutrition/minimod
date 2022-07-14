@@ -1,19 +1,24 @@
 # Imports for local packages
-#from types import NoneType
-import matplotlib
+from typing import Union
+from time import time
+
 from minimod.utils.exceptions import (
     MissingData,
     NotPandasDataframe,
     MissingOptimizationMethod,
 )
+from functools import reduce
+from pandas import DataFrame
 
 from .._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
 from minimod.utils.summary import OptimizationSummary
+from minimod.base.bau_constraint import BAUConstraintCreator
 from minimod.utils.plotting import Plotter
 from minimod.utils.suppress_messages import suppress_stdout_stderr
+from mip.cbc import OptimizationStatus
 
 import matplotlib.pyplot as plt
 
@@ -26,6 +31,18 @@ import re
 import sys
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.gridspec as gridspec
+import matplotlib.ticker as tick
+from dataclasses import dataclass
+
+@dataclass
+class SupplyCurve:
+    
+    supply_curve: DataFrame
+    full_population: int
+    bau: str
+    data: DataFrame
+
+
 
 from typing import Any
 from typing import Union
@@ -111,9 +128,7 @@ class BaseSolver:
         self.minimum_benefit = None
         self.total_funds = None
         
-        if self.show_output:
-            print(
-                f"""
+        self.message = f"""
                 MiniMod Nutrition Intervention Tool
                 Optimization Method: {str(self.sense)}
                 Version: {__version__}
@@ -121,7 +136,10 @@ class BaseSolver:
                 Show Output: {self.show_output}
                 
                 """
-            )
+        
+        if self.show_output:
+            print(self.message)
+        
     
 
     def _discounted_sum_all(self, col_name:str) -> mip.LinExpr:
@@ -832,6 +850,266 @@ class BaseSolver:
         fig.text(0.5,-.05, fig_text, ha='center')
                 
         if save is not None:
-            plt.savefig(save, dpi = 300, bbox_inches="tight")
+            plt.savefig(save, dpi = p.dpi, bbox_inches="tight")
+    
+    @classmethod  
+    def supply_curve(cls, data, 
+                    full_population,
+                    bau,
+                    all_space,
+                    all_time,
+                    time_subset,
+                    benefit_col='effective_coverage',
+                    cost_col='cost',
+                    intervention_col='intervention',
+                    space_col='space',
+                    time_col='time',
+                    ec_range=None,
+                    above_ul = False,
+                    **kwargs): 
+        
+        if ec_range is None:
+            ec_range = np.arange(.1,1,.1)
+        
+        ratio_to_constraint = lambda ratio: ratio*full_population
+        
+        model_dict = {}
+
+        for _, benefit_constraint in enumerate([bau] + list(ec_range)):
             
+            if isinstance(benefit_constraint, str):
+                minimum_benefit = benefit_constraint
+            else:
+                minimum_benefit = ratio_to_constraint(benefit_constraint)
+            
+            c = cls(minimum_benefit = minimum_benefit,
+                        data = data, 
+                        benefit_col = benefit_col,
+                        cost_col = cost_col,
+                        intervention_col = intervention_col,
+                        space_col = space_col,
+                        time_col = time_col,
+                        all_space =all_space, 
+                        all_time = all_time,
+                        time_subset = time_subset,
+                        **kwargs)
+
+            opt = c.fit()
+            
+            model_dict[benefit_constraint] = opt
+            
+        results_dict = {'benefit' : [],
+                        'opt_benefits' : [],
+                        'opt_costs' : [],
+                        'opt_interventions' : [],
+                        'convergence' : [],
+                        'vas_regions' : []}
+        if above_ul:
+            results_dict['opt_above_ul'] = []
+
+        
+        for benefit_constraint, model in model_dict.items():
+
+            model.report(quiet=True)
+            results_dict['benefit'].append(benefit_constraint)
+            results_dict['opt_benefits'].append(model.opt_df.opt_benefit_discounted.sum())
+            results_dict['opt_costs'].append(model.opt_df.opt_costs_discounted.sum())
+            results_dict['opt_interventions'].append(model.optimal_interventions)
+            results_dict['convergence'].append(model.status)
+            results_dict['vas_regions'].append(model.opt_df
+                                               .query("opt_vals > 0")
+                                               .query("index.get_level_values('intervention').str.contains('vas')")
+                                               .index.get_level_values('region').unique().values.tolist())
+            
+            if above_ul:
+                above_ul_df = (
+                        data['above_ul']
+                        .reset_index()
+                        .assign(intervention = lambda df: df[intervention_col].str.lower())
+                        .set_index([intervention_col, space_col, time_col])
+                        )
+                
+                opt_above_ul = (model.opt_df['opt_vals'] * above_ul_df['above_ul']).sum()
+                
+                results_dict['opt_above_ul'].append(opt_above_ul)
+                
+        return SupplyCurve(pd.DataFrame(results_dict, index=[results_dict['opt_benefits'][0]/full_population] + list(ec_range)) 
+                           , full_population=full_population,
+                           bau=bau,
+                           data=data)        
+        
+        
+    @classmethod      
+    def plot_supply_curve(cls, 
+                        supply_curve: SupplyCurve = None,
+                          data: DataFrame = None, 
+                    full_population: Union[int, float] = None,
+                    bau: str=None,
+                    all_space: list[float]=None,
+                    all_time=None,
+                    time_subset=None,
+                    benefit_col='effective_coverage',
+                    cost_col='cost',
+                    intervention_col='intervention',
+                    space_col='space',
+                    time_col='time',
+                    ec_range=None,
+                    above_ul = False,
+                    ec_thousands = 1_000,
+                    ul_thousands = 1_000,
+                    save=None,
+                    splitter=None,
+                    **kwargs):
+        
+        if supply_curve is None:
+            supply_curve = cls.supply_curve(
+                        data=data, 
+                        full_population=full_population,
+                        bau=bau,
+                        all_space=all_space,
+                        all_time=all_time,
+                        time_subset=time_subset,
+                        benefit_col=benefit_col,
+                        cost_col=cost_col,
+                        intervention_col=intervention_col,
+                        space_col=space_col,
+                        time_col=time_col,
+                        ec_range=ec_range,
+                        above_ul = above_ul,
+                        **kwargs
+                        )
+            
+        full_population = supply_curve.full_population
+        bau = supply_curve.bau
+        data=supply_curve.data
+        supply_curve = supply_curve.supply_curve # Now that we have all info. make `supply_curve` just the dataframe
+            
+        # make nan of infeasible solutions
+        supply_curve = supply_curve.replace(0, np.nan)
+        
+        only_bau_opt = supply_curve.query("benefit == @bau")
+        
+        # # get places where interventions change
+        # transitions = supply_curve[~(supply_curve['opt_interventions'] == supply_curve['opt_interventions'].shift(-1))]
+        
+        # Now get additions of interventions by converting to set and doing difference
+        supply_curve = (
+            supply_curve
+            .dropna()
+            .assign(opt_interventions = lambda df: df['opt_interventions'].apply(lambda x: [i.split(' + ') for i in x]))
+            .assign(opt_interventions = lambda df: df['opt_interventions'].apply(lambda x: reduce(lambda y, z: y + z, x)))
+            .assign(opt_interventions = lambda df: df['opt_interventions'].apply(lambda x: set(x)))
+            .assign(int_transitions_lag = lambda df: df['opt_interventions'].shift(-1))
+            .dropna()
+            .assign(transitions_plus = lambda df: df.apply(lambda col: col['int_transitions_lag'].difference(col['opt_interventions']), axis=1).shift(1).fillna(df['opt_interventions']))
+            .assign(transitions_minus = lambda df: df.apply(lambda col: col['opt_interventions'].difference(col['int_transitions_lag']), axis=1).shift(1).fillna(df['opt_interventions']))
+            .query("benefit != @bau")
+            .loc[lambda df: df.index >= only_bau_opt.index.values[0]]
+            )
+        
+        if above_ul:
+            subplot_col = 2
+        else:
+            subplot_col = 1
+        
+        with plt.style.context('seaborn-whitegrid'):
+            fig, ax = plt.subplots(subplot_col, 1, figsize=(4*subplot_col,10), sharex=True)
+            
+            if above_ul:
+                ax0 = ax[0]
+                ax1 = ax[1]
+            else:
+                ax0 = ax
+                      
+            supply_curve['opt_costs'].plot(ax=ax0)
+            
+            ax0.set_xlim([0,1])
+            
+            ax0.set_xlabel('Effective Coverage (%)')
+
+            ax0.set_xticks(supply_curve.index.tolist())
+            
+            ax0.set_xticklabels([f"{x*100:.0f}" for x in supply_curve.index.tolist()])
+            
+            ax0.ticklabel_format(axis='y', useMathText=True)
+            
+            ax0.yaxis.set_major_formatter(tick.FuncFormatter(lambda y, _: f"{y/ec_thousands:,.0f}"))
+            
+            ax0.set_title(f'Total Cost (x {ec_thousands:,.0f})')
+            
+            if bau is not None:
+                if data is None:
+                    raise Exception("If `bau` is specified, `data` must also be specified")
+                
+                bau_ec, bau_costs = BAUConstraintCreator().bau_df(data, bau, ['effective_coverage', 'costs']).sum()
+
+                ax0.scatter(bau_ec/full_population, bau_costs, color='tab:green', marker='s')
+                ax0.annotate("BAU", (bau_ec/full_population, bau_costs), xytext=(5, 5),  
+                            textcoords="offset pixels", color='black')
+                        
+            opt_b, opt_c = only_bau_opt[['opt_benefits', 'opt_costs']].values.tolist()[0]
+            
+            ax0.annotate("Optimum", (opt_b/full_population, opt_c), xytext=(5, -10),  
+                        textcoords="offset pixels", color='black')
+            ax0.scatter(opt_b/full_population, opt_c,  color='tab:orange', marker="s")
+            
+            if above_ul:
+                # Now get above_ul
+                supply_curve['opt_above_ul'].plot(ax=ax1, color='tab:red')
+                ax1.yaxis.set_major_formatter(tick.FuncFormatter(lambda y, _: f"{y/ul_thousands:,.0f}"))
+                ax1.set_title(f'Population Above UL (x {ul_thousands:,.0f})')
+                ax1.set_xticks(supply_curve.index.tolist())
+                ax1.set_xticklabels([f"{x*100:.0f}" for x in supply_curve.index.tolist()])
+                ax1.set_xlabel('Effective Coverage (%)')
+            
+            def message_writer(x):
+                if len(x['transitions_plus']) != 0 and len(x['transitions_minus'])!=0:
+                    message= "+ " + ', '.join(x['transitions_plus']) +  " - " + ", ".join(x['transitions_minus'])
                     
+                    # ns_needed = len(message)//25
+                    
+                    # # for i in range(ns_needed):
+                    # #     message = message[i*25:i+25] + r'-len\n' + message[25+1+i:]
+                    
+                    return message
+            
+            (
+                supply_curve
+                .assign(message = lambda df: df.apply(lambda x: message_writer(x), axis=1))
+                .apply(lambda df: ax0.text(df.name+.01, df['opt_costs'], 
+                                                s=df['message'],
+                                                color='black', wrap=True), axis=1) 
+                )   
+            
+            
+            # popped_markers = markers.copy()
+            
+            # supply_curve.apply(lambda df: ax0.text(df.name+.01, df['opt_costs'],
+            #                                     s=popped_markers.pop(), color='black'), axis=1)
+            
+            # intervention_with_marker = []
+
+            # for m,i in zip(list(reversed(markers)), 
+            #                [', '.join(i) for i in supply_curve['opt_interventions'].values.tolist()]):
+            #         intervention_with_marker.append(m + ': ' + i)
+            
+            # fig_text_start = f"""Note: Letters markers describe interventions as:"""
+            
+            # fig.text(0,-.3, s=fig_text_start+'\n' + '\n'.join(intervention_with_marker))
+            
+            # To create the text for the 
+            
+            txt = fig.text(.05, -.1, s=f"""Note: BAU refers to a nutritional intervention of {bau.title()}. Optimum solution consists of {', '.join(only_bau_opt['opt_interventions'].values[0])}. 
+                           
+                           Vitamin A Supplementation taking place at various level of effective coverage in: 
+                           {', '.join(list(set(np.concatenate(supply_curve['vas_regions'].values))))}"""
+                           )
+                                    
+            plt.tight_layout()
+            
+            if save is not None:
+                plt.savefig(save, dpi=300, bbox_inches='tight')
+            
+        return ax
+        
+        

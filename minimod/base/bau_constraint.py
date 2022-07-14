@@ -26,9 +26,7 @@ class BAUConstraintCreator:
                slice(None), 
                slice(None)),:][discounted_variable]
          )
-        
-        summed_bau_df = df.sum()
-                        
+                                
         return df
         
     
