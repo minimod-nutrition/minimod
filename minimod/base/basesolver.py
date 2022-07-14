@@ -1,6 +1,7 @@
 # Imports for local packages
 from typing import Union
 from time import time
+
 from minimod.utils.exceptions import (
     MissingData,
     NotPandasDataframe,
@@ -22,6 +23,7 @@ from mip.cbc import OptimizationStatus
 import matplotlib.pyplot as plt
 
 import pandas as pd
+import geopandas as gpd
 import numpy as np
 import mip
 import re
@@ -45,57 +47,43 @@ class SupplyCurve:
 
 
 
+from typing import Any
+from typing import Union
 
 class BaseSolver:
 
+    
     def __init__(
         self,
-        data,
-        benefit_col = 'benefits',
-        cost_col = 'costs',
-        intervention_col = 'intervention',
-        space_col = 'space',
-        time_col = 'time',
-        interest_rate_cost=0.0,  # Discount factor for costs
-        interest_rate_benefit=0.03,  # Discount factor for benefits 
-        va_weight=1.0,  # VA Weight
-        sense=None,  # MIP optimization type (maximization or minimization)
-        solver_name=mip.CBC,  # Solver for MIP to use
-        show_output = True,
-        benefit_title = "Benefits",
+        data: pd.DataFrame,
+        benefit_col: str = 'benefits',
+        cost_col: str = 'costs',
+        intervention_col: str = 'intervention',
+        space_col: str = 'space',
+        time_col: str = 'time',
+        interest_rate_cost: float = 0.0,  # Discount factor for costs
+        interest_rate_benefit: float = 0.03,  # Discount factor for benefits 
+        va_weight: float = 1.0,  # VA Weight
+        sense: str = None,  # MIP optimization type (maximization or minimization)
+        solver_name: str = mip.CBC,  # Solver for MIP to use
+        show_output: bool = True,
+        benefit_title: str = "Benefits",
     ):       
+      
         """The base solver for the Optimization. This sets up the basic setup of the model, which includes:
         - data handling
         - BAU constraint creation
         - base model constraint creation
 
-        :param data: dataframe with benefits and cost data
-        :type data: pandas.DataFrame
-        :param benefit_col: benefit data column, defaults to 'benefits'
-        :type benefit_col: str, optional
-        :param cost_col: cost data column, defaults to 'costs'
-        :type cost_col: str, optional
-        :param intervention_col: intervention data column, defaults to 'intervention'
-        :type intervention_col: str, optional
-        :param space_col: space/region data column, defaults to 'space'
-        :type space_col: str, optional
-        :param time_col: time period data column, defaults to 'time'
-        :type time_col: str, optional
-        :param all_time: Whether to treat some interventions as being constrained in time. Coupled with ``time_subset`` to constrain some time periods to all time periods, defaults to None
-        :type all_time: list or iterable, optional
-        :param all_space: whether to treat some interventions as being constraint over space. Coupled with ``space_subset`` to constrain some regions to all regions, defaults to None
-        :type all_space: list or iterable, optional
-        :param time_subset: a subset of time periods in the ``data.time_col`` that are constrained to all other time periods.
-        For example, if ``time_subset = [1,2,3]``, you cannot choose time periods 4-10, without also choosing 1-3. defaults to None, which constrains all time periods to each other.
-        :type time_subset: list or iterable, optional
-        :param space_subset: a subset of regions in ``data.space_col`` that constrain to all other regions, defaults to None which constrains all regions to each other (national intervention).
-        :type space_subset: list or iterable, optional
-        :param strict: Whether to use strict string matching for time and space subsets or whether ``time_subset`` or ``space_subset`` should be treated as a string stub that an intervention should contain. 
-        :type strict: bool, optional
-        :param interest_rate_cost: interest rate of costs, defaults to 0.0
-        :type interest_rate_cost: float, optional
-        :param benefit_title: title for benefits to put in plots and reports, defaults to "Benefits"
-        :type benefit_title: str, optional
+        Args:
+                data (pd.DataFrame): dataframe with benefits and cost data.
+                benefit_col (str, optional): name of dataframe's column with benefit data. Defaults to 'benefits'.
+                cost_col (str, optional): name of dataframe's column with cost data. Defaults to 'costs'.
+                intervention_col (str, optional): name of dataframe's column with intervention data. Defaults to 'intervention'.
+                space_col (str, optional): name of dataframe's column with space/region data . Defaults to 'space'.
+                time_col (str, optional): name of dataframe's column with time period data . Defaults to 'time'.
+                interest_rate_cost (float, optional): interest rate of costs. Defaults to 0.0.
+                benefit_title (str, optional): title for benefits to use in plots and reports. Defaults to "Benefits".
         
         ``BaseSolver`` is inherited by ``CostSolver`` and ``BenefitSolver`` to then run optimizations.
         """        
@@ -155,66 +143,79 @@ class BaseSolver:
         if self.show_output:
             print(self.message)
         
-    def _discounted_sum_all(self, col_name):
+    
+
+    def _discounted_sum_all(self, col_name:str) -> mip.LinExpr:
+       
         """Multiply each ``mip_var`` in the data by benefits or costs (``data``) and then create a ``mip`` expression from it.
 
-        :param data: dataset of benefits and costs
-        :type data: pandas.DataFrame
-        :return: ``mip`` Expression
-        :rtype: ``mip.LinExpr``
-        """        
+        Args:
+            col_name (str): name of dataframe's column with benefits or costs data
+
+        Returns:
+            mip.LinExpr: ``mip`` Expression
+        """    
         
         eq = (self._df['mip_vars'] * self._df[col_name]).agg(mip.xsum)
 
         return eq
 
-    def _discounted_sum_over(self, col_name, over):
+    def _discounted_sum_over(self, col_name: str, over: str) -> pd.DataFrame :
+        """Abstract function used for constructing the objective function and main constraint of the model
+
+        Args:
+            col_name (str): name of dataframe's column with benefits or costs data
+            over (str): name of dataframe's column with attribute used to group data by (e.g. time)
+
+        Returns:
+            (pd.Dataframe): pd.Dataframe with mip variables as observations
+        """
         
-        # Merge data with self._df
-        
+        # Merge data with self._df   
         eq = (self._df['mip_vars'] * self._df[col_name]).groupby(over).agg(mip.xsum)
         
         return eq.to_frame().rename({0 : col_name + '_vars'}, axis=1)
 
-    def _is_dataframe(self, data):
-        """Checks if input dataset if a ``pandas.DataFrame``
+ 
+    def _is_dataframe(self, data: Any):
+        """Checks if input dataset is a ``pandas.DataFrame``
 
-        :param data: input data
-        :type data: anything
-        :raises NotPandasDataframe: Exception if not a ``pandas.DataFrame``
-        """        
+        Args:
+            data (Any): input data
+
+        Raises:
+            NotPandasDataframe: Exception if not a ``pandas.DataFrame``
+        """    
 
         if not isinstance(data, pd.DataFrame):
             raise NotPandasDataframe(
                 "[Error]: Input data is not a dataframe. Please input a dataframe."
             )
 
+
     def _process_data(
         self,
-        data=None,
-        intervention="intervention",
-        space="space",
-        time="time",
-        benefits="benefits",
-        costs="costs",
-    ):
+        data: pd.DataFrame = None,
+        intervention: str ="intervention",
+        space: str = "space",
+        time: str = "time",
+        benefits: str = "benefits",
+        costs: str = "costs",
+    ) -> pd.DataFrame :      
         """Processes the input data by creating discounted benefits and costs.
 
-        :param data: data, defaults to None
-        :type data: pandas.DataFrame, optional
-        :param intervention: intervention column, defaults to "intervention"
-        :type intervention: str, optional
-        :param space: space/region column, defaults to "space"
-        :type space: str, optional
-        :param time: time period column, defaults to "time"
-        :type time: str, optional
-        :param benefits: benefits column, defaults to "benefits"
-        :type benefits: str, optional
-        :param costs: cost column, defaults to "costs"
-        :type costs: str, optional
+        Args:
+            data (pd.DataFrame, optional): raw data to be processed. Defaults to None.
+            intervention (str, optional): name of dataframe's column with intervention data. Defaults to "intervention".
+            space (str, optional): name of dataframe's column with space/region data. Defaults to "space".
+            time (str, optional): name of dataframe's column with time period data. Defaults to "time".
+            benefits (str, optional): name of dataframe's column with benefits data. Defaults to "benefits".
+            costs (str, optional): name of dataframe's column with cost data. Defaults to "costs".
         
-        This method processes the data and gets it ready to be used in the problem
+        Returns:
+            (pd.DataFrame): dataframe ready to be used in the problem
 
+        
         |k     | j   |t   | benefits   | costs |
         |------|-----|----|------------|-------|
         |maize |north|0   | 100        | 10    |
@@ -257,20 +258,28 @@ class BaseSolver:
         return df
 
     def _constraint(self):
-        """To be overridden by BenefitSolver and CostSolver classes.
-        This defines the constraints for the mips model.
+        """This function defines the constraints for the mips model.
+        To be overridden by BenefitSolver and CostSolver classes.
         """
         self.constraint_called = 0
 
     def _objective(self):
-        """To be overridden by BenefitSolver and CostSolver classes.
-        The objective function defines the objective function for a model.
+        """This function defines the objective function for a model.
+        To be overridden by BenefitSolver and CostSolver classes.
         """
         pass
+        
 
-    def _fit(self, **kwargs):
+    def _fit(self, **kwargs) -> str:
         """Fits data to model. The instantiation of the class creates the base model. Uses ``mip.optimize`` to find the optimal point.
-        """        
+
+        Args:
+            *kwargs: Other parameters to send to mip.optimize
+
+        Returns:
+            str: return self
+        """
+      
 
         if self.show_output:
             print("[Note]: Optimizing...")
@@ -289,22 +298,37 @@ class BaseSolver:
         
         return self
         
-    def write(self, filename="model.lp"):
+    def write(self, filename:str="model.lp"):
+        """Save model to file
+
+        Args:
+            filename (str, optional):name of the file. Defaults to "model.lp".
+        """
         
         self.model.write(filename)
         
-    def process_results(self, sol_num=None):
+    def process_results(self, sol_num:int=None):
+        """Processes results of optimization to be used in visualization and reporting functions
+
+        Args:
+            sol_num (int, optional): index of solution. Defaults to None.
+        """
         
         self.opt_df = self.model.process_results(self.benefit_col, 
                                             self.cost_col, 
                                             self.intervention_col,
                                             self.space_col,
                                             sol_num=sol_num)
-        
-    def report(self, sol_num=None, quiet=False):
+
+
+    def report(self, sol_num:int=None, quiet:bool=False) -> str:
         """Prints out a report of optimal model parameters and useful statistics.
-        """        
-        
+
+        Args:
+            sol_num (int, optional): index of solution to be displayed. Defaults to None.
+            quiet (bool, optional): whether we want the report printed out or not. Defaults to False.
+        """
+             
         self.opt_df = self.model.process_results(self.benefit_col, 
                                             self.cost_col, 
                                             self.intervention_col,
@@ -336,7 +360,7 @@ class BaseSolver:
         print("Interventions Chosen:")
         
     @property
-    def optimal_interventions(self):
+    def optimal_interventions(self) -> list:
         opt_intervention = (
             self.opt_df
             .loc[lambda df: df['opt_vals']>0]
@@ -345,11 +369,21 @@ class BaseSolver:
             .unique()
             .tolist()
         )
+        """Outputs the unique set of optimal interventions as a list
+
+        Returns:
+            list: The list of optimal interventions
+        """
         
         return opt_intervention
     
     @property
-    def _intervention_list_space_time(self):
+    def _intervention_list_space_time(self) -> pd.DataFrame:
+        """Returns a data frame with multindex (space_col, time_col) where each row is the optimal intervention.
+
+        Returns:
+            pd.DataFrame: A dataframe where each row is the optimal intervention for each time period and space
+        """
         
         df = (
             self.opt_df['opt_vals']
@@ -364,7 +398,12 @@ class BaseSolver:
         return df
     
     @property
-    def bau_list(self):
+    def bau_list(self) -> pd.DataFrame:
+        """Returns a dataframe with the name of the bau intervention. Mostly done for compatibility with other methods.
+
+        Returns:
+            pd.DataFrame: dataframe with the name of the bau intervention
+        """
         
         df = (
             self.bau_df
@@ -374,23 +413,26 @@ class BaseSolver:
         )
         
         return df
+     
         
-    
     def plot_time(self, 
-                  fig = None, 
-                  ax = None,
-                  save = None,
-                  cumulative = False,
-                  cumulative_discount = False):
+                  fig: matplotlib.figure = None, 
+                  ax: matplotlib.axis= None,
+                  save: str = None,
+                  cumulative: bool = False,
+                  cumulative_discount: bool = False) -> matplotlib.figure:
         """Plots optimal benefits and costs across time after model optimization
 
-        :param fig: matplotlib figure, defaults to None
-        :type fig: matplotlib.figure, optional
-        :param ax: matplotlib axis to use, defaults to None
-        :type ax: matplotlib.axis, optional
-        :param save: whether to save the figure, defaults to None
-        :type save:  str for file path, optional
-        """        
+        Args:
+            fig (matplotlib.figure, optional): matplotlib figure. Defaults to None.
+            ax (matplotlib.axis, optional): matplotlib axis to use. Defaults to None.
+            save (str, optional): path to save the figure. Defaults to None.
+            cumulative (bool, optional): whether to plot cumulative benefits or costs. Defaults to False.
+            cumulative_discount (bool, optional): whether to plot cumulative benefits or costs, discounted. Defaults to False.
+
+        Returns:
+            matplotlib.figure: figure with optimal benefits and cost across time
+        """
         
         p = Plotter(self)
                 
@@ -432,10 +474,28 @@ class BaseSolver:
                                 axis=ax)
 
     def plot_bau_time(self,
-                      opt_variable = 'b',
-                      fig = None,
-                      ax = None,
-                      save = None):
+                      opt_variable: str = 'b',
+                      fig: matplotlib.figure = None,
+                      ax: matplotlib.axis = None,
+                      save: str = None):
+        """Plots benefits and costs of optimal and benchark interventions across time 
+
+        Args:
+            opt_variable (str, optional): optimal variable to be plotted, where
+                b = optimal benefits
+                c = 'optimal costs
+                cdb = cumulative discounted benefits
+                cdc = cumulative discounted costs
+                cb = cumulative benefits
+                cc = cumulative costs
+            Defaults to 'b'.
+            fig (matplotlib.figure, optional): matplotlib figure. Defaults to None.
+            ax (matplotlib.axis, optional):matplotlib axis to use. Defaults to None.
+            save (str, optional): path to save the figure. Defaults to None.
+
+        Raises:
+            Exception: not one of the allowed variables for map plotting
+        """
         
         if ax is None:
             fig, ax = plt.subplots()
@@ -500,19 +560,22 @@ class BaseSolver:
         if save is not None:
             plt.savefig(save)
 
+             
+
     def plot_opt_val_hist(self, 
-                          fig = None, 
-                          ax = None, 
-                          save = None):
+                          fig: matplotlib.figure = None, 
+                          ax: matplotlib.axis = None, 
+                          save: str = None) -> matplotlib.figure:
         """A histogram of the optimally chosen interventions
 
-        :param fig: figure instance to use, defaults to None
-        :type fig: matplotlib.figure, optional
-        :param ax: axis instance to use, defaults to None
-        :type ax: matplotlib.axis, optional
-        :param save: whether to save the figure, defaults to None
-        :type save: str of file path, optional
-        """        
+        Args:
+            fig (matplotlib.figure, optional): figure instance to use. Defaults to None.
+            ax (matplotlib.axis, optional): axis instance to use. Defaults to None.
+            save (str, optional): path to save the figure. Defaults to None.
+
+        Returns:
+            matplotlib.figure: histogram figure
+        """      
         
         p = Plotter(self)
         
@@ -522,34 +585,34 @@ class BaseSolver:
                             ylabel= "",
                             figure = fig,
                             axis = ax,
-                            save = save)
-        
+                            save = save)  
+
     def plot_chloropleth(self,
-                         intervention = None,
-                         time = None,
-                         optimum_interest = 'b',
-                         map_df = None,
-                         merge_key = None,
-                         intervention_bubbles = False,
-                         intervention_bubble_names = None,
-                         save = None):
+                         intervention: str = None,
+                         time: Union[int,list] = None,
+                         optimum_interest: str = 'b',
+                         map_df: gpd.GeoDataFrame  = None,
+                         merge_key: Union[str,list] = None,
+                         intervention_bubbles: bool = False,
+                         intervention_bubble_names: Union[str,list] = None,
+                         save: str = None):
         """Creates a chloropleth map of the specified intervention and time period for the optimal variable. 
         If more than one intervention is specified, then aggregates them. If more than one time period is specified, then creates a subplots of len(time) and show each.
 
-        :param intervention: interventions to use, defaults to slice(None)
-        :type intervention: str or list, optional
-        :param time: time periods to plot, defaults to None
-        :type time: int or list, optional
-        :param optimum_interest: optimum variable to use. 
-        Options include: 'b' for optimal benefits, 'c' for optimal costs, and 'v' for optimal variable, defaults to 'b'
-        :type optimum_interest: str, optional
-        :param map_df: geopandas dataframe with geometry information, defaults to None
-        :type map_df: geopandas.GeoDataFrame, optional
-        :param merge_key: key to merge on to geo dataframe, defaults to None
-        :type merge_key: str or list, optional
-        :param save: whether to save the figure, defaults to None
-        :type save: str of file path, optional
-        """        
+        Args:
+            intervention (str, optional): intervention to use. Defaults to None.
+            time (Union[int,list], optional): time periods to plot. Defaults to None.
+            optimum_interest (str, optional): optimal variable to use (Options include: 'b' for optimal benefits, 'c' for optimal costs, and 'v' for optimal variable). Defaults to 'b'.
+            map_df (geopandas.GeoDataFrame, optional): geopandas dataframe with geometry information. Defaults to None.
+            merge_key (Union[str,list], optional): column to merge geo-dataframe. Defaults to None.
+            intervention_bubbles (bool, optional): whether to show optimal intervention names in map. Defaults to False.
+            intervention_bubble_names (Union[str,list], optional): key to merge on to geo dataframe. Defaults to None.
+            save (str, optional): path to save map. Defaults to None.
+
+        Raises:
+            Exception: Not one of the allowed variables for map plotting
+        """
+        
         
         if intervention is None:
             intervention = self.optimal_interventions
@@ -595,22 +658,21 @@ class BaseSolver:
                                             save = save)
         # return plot
 
+
     def plot_grouped_interventions(self, 
-                                data_of_interest = 'benefits', 
-                                title = None,
-                                intervention_subset = slice(None),
-                                save = None):
+                                    data_of_interest: str = 'benefits', 
+                                    title: str = None,
+                                    intervention_subset: Union[str,list] = slice(None),
+                                    save: str = None):
         """Shows Optimal level of benefits or costs in a grouped bar plots for every optimally chosen variable across regions.
 
-        :param data_of_interest: variable to show, defaults to 'benefits'
-        :type data_of_interest: str, optional
-        :param title: title for resulting plot, defaults to None
-        :type title: str, optional
-        :param intervention_subset: subset of interventions to show on bar plot, defaults to slice(None)
-        :type intervention_subset: str ot list, optional
-        :param save: whether to save the figure, defaults to None
-        :type save: str of filepath, optional
-        """        
+        Args:
+            data_of_interest (str, optional): variable to show. Defaults to 'benefits'.
+            title (str, optional):title for resulting plot. Defaults to None.
+            intervention_subset (Union[str,list], optional): subset of interventions to show on bar plot. Defaults to slice(None).
+            save (str, optional): path to save the figure. Defaults to None.
+        """
+                                 
         
         p = Plotter(self)
             
@@ -626,49 +688,47 @@ class BaseSolver:
                             intervention_subset= intervention_subset,
                             save = save)
         
-        
-    def plot_map_benchmark(self,
-                           intervention = None,
-                           time = None,
-                           optimum_interest = 'b',
-                           bench_intervention = None,
-                           map_df = None,
-                           merge_key = None,
-                           save = None,
-                           intervention_in_title = True,
-                           intervention_bubbles = False,
-                           intervention_bubble_names = None,
-                           millions = True,
-                           bau_intervention_bubble_names = None
-                           ):
-        """Maps the the optimal level on a map against a benchmark, optionally the BAU level chosen from ``minimum_benefit`` or ``total_funds``.
+     
 
-        :param intervention: interventions to map, defaults to slice(None)
-        :type intervention: list, optional
-        :param time: time periods to map, defaults to None
-        :type time: list, optional
-        :param optimum_interest: which optimal value to use. Options include 'b' (benefits), 'c' (costs), 'v' (variables), defaults to 'b'
-        :type optimum_interest: str, optional
-        :param data_bench: data to use for benchmark mapping, defaults to None
-        :type data_bench: pandas.DataFrame, optional
-        :param bench_intervention: interventions to use for benchmark, defaults to None
-        :type bench_intervention: list, optional
-        :param bench_col: column to use for benchmark, defaults to None
-        :type bench_col: str, optional
-        :param bench_merge_key: merge key for bench_df, defaults to None
-        :type bench_merge_key: list, optional
-        :param map_df: geo dataframe with geometry data, defaults to None
-        :type map_df: geopandas.GeoDataFrame, optional
-        :param merge_key: key to merge data from opt_df to geo dataframe, defaults to None
-        :type merge_key: str or list, optional
-        :param save: whether to save the figure, defaults to None
-        :type save: str of file path, optional
-        """  
-        
+    def plot_map_benchmark(self,
+                           intervention: list = None,
+                           time: list = None,
+                           optimum_interest: str = 'b',
+                           bench_intervention: list = None,
+                           map_df: gpd.GeoDataFrame = None,
+                           merge_key: Union[str,list] = None,
+                           save: str = None,
+                           intervention_in_title: bool = True,
+                           intervention_bubbles: bool = False,
+                           intervention_bubble_names: Union[str,list] = None,
+                           millions: bool = True,
+                           bau_intervention_bubble_names: Union[str,list] = None
+                           ):
+        """Maps the optimal level on a map against a benchmark, optionally the BAU level chosen from ``minimum_benefit`` or ``total_funds``.
+
+        Args:
+            intervention (list, optional): interventions to map. Defaults to None.
+            time (list, optional): time periods to map. Defaults to None.
+            optimum_interest (str, optional):  optimal value to use. Options include 'b' (benefits), 'c' (costs), 'v' (variables). Defaults to 'b'.
+            bench_intervention (list, optional): interventions to use for benchmark. Defaults to None.
+            map_df (geopandas.GeoDataFrame, optional):  geo dataframe with geometry data. Defaults to None.
+            merge_key (Union[str,list], optional): key to merge data from opt_df to geo dataframe. Defaults to None.
+            save (str, optional): path to save the map. Defaults to None.
+            intervention_in_title (bool, optional): True if intervention name will be included in the title of the figure. Defaults to True.
+            intervention_bubbles (bool, optional): True if intervention bubbles. Defaults to False.
+            intervention_bubble_names (Union[str,list], optional): names of intervention bubbles. Defaults to None.
+            millions (bool, optional): True if values displayed in millions. Defaults to True.
+            bau_intervention_bubble_names (Union[str,list], optional): name for bau intervention bubble. Defaults to None.
+
+        """
+                
         if intervention is None:
-            intervention = self.optimal_interventions      
-        
-        fig = plt.figure()
+            intervention = self.optimal_interventions   
+            
+        if figsize is not None:   
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure(figsize=(10,12))
         
         gs = gridspec.GridSpec(2,2, height_ratios = [6,1])
         optimal = fig.add_subplot(gs[0,0])
