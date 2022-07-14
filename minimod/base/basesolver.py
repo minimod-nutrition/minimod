@@ -1,6 +1,7 @@
 # Imports for local packages
-from typing import Union
+from typing import Union, Type, List
 from time import time
+import matplotlib as mpl
 
 from minimod.utils.exceptions import (
     MissingData,
@@ -33,6 +34,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.gridspec as gridspec
 import matplotlib.ticker as tick
 from dataclasses import dataclass
+
 
 @dataclass
 class SupplyCurve:
@@ -413,11 +415,11 @@ class BaseSolver:
      
         
     def plot_time(self, 
-                  fig: matplotlib.figure = None, 
-                  ax: matplotlib.axis= None,
+                  fig: mpl.figure = None, 
+                  ax: mpl.axis= None,
                   save: str = None,
                   cumulative: bool = False,
-                  cumulative_discount: bool = False) -> matplotlib.figure:
+                  cumulative_discount: bool = False) -> mpl.figure:
         """Plots optimal benefits and costs across time after model optimization
 
         Args:
@@ -472,8 +474,8 @@ class BaseSolver:
 
     def plot_bau_time(self,
                       opt_variable: str = 'b',
-                      fig: matplotlib.figure = None,
-                      ax: matplotlib.axis = None,
+                      fig: mpl.figure = None,
+                      ax: mpl.axis = None,
                       save: str = None):
         """Plots benefits and costs of optimal and benchark interventions across time 
 
@@ -560,9 +562,9 @@ class BaseSolver:
              
 
     def plot_opt_val_hist(self, 
-                          fig: matplotlib.figure = None, 
-                          ax: matplotlib.axis = None, 
-                          save: str = None) -> matplotlib.figure:
+                          fig: mpl.figure = None, 
+                          ax: mpl.axis = None, 
+                          save: str = None) -> mpl.figure:
         """A histogram of the optimally chosen interventions
 
         Args:
@@ -945,7 +947,7 @@ class BaseSolver:
                           data: DataFrame = None, 
                     full_population: Union[int, float] = None,
                     bau: str=None,
-                    all_space: list[float]=None,
+                    all_space: List[float]=None,
                     all_time=None,
                     time_subset=None,
                     benefit_col='effective_coverage',

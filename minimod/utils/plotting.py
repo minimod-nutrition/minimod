@@ -6,21 +6,18 @@ import functools
 import geopandas as gpd
 from matplotlib.patches import Ellipse
 
-
+def plot_context(func):
+    
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):   
+        with mpl.rc_context(self.mpl_theme_dict):
+            plot = func(self, *args, **kwargs)  
+            return plot
+    return wrapper
 
 class Plotter:
     """This class is in charge of plotting the results of the `minimod`. 
     """     
-    
-    @staticmethod
-    def plot_context(func):
-        
-        @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):   
-            with mpl.rc_context(self.mpl_theme_dict):
-                plot = func(self, *args, **kwargs)  
-                return plot
-        return wrapper
                
     
     def __init__(self, model, dpi = 600):
