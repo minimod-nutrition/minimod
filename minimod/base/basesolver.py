@@ -618,7 +618,7 @@ class BaseSolver:
                            intervention_bubbles = False,
                            intervention_bubble_names = None,
                            millions = True,
-                           bau_intervention_bubble_names = None
+                           bau_intervention_bubble_names = None,
                            ):
         """Maps the the optimal level on a map against a benchmark, optionally the BAU level chosen from ``minimum_benefit`` or ``total_funds``.
 
@@ -645,9 +645,12 @@ class BaseSolver:
         """  
         
         if intervention is None:
-            intervention = self.optimal_interventions      
-        
-        fig = plt.figure()
+            intervention = self.optimal_interventions   
+            
+        if figsize is not None:   
+            fig = plt.figure(figsize=figsize)
+        else:
+            fig = plt.figure(figsize=(10,12))
         
         gs = gridspec.GridSpec(2,2, height_ratios = [6,1])
         optimal = fig.add_subplot(gs[0,0])
@@ -772,6 +775,6 @@ class BaseSolver:
         fig.text(0.5,-.05, fig_text, ha='center')
                 
         if save is not None:
-            plt.savefig(save, dpi = p.dpi, bbox_inches="tight")
+            plt.savefig(save, dpi = 300, bbox_inches="tight")
             
                     

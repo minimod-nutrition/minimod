@@ -247,7 +247,7 @@ class Plotter:
                         .apply(lambda row: '\n'.join(row), axis=1))
             )
             
-            df_bubble_final.apply(lambda x: ax.annotate(s = x.bubble_name,
+            df_bubble_final.apply(lambda x: ax.annotate(text = x.bubble_name,
                                                         xy = x.centroid.coords[0],
                                                         size = 7,
                                                         color ='red'), 

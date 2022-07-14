@@ -205,6 +205,7 @@ class MonteCarloMinimod:
         cost_callable=None,
         benefit_kwargs=None,
         cost_kwargs=None,
+        random_seeds = None,
         **kwargs
     ):
         
@@ -227,8 +228,11 @@ class MonteCarloMinimod:
                                      benefit_kwargs=benefit_kwargs,
                                      cost_kwargs=cost_kwargs,
                                      **kwargs)
+        
+        if random_seeds is None:
+            random_seeds = range(N)
                 
-        sim_dict = pqdm(range(N), partial_fit_sample, n_jobs=n_jobs, exception_behaviour=exception_behavior)
+        sim_dict = pqdm(random_seeds, partial_fit_sample, n_jobs=n_jobs, exception_behaviour=exception_behavior)
         
         sim_df = pd.DataFrame(sim_dict)
         
