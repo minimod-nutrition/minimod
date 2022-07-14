@@ -31,6 +31,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.gridspec as gridspec
 import matplotlib.ticker as tick
 from dataclasses import dataclass
+import textwrap
+from adjustText import adjust_text
+
 
 @dataclass
 class SupplyCurve:
@@ -1005,6 +1008,7 @@ class BaseSolver:
             def message_writer(x):
                 if len(x['transitions_plus']) != 0 and len(x['transitions_minus'])!=0:
                     message= "+ " + ', '.join(x['transitions_plus']) +  " - " + ", ".join(x['transitions_minus'])
+                    message = '\n'.join(textwrap.wrap(message, width=50))
                     
                     # ns_needed = len(message)//25
                     
@@ -1013,13 +1017,18 @@ class BaseSolver:
                     
                     return message
             
-            (
+            print(supply_curve)
+            
+            texts = (
                 supply_curve
                 .assign(message = lambda df: df.apply(lambda x: message_writer(x), axis=1))
                 .apply(lambda df: ax0.text(df.name+.01, df['opt_costs'], 
                                                 s=df['message'],
                                                 color='black', wrap=True), axis=1) 
+                .values.tolist()
                 )   
+            
+            adjust_text(texts, arrowprops=dict(arrowstyle='->', color='green'))
             
             
             # popped_markers = markers.copy()
@@ -1039,11 +1048,12 @@ class BaseSolver:
             
             # To create the text for the 
             
-            txt = fig.text(.05, -.1, s=f"""Note: BAU refers to a nutritional intervention of {bau.title()}. Optimum solution consists of {', '.join(only_bau_opt['opt_interventions'].values[0])}. 
-                           
-                           Vitamin A Supplementation taking place at various level of effective coverage in: 
-                           {', '.join(list(set(np.concatenate(supply_curve['vas_regions'].values))))}"""
-                           )
+            figtext = f"Note: BAU refers to a nutritional intervention of {bau.title()}." \
+            f" Optimum solution consists of {', '.join(only_bau_opt['opt_interventions'].values[0])}." \
+            " Vitamin A Supplementation taking place at various level of effective coverage in: " \
+                           f"{', '.join(list(set(np.concatenate(supply_curve['vas_regions'].values))))}"
+                        
+            txt = fig.text(.05, -.1, s='\n'.join(textwrap.wrap(figtext, width=100)))
                                     
             plt.tight_layout()
             

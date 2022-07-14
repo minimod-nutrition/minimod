@@ -69,12 +69,15 @@ supply_curve = mm.Minimod('costmin').supply_curve(
 
 
 # %%
+#!%config InlineBackend.print_figure_kwargs = {'bbox_inches': 'tight'}
+
 mm.Minimod('costmin').plot_supply_curve(supply_curve, 
                                     ec_thousands = 1_000_000_000,
                                     ul_thousands = 1_000,
                                     above_ul=True,
                                     splitter=' + ',
-                                    save=None)
+                                    save='supply_curve.png')
+
 
 # %%
 
