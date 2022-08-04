@@ -11,6 +11,7 @@
 import pandas as pd
 import minimod as mm
 import numpy as np
+import joblib
 
 # %% 
 
@@ -51,27 +52,31 @@ full_population = df_dict['pop'].set_index('region').sum(axis=1).sum()
 # %%
 
 
-supply_curve = mm.Minimod('costmin').supply_curve(
-      df, 
-      full_population,
-      bau = 'current fortification',
-      all_space=  ['Cube', 'Oil', 'current'],
-      all_time =  ['Cube', 'Oil', 'current'],
-      time_subset = [1,2,3],
-      cost_col='costs',
-      space_col='region',
-      ec_range=np.linspace(.01,.99,20),
-      above_ul = True,
-      show_output=False
-)
+# supply_curve = mm.Minimod('costmin').supply_curve(
+#       df, 
+#       full_population,
+#       bau = 'current fortification',
+#       all_space=  ['Cube', 'Oil', 'current'],
+#       all_time =  ['Cube', 'Oil', 'current'],
+#       time_subset = [1,2,3],
+#       cost_col='costs',
+#       space_col='region',
+#       ec_range=np.linspace(.01,.99,20),
+#       above_ul = True,
+#       show_output=False
+# )
 
+# joblib.dump(supply_curve, "supply_curve.joblib")
 
+# %%
+
+supply_curve = joblib.load("supply_curve.joblib")
 
 
 # %%
 #!%config InlineBackend.print_figure_kwargs = {'bbox_inches': 'tight'}
 
-mm.Minimod('costmin').plot_supply_curve(supply_curve, 
+ax = mm.Minimod('costmin').plot_supply_curve(supply_curve, 
                                     ec_thousands = 1_000_000_000,
                                     ul_thousands = 1_000,
                                     above_ul=True,

@@ -1,5 +1,5 @@
 # Imports for local packages
-from typing import Union, Type, List
+from typing import Union, Type, List, Iterable
 from time import time
 import matplotlib as mpl
 
@@ -46,6 +46,7 @@ class SupplyCurve:
     full_population: int
     bau: str
     data: DataFrame
+    ec_range: Iterable
 
 
 
@@ -875,6 +876,7 @@ class BaseSolver:
         
         if ec_range is None:
             ec_range = np.arange(.1,1,.1)
+            
         
         ratio_to_constraint = lambda ratio: ratio*full_population
         
@@ -941,7 +943,8 @@ class BaseSolver:
         return SupplyCurve(pd.DataFrame(results_dict, index=[results_dict['opt_benefits'][0]/full_population] + list(ec_range)) 
                            , full_population=full_population,
                            bau=bau,
-                           data=data)        
+                           data=data,
+                           ec_range=ec_range)        
         
         
     @classmethod      
@@ -983,12 +986,13 @@ class BaseSolver:
                         above_ul = above_ul,
                         **kwargs
                         )
-            
+        
+        N_ec = len(supply_curve.ec_range)
         full_population = supply_curve.full_population
         bau = supply_curve.bau
         data=supply_curve.data
         supply_curve = supply_curve.supply_curve # Now that we have all info. make `supply_curve` just the dataframe
-            
+
         # make nan of infeasible solutions
         supply_curve = supply_curve.replace(0, np.nan)
         
@@ -1018,18 +1022,19 @@ class BaseSolver:
             subplot_col = 1
         
         with plt.style.context('seaborn-whitegrid'):
-            fig, ax = plt.subplots(subplot_col, 1, figsize=(4*subplot_col,10), sharex=True)
+            fig, ax = plt.subplots(subplot_col+1, 1, figsize=(5*subplot_col,12))
+            
             
             if above_ul:
                 ax0 = ax[0]
                 ax1 = ax[1]
+                ax_region=ax[2]
             else:
                 ax0 = ax
+                ax_region=ax[1]
                       
             supply_curve['opt_costs'].plot(ax=ax0)
-            
-            ax0.set_xlim([0,1])
-            
+                        
             ax0.set_xlabel('Effective Coverage (%)')
 
             ax0.set_xticks(supply_curve.index.tolist())
@@ -1079,7 +1084,30 @@ class BaseSolver:
                     
                     return message
             
-            print(supply_curve)
+            # print(supply_curve)
+
+            
+            (
+                supply_curve['vas_regions']
+                .explode()
+                .to_frame()
+                .assign(yes=lambda df: \
+                    (~df['vas_regions'].isnull())
+                    .astype(int))
+                .set_index('vas_regions', 
+                           append=True)
+                .unstack()
+                .drop(columns=('yes', pd.NA))
+                .plot.bar(stacked=True, legend=False, 
+                          ax=ax_region, cmap='tab20')
+                )
+            
+            # ax_region.set_xticks(supply_curve.index.tolist())
+            ax_region.set_xticklabels([f"{x*100:.0f}" for x in supply_curve.index.tolist()],
+                                      rotation=0)
+            ax_region.set_xlabel('Effective Coverage (%)')
+            ax_region.set_yticklabels([])
+            ax_region.set_title("VAS Regions")
             
             texts = (
                 supply_curve
@@ -1092,31 +1120,20 @@ class BaseSolver:
             
             adjust_text(texts, arrowprops=dict(arrowstyle='->', color='green'))
             
-            
-            # popped_markers = markers.copy()
-            
-            # supply_curve.apply(lambda df: ax0.text(df.name+.01, df['opt_costs'],
-            #                                     s=popped_markers.pop(), color='black'), axis=1)
-            
-            # intervention_with_marker = []
-
-            # for m,i in zip(list(reversed(markers)), 
-            #                [', '.join(i) for i in supply_curve['opt_interventions'].values.tolist()]):
-            #         intervention_with_marker.append(m + ': ' + i)
-            
-            # fig_text_start = f"""Note: Letters markers describe interventions as:"""
-            
-            # fig.text(0,-.3, s=fig_text_start+'\n' + '\n'.join(intervention_with_marker))
-            
-            # To create the text for the 
-            
             figtext = f"Note: BAU refers to a nutritional intervention of {bau.title()}." \
             f" Optimum solution consists of {', '.join(only_bau_opt['opt_interventions'].values[0])}." \
             " Vitamin A Supplementation taking place at various level of effective coverage in: " \
                            f"{', '.join(list(set(np.concatenate(supply_curve['vas_regions'].values))))}"
                         
             txt = fig.text(.05, -.1, s='\n'.join(textwrap.wrap(figtext, width=100)))
-                                    
+                             
+            handles, labels = ax_region.get_legend_handles_labels()
+            
+            new_labels = [i.split(',')[1].replace(')', '').strip() for i in labels]
+            plt.legend(handles, new_labels, ncol=4, loc='lower center', 
+                       bbox_to_anchor = (.5,-.6),
+                       title='Regions')                 
+                               
             plt.tight_layout()
             
             if save is not None:
