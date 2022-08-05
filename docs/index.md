@@ -1,17 +1,29 @@
 # Welcome to MkDocs
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Welcome the documentation for the MINIMOD Optimization Tool!
 
-## Commands
+## Installation 
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+### Install with `pip`
 
-## Project layout
+To install the tool with the Python package manager `pip`, type:
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+```bash
+
+pip install minimod
+
+```
+
+
+### Install with source
+
+You can also install the tool with source by cloning the repository and then installing with pip:
+
+```bash
+git clone https://github.com/minimod-nutrition/minimod.git
+
+cd minimod
+
+pip install .
+
+```
