@@ -3,12 +3,14 @@ nav:
   - Home: index.md
   - Base Classes: base.md
   - Solvers: solvers.md
+  - Monte Carlo: monte_carlo.md
   - Utility Classes: utils.md
 theme:
   name: material
   features:
     - navigation.instant
     - navigation.tabs
+    - content.code.annotate
 plugins:
   - git-revision-date-localized
   - search

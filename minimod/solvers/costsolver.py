@@ -11,7 +11,7 @@ import mip
 import numpy as np
 
 
-class CostSolver(BaseSolver):
+class CostSolver(BaseSolver):  
     def __init__(self,         
                  all_time=None, 
                  all_space=None, 
