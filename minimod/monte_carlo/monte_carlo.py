@@ -140,8 +140,7 @@ class MonteCarloMinimod:
                                  benefit_kwargs=benefit_kwargs_default,
                                  cost_kwargs=cost_kwargs_default) 
 
-        minimod = Minimod(
-            solver_type=self.solver_type,
+        minimod = Minimod(solver_type=self.solver_type)(
             data=df,
             intervention_col=self.intervention_col,
             space_col=self.space_col,
