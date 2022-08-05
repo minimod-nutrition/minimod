@@ -17,4 +17,5 @@ jobs:
       - run: pip install mkdocstrings-python
       - run: pip install mkdocstrings
       - run: pip install mkdocs-git-revision-date-localized-plugin
+      - run: pwd
       - run: mkdocs gh-deploy --force
