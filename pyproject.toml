@@ -2,8 +2,14 @@
 name = "minimod-opt"
 version = "0.1.0"
 description = "A mixed-integer program optimization solver for finding optimal nutritional interventions across space and time."
-authors = ["Aleksandr Michuda <am2497@cornell.edu>"]
-license = "GPL-3.0"
+authors = ["Aleksandr Michuda <am2497@cornell.edu>", "Karen Ortiz Becerra <kortizbecerra@sandiego.edu>"]
+maintainers = ["Aleksandr Michuda <am2497@cornell.edu>", "Karen Ortiz Becerra <kortizbecerra@sandiego.edu>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+homepage= "https://minimod-nutrition.github.io/minimod-opt/"
+repository = "https://github.com/minimod-nutrition/minimod-opt"
+keywords=["economics", "mixed-integer-programming", "nutrition"]
+
 
 [tool.poetry.dependencies]
 python = "^3.9"
