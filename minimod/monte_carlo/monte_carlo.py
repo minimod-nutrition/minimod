@@ -1,3 +1,4 @@
+from typing import Any, Callable, Dict, List, Union
 from minimod.solvers import Minimod
 from minimod.utils.plotting import Plotter
 from minimod.utils.summary import OptimizationSummary
@@ -19,18 +20,78 @@ import matplotlib.ticker as mtick
 class MonteCarloMinimod:
     def __init__(
         self,
-        solver_type=None,
-        data=None,
-        intervention_col=None,
-        time_col=None,
-        space_col=None,
-        benefit_mean_col=None,
-        benefit_sd_col=None,
-        cost_col=None,
-        cost_uniform_perc=None,
-        pop_weight_col=None,
+        solver_type: str=None,
+        data: pd.DataFrame=None,
+        intervention_col: str=None,
+        time_col: str=None,
+        space_col:str=None,
+        benefit_mean_col: str=None,
+        benefit_sd_col: str=None,
+        cost_col: str=None,
+        cost_uniform_perc: float=None,
+        pop_weight_col: str=None,
         **kwargs,
     ):
+        """MonteCarloMinimod uses the `Minimod` optimization classes and conducts Monte Carlo simulations of benefits and cost data through distribution assumptions on the data. Currently the simulations assume a normal distribution about benefits and a uniform distribution around costs.
+        
+        
+
+        Args:
+            solver_type (str, optional): Whether to minimize costs or maximize benfits. Currently only the former is implemented. Defaults to None.
+            data (pd.DataFrame, optional): The input data. Defaults to None.
+            intervention_col (str, optional): the name of the intervention variable. Defaults to None.
+            time_col (str, optional): the name of the time variable. Defaults to None.
+            space_col (str, optional): the name of region/spatial variable. Defaults to None.
+            benefit_mean_col (str, optional): the name of the variable that gives the mean of benefits for the intervention. Usually just the name of the benefits variable. Defaults to None.
+            benefit_sd_col (str, optional): The name of the variable for the standard deviation of benefits. Defaults to None.
+            cost_col (str, optional): The name of the cost variable. Defaults to None.
+            cost_uniform_perc (float, optional): If using the default of a uniform distribution for costs, the amount of the endpoint of the uniform distribution ([cost*(1+cost_uniform_perc), cost*(1- cost_uniform_perc)]). Defaults to None.
+            pop_weight_col (str, optional): The name name of the variable that specific population weights. Defaults to None.
+            
+        Examples:
+        
+            Below is an example of how you would run the simulations as well as the visualizations.
+            
+            >>> import os; print(os.getcwd())
+            >>> df = (
+            ...     pd.read_csv("data/processed/example1.csv")
+            ...     .assign(benefit_sd = lambda df: df['benefit']/2,
+            ...             costs_sd = lambda df: df['costs']/2)
+            ...     )
+
+            >>> cube = ["cube", "vascube", "oilcube", "cubemaize", "vascubemaize", "vasoilcube", "oilcubemaize", "vasoilcubemaize"]
+            >>> oil = ["oil", "vasoil", "oilcube", "oilmaize", "vasoilmaize", "vasoilcube", "oilcubemaize", "vasoilcubemaize"]
+            >>> maize = ["maize", "vasmaize", "oilmaize", "cubemaize", "vascubemaize", "vasoilmaize", "oilcubemaize", "vasoilcubemaize" ]
+
+            >>> a = mm.MonteCarloMinimod(solver_type = 'costmin', 
+            ...                        data = df, 
+            ...                        intervention_col='intervention',
+            ...                        space_col='space',
+            ...                        time_col='time',
+            ...                        benefit_mean_col = 'benefit',
+            ...                        benefit_sd_col= 'benefit_sd',
+            ...                        cost_col='costs')
+
+            >>> def benefit_no_change(seed, benefit_col, data):
+            ...    return data[benefit_col]
+            
+            >>> sim = a.fit_all_samples(N = 100, 
+            ...                         all_space=oil, 
+            ...                         all_time=cube, 
+            ...                         time_subset=[1,2,3], 
+            ...                         minimum_benefit='vasoilold', 
+            ...                         benefit_callable=benefit_no_change, 
+            ...                         benefit_kwargs={'benefit_col' : 'benefit'}
+            ...                         )
+            
+            >>> a.plot_opt_hist(save = "sim_results.png")
+
+            >>> a.report(perc_intervention_appeared=True)
+
+            >>> a.plot_sim_trajectories(save = 'sim_traj.png')
+        
+        """        
+     
 
         print("""Monte Carlo Simulator""")
 
@@ -59,8 +120,17 @@ class MonteCarloMinimod:
         self.cost_col = cost_col
 
 
-    def _construct_benefit_sample(self, seed, data=None, benefit_col = 'benefit_random_draw'):
-        """ For normal, it doesn't require transformation, so just return mean and sd"""
+    def _construct_benefit_sample(self, seed: int, data: pd.DataFrame=None, benefit_col: str = 'benefit_random_draw') -> pd.Series:
+        """Draw of a sample of benefits assuming normality
+
+        Args:
+            seed (int): The random seed
+            data (pd.DataFrame, optional): The input data. Defaults to None.
+            benefit_col (str, optional): the name of the resulting benefits variable. Defaults to 'benefit_random_draw'.
+
+        Returns:
+            pd.Series: A series of benefits
+        """        
 
         random = np.random.default_rng(seed=seed)
         
@@ -78,8 +148,17 @@ class MonteCarloMinimod:
 
         return df[benefit_col]
 
-    def _construct_cost_sample(self, seed, data=None, cost_col='cost_random_draw'):
-        """For costs we assume uniform and deviate by some percentage."""
+    def _construct_cost_sample(self, seed: str, data: pd.DataFrame=None, cost_col: str='cost_random_draw') -> pd.Series:
+        """Draw a sample costs assuming a uniform distribution
+
+        Args:
+            seed (str): The randome
+            data (pd.DataFrame, optional): The input data. Defaults to None.
+            cost_col (str, optional): The name of the cost variable. Defaults to 'cost_random_draw'.
+
+        Returns:
+            pd.Series: The cost draw
+        """        
 
         random= np.random.default_rng(seed=seed)
 
@@ -99,7 +178,20 @@ class MonteCarloMinimod:
 
         return df
 
-    def _merge_samples(self, benefit_callable, cost_callable,  cost_kwargs, benefit_kwargs):
+    def _merge_samples(self, benefit_callable: Callable, cost_callable: Callable,  
+                       cost_kwargs: dict, benefit_kwargs: dict) -> pd.DataFrame:
+        """Transforms the cost and benefit data and merges them together.
+
+        Args:
+            benefit_callable (Callable): The function for transforming benefits
+            cost_callable (Callable): The function for transforming costs
+            cost_kwargs (dict): extra arguments for `cost_callable`
+            benefit_kwargs (dict): extra arguments for `benefit_callable`
+
+        Returns:
+            pd.DataFrame: The merged dataset of benefits and costs
+        """        
+        
 
         benefit_sample = benefit_callable(**benefit_kwargs)
         cost_sample = cost_callable(**cost_kwargs)
@@ -109,17 +201,38 @@ class MonteCarloMinimod:
         )
         
     def fit_one_sample(self, 
-                       seed,
-                       all_space,
-                       all_time,
-                       space_subset,
-                       time_subset,
-                       strict,
-                       benefit_callable=None,
-                       cost_callable=None,
-                       cost_kwargs=None,
-                       benefit_kwargs=None,
-                       **kwargs):
+                       seed: int,
+                       all_space: Union[List, None],
+                       all_time: Union[List, None],
+                       space_subset: List[str],
+                       time_subset: List[int],
+                       strict: bool,
+                       benefit_callable:Union[Callable, None],
+                       cost_callable:Union[Callable, None],
+                       cost_kwargs:dict,
+                       benefit_kwargs:dict,
+                       **kwargs) -> dict:
+        """Draw one MonteCarlo sample and optimize. To be used with `fit_all_samples`. 
+        
+        `benefit_callable and `cost_callable` must be functions with arguments `(seed, benefit_col, data)`. `cost_kwargs` and `benefit_kwargs` can be input to override defaults, such as if you want to use a different seed or change the name of a column.
+        
+        Note: `benefit_col` and `cost_col` for these callables denote the name of the resulting columns of the draw, not the original variable names.
+
+        Args:
+            seed (int): random seed
+            all_space (Union[List, None]): spatial constraints (as in `Minimod`)
+            all_time (Union[List, None]): time constraints (as in `Minimod`)
+            space_subset (List[str]): subset for space constraints (as in `Minimod`)
+            time_subset (List[int]): subset for time constraints (as in `Minimod`)
+            strict (bool): whether to treat list of intervention names input *strictly* or using regex
+            benefit_callable (Union[Callable, None]): The function for benefits transformation
+            cost_callable (Union[Callable, None]): The function for cost transformation
+            cost_kwargs (dict): extra arguments for the cost_callabe
+            benefit_kwargs (dict): extra arguments for benefits callable
+
+        Returns:
+            dict: A dictionary of fitted results
+        """    
         
         if benefit_callable is None:
             benefit_callable = self._construct_benefit_sample

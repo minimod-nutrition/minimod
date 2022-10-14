@@ -1,4 +1,3 @@
-from typing import Any
 import mip
 import pandas as pd
 
