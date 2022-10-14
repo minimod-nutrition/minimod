@@ -11,10 +11,6 @@ from minimod.utils.exceptions import (
 from functools import reduce
 from pandas import DataFrame
 
-from .._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
-
 from minimod.utils.summary import OptimizationSummary
 from minimod.base.bau_constraint import BAUConstraintCreator
 from minimod.utils.plotting import Plotter
