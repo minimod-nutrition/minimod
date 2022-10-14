@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "minimod-opt"
+version = "0.1.0"
+description = "A mixed-integer program optimization solver for finding optimal nutritional interventions across space and time."
+authors = ["Aleksandr Michuda <am2497@cornell.edu>"]
+license = "GPL-3.0"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+xlrd = "^2.0.1"
+geopandas = "^0.11.1"
+tabulate = "^0.9.0"
+pandas = "^1.5.0"
+matplotlib = "^3.6.1"
+progressbar33 = "^2.4"
+python-docx = "^0.8.11"
+numpy = "^1.23.4"
+mip = "1.9.3"
+pqdm = "^0.2.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry-dynamic-versioning]
+enable = true
