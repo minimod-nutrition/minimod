@@ -214,7 +214,7 @@ class MonteCarloMinimod:
                        **kwargs) -> dict:
         """Draw one MonteCarlo sample and optimize. To be used with `fit_all_samples`. 
         
-        `benefit_callable and `cost_callable` must be functions with arguments `(seed, benefit_col, data)`. `cost_kwargs` and `benefit_kwargs` can be input to override defaults, such as if you want to use a different seed or change the name of a column.
+        `benefit_callable` and `cost_callable` must be functions with arguments `(seed, benefit_col, data)`. `cost_kwargs` and `benefit_kwargs` can be input to override defaults, such as if you want to use a different seed or change the name of a column.
         
         Note: `benefit_col` and `cost_col` for these callables denote the name of the resulting columns of the draw, not the original variable names.
 
