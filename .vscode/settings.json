@@ -1,8 +1,0 @@
-{
-    "python.pythonPath": "/usr/bin/python",
-    "python.formatting.provider": "black",
-    "python.dataScience.jupyterServerURI": "local",
-    "restructuredtext.confPath": "${workspaceFolder}/docs",
-    "python.dataScience.notebookFileRoot": "${workspaceFolder}",
-    "esbonio.sphinx.confDir": "${workspaceFolder}/docs"
-}

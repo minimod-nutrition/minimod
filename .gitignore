@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.cpython-38.pyc
+.vscode/
 
 *.png
 reports/source/*.png
