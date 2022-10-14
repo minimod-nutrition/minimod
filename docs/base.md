@@ -1,7 +1,7 @@
 # Base Classes
 
-::: minimod.base.model
+::: minimod_opt.base.model
 
-::: minimod.base.basesolver
+::: minimod_opt.base.basesolver
 
-::: minimod.base.bau_constraint
+::: minimod_opt.base.bau_constraint

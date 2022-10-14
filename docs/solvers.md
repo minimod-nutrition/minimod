@@ -1,3 +1,3 @@
 # Solver Classes
 
-::: minimod.solvers.costsolver
+::: minimod_opt.solvers.costsolver

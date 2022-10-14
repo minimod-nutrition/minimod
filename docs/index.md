@@ -10,7 +10,7 @@ To install the tool with the Python package manager `pip`, type:
 
 ```bash
 
-pip install minimod
+pip install minimod-opt
 
 ```
 
@@ -20,9 +20,9 @@ pip install minimod
 You can also install the tool with source by cloning the repository and then installing with pip:
 
 ```bash
-git clone https://github.com/minimod-nutrition/minimod.git
+git clone https://github.com/minimod-nutrition/minimod-opt.git
 
-cd minimod
+cd minimod-opt
 
 pip install .
 

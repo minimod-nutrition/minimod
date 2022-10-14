@@ -1,3 +1,3 @@
 # Utility Classes
 
-::: minimod.utils
+::: minimod_opt.utils

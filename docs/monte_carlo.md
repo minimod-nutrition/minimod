@@ -1,3 +1,3 @@
 # Monte Carlo Classes
 
-::: minimod.monte_carlo.monte_carlo
+::: minimod_opt.monte_carlo.monte_carlo
