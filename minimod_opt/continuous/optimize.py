@@ -1,12 +1,12 @@
 # %%
 from typing import Callable
-from minimod.continuous.benefits import Benefits
-from minimod.continuous.costs import PremixCostCalculator
+from minimod_opt.continuous.benefits import Benefits
+from minimod_opt.continuous.costs import PremixCostCalculator
 import pandas as pd
-from minimod.continuous.data import CostDataProcessor
+from minimod_opt.continuous.data import CostDataProcessor
 import re
 import numpy as np
-from minimod.continuous.exceptions import NonUniqueNutrient, NutrientNotFound, FunctionValueIncompatible, EmptyDataFrame
+from minimod_opt.continuous.exceptions import NonUniqueNutrient, NutrientNotFound, FunctionValueIncompatible, EmptyDataFrame
 from scipy.optimize import minimize, basinhopping
 
 class ContinuousOptimizer:

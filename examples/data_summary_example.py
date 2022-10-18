@@ -1,6 +1,6 @@
 import pandas as pd
 
-from minimod.utils.summary import PreOptimizationDataSummary
+from minimod_opt.utils.summary import PreOptimizationDataSummary
 
 df = pd.read_csv("examples/data/processed/example1.csv")
 

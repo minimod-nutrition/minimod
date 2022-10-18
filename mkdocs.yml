@@ -15,4 +15,4 @@ plugins:
   - git-revision-date-localized
   - search
   - mkdocstrings
-repo_url: https://github.com/minimod-nutrition/minimod
+repo_url: https://github.com/minimod-nutrition/minimod-opt

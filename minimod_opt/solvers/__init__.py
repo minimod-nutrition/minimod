@@ -1,5 +1,5 @@
-from minimod.solvers.costsolver import CostSolver
-from minimod.solvers.benefitsolver import BenefitSolver
+from minimod_opt.solvers.costsolver import CostSolver
+from minimod_opt.solvers.benefitsolver import BenefitSolver
 
 class Minimod:
     

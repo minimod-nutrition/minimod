@@ -1,9 +1,9 @@
 import mip
 import pandas as pd
 
-from minimod.utils.suppress_messages import suppress_stdout_stderr
+from minimod_opt.utils.suppress_messages import suppress_stdout_stderr
 
-from minimod.utils.exceptions import NoVars, NoObjective, NoConstraints
+from minimod_opt.utils.exceptions import NoVars, NoObjective, NoConstraints
 from itertools import combinations, permutations
 
 

@@ -3,7 +3,7 @@ from typing import Union, Type, List, Iterable
 from time import time
 import matplotlib as mpl
 
-from minimod.utils.exceptions import (
+from minimod_opt.utils.exceptions import (
     MissingData,
     NotPandasDataframe,
     MissingOptimizationMethod,
@@ -11,10 +11,10 @@ from minimod.utils.exceptions import (
 from functools import reduce
 from pandas import DataFrame
 
-from minimod.utils.summary import OptimizationSummary
-from minimod.base.bau_constraint import BAUConstraintCreator
-from minimod.utils.plotting import Plotter
-from minimod.utils.suppress_messages import suppress_stdout_stderr
+from minimod_opt.utils.summary import OptimizationSummary
+from minimod_opt.base.bau_constraint import BAUConstraintCreator
+from minimod_opt.utils.plotting import Plotter
+from minimod_opt.utils.suppress_messages import suppress_stdout_stderr
 from mip.cbc import OptimizationStatus
 
 import matplotlib.pyplot as plt

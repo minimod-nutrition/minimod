@@ -1,6 +1,6 @@
-from minimod.base.basesolver import BaseSolver
-from minimod.utils.exceptions import NotPandasDataframe, MissingColumn
-from minimod.utils.summary import OptimizationSummary
+from minimod_opt.base.basesolver import BaseSolver
+from minimod_opt.utils.exceptions import NotPandasDataframe, MissingColumn
+from minimod_opt.utils.summary import OptimizationSummary
 
 import pandas as pd
 import mip

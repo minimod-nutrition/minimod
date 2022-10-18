@@ -1,7 +1,7 @@
 from typing import Any, Callable, Dict, List, Union
-from minimod.solvers import Minimod
-from minimod.utils.plotting import Plotter
-from minimod.utils.summary import OptimizationSummary
+from minimod_opt.solvers import Minimod
+from minimod_opt.utils.plotting import Plotter
+from minimod_opt.utils.summary import OptimizationSummary
 from mip import OptimizationStatus
 
 import numpy as np
@@ -270,34 +270,34 @@ class MonteCarloMinimod:
             **kwargs,
         )
 
-        minimod.fit()
+        minimod_opt.fit()
         
-        # Run `minimod.report` to get opt_df for iteration
+        # Run `minimod_opt.report` to get opt_df for iteration
         # Also save the opt_chosen dataframes in case there are multiple solutions
         
         opt_df_list = []
         
-        for i in range(minimod.num_solutions):
-            minimod.report(sol_num=i, quiet=True)
-            opt_df_list.append(minimod.opt_df)
+        for i in range(minimod_opt.num_solutions):
+            minimod_opt.report(sol_num=i, quiet=True)
+            opt_df_list.append(minimod_opt.opt_df)
             
         #TODO: add lowest cost per life saved index into iteration dict
             
         iteration_dict = {
-            "status": minimod.status,
+            "status": minimod_opt.status,
             "opt_objective": [df['opt_costs_discounted'].sum() for df in opt_df_list],
             "opt_constraint": [df["opt_benefit_discounted"].sum() for df in opt_df_list],
-            "num_vars": minimod.num_cols,
-            "constraints": minimod.num_rows,
-            "solutions": minimod.num_solutions,
-            "num_int": minimod.num_int,
-            "num_nz": minimod.num_nz,
+            "num_vars": minimod_opt.num_cols,
+            "constraints": minimod_opt.num_rows,
+            "solutions": minimod_opt.num_solutions,
+            "num_int": minimod_opt.num_int,
+            "num_nz": minimod_opt.num_nz,
             "opt_df": opt_df_list,
-            "sense" : minimod.sense,
-            "solver_name" : minimod.solver_name,
-            "minimum_benefit" : minimod.minimum_benefit,
-            "benefit_title" : minimod.benefit_title,
-            "bau_draw" : minimod.bau_df
+            "sense" : minimod_opt.sense,
+            "solver_name" : minimod_opt.solver_name,
+            "minimum_benefit" : minimod_opt.minimum_benefit,
+            "benefit_title" : minimod_opt.benefit_title,
+            "bau_draw" : minimod_opt.bau_df
         }
         
         return iteration_dict

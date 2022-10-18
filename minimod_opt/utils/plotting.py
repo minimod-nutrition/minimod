@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
-from minimod.utils.exceptions import MissingOptimizationMethod
+from minimod_opt.utils.exceptions import MissingOptimizationMethod
 import functools
 import geopandas as gpd
 from matplotlib.patches import Ellipse
