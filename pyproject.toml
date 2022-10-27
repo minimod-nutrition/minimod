@@ -22,6 +22,7 @@ python-docx = "^0.8.11"
 numpy = "^1.23.4"
 mip = "1.9.3"
 pqdm = "^0.2.0"
+adjustText = "^0.7.3"
 
 [tool.poetry.dev-dependencies]
 
