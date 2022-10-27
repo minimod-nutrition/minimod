@@ -133,7 +133,6 @@ class BaseSolver:
         self.message = f"""
                 MiniMod Nutrition Intervention Tool
                 Optimization Method: {str(self.sense)}
-                Version: {__version__}
                 Solver: {str(self.solver_name)},
                 Show Output: {self.show_output}
                 
