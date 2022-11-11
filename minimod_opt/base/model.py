@@ -36,21 +36,21 @@ class Model:
         # primal tol -> infeas
         # dual tol -> opt tol
         # integer  tol -> integer_tol
-        self.model.opt_tol = 1e-10
-        self.model.infeas_tol = 1e-10
-        self.model.integer_tol = 1e-06
-        self.model.seed = 0
-        # self.model.clique = 0
+        # self.model.opt_tol = 1e-10
+        # self.model.infeas_tol = 1e-10
+        # self.model.integer_tol = 1e-06
+        # self.model.seed = 0
+        # # self.model.clique = 0
 
-        # # # # allowable gap/ optca -> max_mip_gap_abs
-        # # # # ratioGap/ optcr -> max_mip_gap
+        # # # # # allowable gap/ optca -> max_mip_gap_abs
+        # # # # # ratioGap/ optcr -> max_mip_gap
 
-        self.model.max_mip_gap_abs = 0
-        self.model.max_mip_gap = 0.1
+        # self.model.max_mip_gap_abs = 0
+        # self.model.max_mip_gap = 0.1
 
-        self.model.preprocess = 0
-        self.model.lp_method = -1
-        self.cut_passes = 1
+        # self.model.preprocess = 0
+        # self.model.lp_method = -1
+        # self.cut_passes = 1
 
     def _stringify_tuple(self, tup:tuple)->str:
         """This function converts all the items of a tuple into one string
