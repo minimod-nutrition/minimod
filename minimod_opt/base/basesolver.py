@@ -245,7 +245,7 @@ class BaseSolver:
             )
         )
         
-        df_aux[intervention] = df_aux[intervention].str.lower().str.lstrip().str.rstrip()
+        df_aux[intervention] = df_aux[intervention].str.lstrip().str.rstrip()
         
         df = (
             df_aux
