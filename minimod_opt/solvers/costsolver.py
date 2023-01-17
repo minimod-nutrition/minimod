@@ -136,7 +136,7 @@ class CostSolver(BaseSolver):
         print()
         opt_chosen = self.opt_df.loc[lambda df: df['opt_vals']>0]['opt_vals'].unstack(level=self.time_col).fillna(0)
         
-        s.print_df(opt_chosen)
+        # s.print_df(opt_chosen)
         
         if isinstance(intervention_groups, dict):
             opt_chosen_reset = opt_chosen.reset_index()
