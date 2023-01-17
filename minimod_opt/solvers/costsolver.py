@@ -134,7 +134,7 @@ class CostSolver(BaseSolver):
         print()
         print("Optimal Interventions")
         print()
-        opt_chosen = self.opt_df.loc[lambda df: df['opt_vals']>0]['opt_vals'].unstack(level='time').fillna(0)
+        opt_chosen = self.opt_df.loc[lambda df: df['opt_vals']>0]['opt_vals'].unstack(level=self.time_col).fillna(0)
         
         s.print_df(opt_chosen)
         
