@@ -33,6 +33,9 @@ from dataclasses import dataclass
 import textwrap
 from adjustText import adjust_text
 
+class SupplyCurveTransitionException(Exception):
+    pass
+
 
 
 @dataclass
@@ -43,6 +46,11 @@ class SupplyCurve:
     bau: str
     data: DataFrame
     ec_range: Iterable
+    intervention_col: str
+    space_col: str
+    time_col: str
+    benefit_col: str
+    cost_col: str
 
 
 
@@ -912,8 +920,8 @@ class BaseSolver:
                         'vas_regions' : []}
         if above_ul:
             results_dict['opt_above_ul'] = []
-
-        
+            data = data.set_index([intervention_col,space_col,time_col])
+            
         for benefit_constraint, model in model_dict.items():
 
             model.report(quiet=True)
@@ -924,18 +932,18 @@ class BaseSolver:
             results_dict['convergence'].append(model.status)
             results_dict['vas_regions'].append(model.opt_df
                                                .query("opt_vals > 0")
-                                               .query("index.get_level_values('intervention').str.contains('vas')")
+                                               .query("index.get_level_values('intervention').str.contains('vas', case=False)")
                                                .index.get_level_values('region').unique().values.tolist())
             
             if above_ul:
                 above_ul_df = (
-                        data['above_ul']
-                        .reset_index()
-                        .assign(intervention = lambda df: df[intervention_col].str.lower())
-                        .set_index(['intervention', space_col, time_col])
+                        data[above_ul_col]
+                        # .reset_index()
+                        # # .assign(intervention = lambda df: df[intervention_col].str.lower())
+                        # .set_index([intervention_col, space_col, time_col])
                         )
                 
-                opt_above_ul = (model.opt_df['opt_vals'] * above_ul_df['above_ul']).sum()
+                opt_above_ul = (model.opt_df['opt_vals'] * above_ul_df).sum()
                 
                 results_dict['opt_above_ul'].append(opt_above_ul)
                 
@@ -943,7 +951,12 @@ class BaseSolver:
                            , full_population=full_population,
                            bau=bau,
                            data=data,
-                           ec_range=ec_range)        
+                           ec_range=ec_range,
+                           intervention_col = intervention_col,
+                           space_col=space_col,
+                           time_col = time_col,
+                           cost_col=cost_col,
+                           benefit_col=benefit_col)        
         
         
     @classmethod      
@@ -965,7 +978,7 @@ class BaseSolver:
                     ec_thousands = 1_000,
                     ul_thousands = 1_000,
                     save=None,
-                    splitter=None,
+                    subplot_multiple=10,
                     **kwargs):
         
         if supply_curve is None:
@@ -990,19 +1003,27 @@ class BaseSolver:
         full_population = supply_curve.full_population
         bau = supply_curve.bau
         data=supply_curve.data
-        supply_curve = supply_curve.supply_curve # Now that we have all info. make `supply_curve` just the dataframe
+        sc = supply_curve.supply_curve # Now that we have all info. make `supply_curve` just the dataframe
 
         # make nan of infeasible solutions
-        supply_curve = supply_curve.replace(0, np.nan)
+        sc = sc.replace(0, np.nan)
         
-        only_bau_opt = supply_curve.query("benefit == @bau")
+        only_bau_opt = sc.query("benefit == @bau")
         
         # # get places where interventions change
         # transitions = supply_curve[~(supply_curve['opt_interventions'] == supply_curve['opt_interventions'].shift(-1))]
         
+        def start_from_bau(df):
+            df = df.loc[lambda df: df.index >= only_bau_opt.index.values[0]]
+            if df.empty:
+                raise SupplyCurveTransitionException("All transitions less than BAU. Try increasing the number of points in ec_range")
+            
+            return df
+            
+        
         # Now get additions of interventions by converting to set and doing difference
-        supply_curve = (
-            supply_curve
+        sc = (
+            sc
             .dropna()
             .assign(opt_interventions = lambda df: df['opt_interventions'].apply(lambda x: [i.split(' + ') for i in x]))
             .assign(opt_interventions = lambda df: df['opt_interventions'].apply(lambda x: reduce(lambda y, z: y + z, x)))
@@ -1012,7 +1033,7 @@ class BaseSolver:
             .assign(transitions_plus = lambda df: df.apply(lambda col: col['int_transitions_lag'].difference(col['opt_interventions']), axis=1).shift(1).fillna(df['opt_interventions']))
             .assign(transitions_minus = lambda df: df.apply(lambda col: col['opt_interventions'].difference(col['int_transitions_lag']), axis=1).shift(1).fillna(df['opt_interventions']))
             .query("benefit != @bau")
-            .loc[lambda df: df.index >= only_bau_opt.index.values[0]]
+            # .pipe(start_from_bau)
             )
         
         if above_ul:
@@ -1021,7 +1042,7 @@ class BaseSolver:
             subplot_col = 1
         
         with plt.style.context('seaborn-whitegrid'):
-            fig, ax = plt.subplots(subplot_col+1, 1, figsize=(5*subplot_col,12))
+            fig, ax = plt.subplots(subplot_col+1, 1, figsize=(subplot_multiple*subplot_col,12))
             
             
             if above_ul:
@@ -1032,13 +1053,13 @@ class BaseSolver:
                 ax0 = ax[0]
                 ax_region=ax[1]
                       
-            supply_curve['opt_costs'].plot(ax=ax0)
+            sc['opt_costs'].plot(ax=ax0)
                         
             ax0.set_xlabel('Effective Coverage (%)')
 
-            ax0.set_xticks(supply_curve.index.tolist())
+            ax0.set_xticks(sc.index.tolist())
             
-            ax0.set_xticklabels([f"{x*100:.0f}" for x in supply_curve.index.tolist()])
+            ax0.set_xticklabels([f"{x*100:.0f}" for x in sc.index.tolist()])
             
             ax0.ticklabel_format(axis='y', useMathText=True)
             
@@ -1050,7 +1071,8 @@ class BaseSolver:
                 if data is None:
                     raise Exception("If `bau` is specified, `data` must also be specified")
                 
-                bau_ec, bau_costs = BAUConstraintCreator().bau_df(data, bau, ['effective_coverage', 'costs']).sum()
+                bau_ec, bau_costs = BAUConstraintCreator().bau_df(data, bau, [supply_curve.benefit_col,
+                                                                              supply_curve.cost_col]).sum()
 
                 ax0.scatter(bau_ec/full_population, bau_costs, color='tab:green', marker='s')
                 ax0.annotate("BAU", (bau_ec/full_population, bau_costs), xytext=(5, 5),  
@@ -1064,11 +1086,11 @@ class BaseSolver:
             
             if above_ul:
                 # Now get above_ul
-                supply_curve['opt_above_ul'].plot(ax=ax1, color='tab:red')
+                sc['opt_above_ul'].plot(ax=ax1, color='tab:red')
                 ax1.yaxis.set_major_formatter(tick.FuncFormatter(lambda y, _: f"{y/ul_thousands:,.0f}"))
                 ax1.set_title(f'Population Above UL (x {ul_thousands:,.0f})')
-                ax1.set_xticks(supply_curve.index.tolist())
-                ax1.set_xticklabels([f"{x*100:.0f}" for x in supply_curve.index.tolist()])
+                ax1.set_xticks(sc.index.tolist())
+                ax1.set_xticklabels([f"{x*100:.0f}" for x in sc.index.tolist()])
                 ax1.set_xlabel('Effective Coverage (%)')
             
             def message_writer(x):
@@ -1083,11 +1105,11 @@ class BaseSolver:
                     
                     return message
             
-            # print(supply_curve)
+            # print(sc)
 
             
             (
-                supply_curve['vas_regions']
+                sc['vas_regions']
                 .explode()
                 .to_frame()
                 .assign(yes=lambda df: \
@@ -1096,20 +1118,20 @@ class BaseSolver:
                 .set_index('vas_regions', 
                            append=True)
                 .unstack()
-                .drop(columns=('yes', pd.NA))
+                # .drop(columns=('yes', pd.NA))
                 .plot.bar(stacked=True, legend=False, 
                           ax=ax_region, cmap='tab20')
                 )
             
-            # ax_region.set_xticks(supply_curve.index.tolist())
-            ax_region.set_xticklabels([f"{x*100:.0f}" for x in supply_curve.index.tolist()],
+            # ax_region.set_xticks(sc.index.tolist())
+            ax_region.set_xticklabels([f"{x*100:.0f}" for x in sc.index.tolist()],
                                       rotation=0)
             ax_region.set_xlabel('Effective Coverage (%)')
             ax_region.set_yticklabels([])
             ax_region.set_title("VAS Regions")
             
             texts = (
-                supply_curve
+                sc
                 .assign(message = lambda df: df.apply(lambda x: message_writer(x), axis=1))
                 .apply(lambda df: ax0.text(df.name+.01, df['opt_costs'], 
                                                 s=df['message'],
@@ -1117,12 +1139,12 @@ class BaseSolver:
                 .values.tolist()
                 )   
             
-            adjust_text(texts, arrowprops=dict(arrowstyle='->', color='green'))
+            # adjust_text(texts, arrowprops=dict(arrowstyle='->', color='green'))
             
             figtext = f"Note: BAU refers to a nutritional intervention of {bau.title()}." \
             f" Optimum solution consists of {', '.join(only_bau_opt['opt_interventions'].values[0])}." \
             " Vitamin A Supplementation taking place at various level of effective coverage in: " \
-                           f"{', '.join(list(set(np.concatenate(supply_curve['vas_regions'].values))))}"
+                           f"{', '.join(list(set(np.concatenate(sc['vas_regions'].values))))}"
                         
             txt = fig.text(.05, -.1, s='\n'.join(textwrap.wrap(figtext, width=100)))
                              

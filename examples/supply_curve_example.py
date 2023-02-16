@@ -9,7 +9,7 @@
 # %%
 #!%autoreload 2
 import pandas as pd
-import minimod as mm
+import minimod_opt as mm
 import numpy as np
 import joblib
 
@@ -18,7 +18,7 @@ import joblib
 # Data
 
 # This is how the data was processed, assuming we use the Katie_VA_Benefits_and_Costs_1_8_2019.xlsx file.
-excel_file = "data/processed/supply_curve_example.xlsx"
+excel_file = "examples/data/processed/supply_curve_example.xlsx"
 
 # %%
 
