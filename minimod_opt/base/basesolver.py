@@ -867,10 +867,14 @@ class BaseSolver:
                     time_col='time',
                     ec_range=None,
                     above_ul = False,
+                    above_ul_col = None,
                     **kwargs): 
         
         if ec_range is None:
             ec_range = np.arange(.1,1,.1)
+            
+        if above_ul and above_ul_col is None:
+            above_ul_col = 'above_ul'
             
         
         ratio_to_constraint = lambda ratio: ratio*full_population
@@ -928,7 +932,7 @@ class BaseSolver:
                         data['above_ul']
                         .reset_index()
                         .assign(intervention = lambda df: df[intervention_col].str.lower())
-                        .set_index([intervention_col, space_col, time_col])
+                        .set_index(['intervention', space_col, time_col])
                         )
                 
                 opt_above_ul = (model.opt_df['opt_vals'] * above_ul_df['above_ul']).sum()
