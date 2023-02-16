@@ -1025,7 +1025,7 @@ class BaseSolver:
                 ax1 = ax[1]
                 ax_region=ax[2]
             else:
-                ax0 = ax
+                ax0 = ax[0]
                 ax_region=ax[1]
                       
             supply_curve['opt_costs'].plot(ax=ax0)
