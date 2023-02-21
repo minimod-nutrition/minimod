@@ -1,0 +1,2558 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../solvers/">
+      
+      
+        <link rel="next" href="../utils/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.13">
+    
+    
+      
+        <title>Monte Carlo - MINIMOD Optimization Tool</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ffa9267a.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a0c5b2b5.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#monte-carlo-classes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="MINIMOD Optimization Tool" class="md-header__button md-logo" aria-label="MINIMOD Optimization Tool" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MINIMOD Optimization Tool
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Monte Carlo
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/minimod-nutrition/minimod-opt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href=".." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../base/" class="md-tabs__link">
+      Base Classes
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../solvers/" class="md-tabs__link">
+      Solvers
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      Monte Carlo
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../utils/" class="md-tabs__link">
+      Utility Classes
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="MINIMOD Optimization Tool" class="md-nav__button md-logo" aria-label="MINIMOD Optimization Tool" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    MINIMOD Optimization Tool
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/minimod-nutrition/minimod-opt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.3.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../base/" class="md-nav__link">
+        Base Classes
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../solvers/" class="md-nav__link">
+        Solvers
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Monte Carlo
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Monte Carlo
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#minimod_opt.monte_carlo.monte_carlo" class="md-nav__link">
+    minimod_opt.monte_carlo.monte_carlo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod" class="md-nav__link">
+    MonteCarloMinimod
+  </a>
+  
+    <nav class="md-nav" aria-label="MonteCarloMinimod">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod.fit_one_sample" class="md-nav__link">
+    fit_one_sample()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        Utility Classes
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#minimod_opt.monte_carlo.monte_carlo" class="md-nav__link">
+    minimod_opt.monte_carlo.monte_carlo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod" class="md-nav__link">
+    MonteCarloMinimod
+  </a>
+  
+    <nav class="md-nav" aria-label="MonteCarloMinimod">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod.fit_one_sample" class="md-nav__link">
+    fit_one_sample()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="monte-carlo-classes">Monte Carlo Classes</h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+<a id="minimod_opt.monte_carlo.monte_carlo"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod" class="doc doc-heading">
+        <code>MonteCarloMinimod</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+
+
+
+        <details class="quote">
+          <summary>Source code in <code>minimod_opt/monte_carlo/monte_carlo.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">MonteCarloMinimod</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">solver_type</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">intervention_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">space_col</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">benefit_mean_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">benefit_sd_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cost_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cost_uniform_perc</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pop_weight_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;MonteCarloMinimod uses the `Minimod` optimization classes and conducts Monte Carlo simulations of benefits and cost data through distribution assumptions on the data. Currently the simulations assume a normal distribution about benefits and a uniform distribution around costs.</span>
+
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            solver_type (str, optional): Whether to minimize costs or maximize benfits. Currently only the former is implemented. Defaults to None.</span>
+<span class="sd">            data (pd.DataFrame, optional): The input data. Defaults to None.</span>
+<span class="sd">            intervention_col (str, optional): the name of the intervention variable. Defaults to None.</span>
+<span class="sd">            time_col (str, optional): the name of the time variable. Defaults to None.</span>
+<span class="sd">            space_col (str, optional): the name of region/spatial variable. Defaults to None.</span>
+<span class="sd">            benefit_mean_col (str, optional): the name of the variable that gives the mean of benefits for the intervention. Usually just the name of the benefits variable. Defaults to None.</span>
+<span class="sd">            benefit_sd_col (str, optional): The name of the variable for the standard deviation of benefits. Defaults to None.</span>
+<span class="sd">            cost_col (str, optional): The name of the cost variable. Defaults to None.</span>
+<span class="sd">            cost_uniform_perc (float, optional): If using the default of a uniform distribution for costs, the amount of the endpoint of the uniform distribution ([cost*(1+cost_uniform_perc), cost*(1- cost_uniform_perc)]). Defaults to None.</span>
+<span class="sd">            pop_weight_col (str, optional): The name name of the variable that specific population weights. Defaults to None.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">            Below is an example of how you would run the simulations as well as the visualizations.</span>
+
+<span class="sd">            &gt;&gt;&gt; import os; print(os.getcwd())</span>
+<span class="sd">            &gt;&gt;&gt; df = (</span>
+<span class="sd">            ...     pd.read_csv(&quot;data/processed/example1.csv&quot;)</span>
+<span class="sd">            ...     .assign(benefit_sd = lambda df: df[&#39;benefit&#39;]/2,</span>
+<span class="sd">            ...             costs_sd = lambda df: df[&#39;costs&#39;]/2)</span>
+<span class="sd">            ...     )</span>
+
+<span class="sd">            &gt;&gt;&gt; cube = [&quot;cube&quot;, &quot;vascube&quot;, &quot;oilcube&quot;, &quot;cubemaize&quot;, &quot;vascubemaize&quot;, &quot;vasoilcube&quot;, &quot;oilcubemaize&quot;, &quot;vasoilcubemaize&quot;]</span>
+<span class="sd">            &gt;&gt;&gt; oil = [&quot;oil&quot;, &quot;vasoil&quot;, &quot;oilcube&quot;, &quot;oilmaize&quot;, &quot;vasoilmaize&quot;, &quot;vasoilcube&quot;, &quot;oilcubemaize&quot;, &quot;vasoilcubemaize&quot;]</span>
+<span class="sd">            &gt;&gt;&gt; maize = [&quot;maize&quot;, &quot;vasmaize&quot;, &quot;oilmaize&quot;, &quot;cubemaize&quot;, &quot;vascubemaize&quot;, &quot;vasoilmaize&quot;, &quot;oilcubemaize&quot;, &quot;vasoilcubemaize&quot; ]</span>
+
+<span class="sd">            &gt;&gt;&gt; a = mm.MonteCarloMinimod(solver_type = &#39;costmin&#39;, </span>
+<span class="sd">            ...                        data = df, </span>
+<span class="sd">            ...                        intervention_col=&#39;intervention&#39;,</span>
+<span class="sd">            ...                        space_col=&#39;space&#39;,</span>
+<span class="sd">            ...                        time_col=&#39;time&#39;,</span>
+<span class="sd">            ...                        benefit_mean_col = &#39;benefit&#39;,</span>
+<span class="sd">            ...                        benefit_sd_col= &#39;benefit_sd&#39;,</span>
+<span class="sd">            ...                        cost_col=&#39;costs&#39;)</span>
+
+<span class="sd">            &gt;&gt;&gt; def benefit_no_change(seed, benefit_col, data):</span>
+<span class="sd">            ...    return data[benefit_col]</span>
+
+<span class="sd">            &gt;&gt;&gt; sim = a.fit_all_samples(N = 100, </span>
+<span class="sd">            ...                         all_space=oil, </span>
+<span class="sd">            ...                         all_time=cube, </span>
+<span class="sd">            ...                         time_subset=[1,2,3], </span>
+<span class="sd">            ...                         minimum_benefit=&#39;vasoilold&#39;, </span>
+<span class="sd">            ...                         benefit_callable=benefit_no_change, </span>
+<span class="sd">            ...                         benefit_kwargs={&#39;benefit_col&#39; : &#39;benefit&#39;}</span>
+<span class="sd">            ...                         )</span>
+
+<span class="sd">            &gt;&gt;&gt; a.plot_opt_hist(save = &quot;sim_results.png&quot;)</span>
+
+<span class="sd">            &gt;&gt;&gt; a.report(perc_intervention_appeared=True)</span>
+
+<span class="sd">            &gt;&gt;&gt; a.plot_sim_trajectories(save = &#39;sim_traj.png&#39;)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;Monte Carlo Simulator&quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">=</span> <span class="n">solver_type</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">intervention_col</span><span class="p">,</span> <span class="n">space_col</span><span class="p">,</span> <span class="n">time_col</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span> <span class="o">=</span> <span class="n">intervention_col</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">space_col</span> <span class="o">=</span> <span class="n">space_col</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_col</span> <span class="o">=</span> <span class="n">time_col</span>
+
+        <span class="k">if</span> <span class="n">pop_weight_col</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">pop_weight_col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pop_weight_col</span> <span class="o">=</span> <span class="s2">&quot;pop_weight_col&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pop_weight_col</span> <span class="o">=</span> <span class="n">pop_weight_col</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">benefit_mean_col</span> <span class="o">=</span> <span class="n">benefit_mean_col</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">benefit_sd_col</span> <span class="o">=</span> <span class="n">benefit_sd_col</span>
+
+        <span class="k">if</span> <span class="n">cost_uniform_perc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cost_uniform_perc</span> <span class="o">=</span> <span class="mf">0.2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cost_uniform_perc</span> <span class="o">=</span> <span class="n">cost_uniform_perc</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost_col</span> <span class="o">=</span> <span class="n">cost_col</span>
+
+
+    <span class="k">def</span> <span class="nf">_construct_benefit_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">benefit_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;benefit_random_draw&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw of a sample of benefits assuming normality</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            seed (int): The random seed</span>
+<span class="sd">            data (pd.DataFrame, optional): The input data. Defaults to None.</span>
+<span class="sd">            benefit_col (str, optional): the name of the resulting benefits variable. Defaults to &#39;benefit_random_draw&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.Series: A series of benefits</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+        <span class="n">random</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="n">df_mean_sd</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">benefit_mean_col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">benefit_sd_col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_weight_col</span><span class="p">]</span>
+        <span class="p">]</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df_mean_sd</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_nan_benefits</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+            <span class="n">weight_mean</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">benefit_mean_col</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_weight_col</span><span class="p">],</span>
+            <span class="n">weight_sd</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">benefit_sd_col</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pop_weight_col</span><span class="p">],</span>
+            <span class="n">benefit_random_draw</span><span class="o">=</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+                <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight_mean&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;weight_sd&quot;</span><span class="p">]</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">benefit_col</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_construct_cost_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cost_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;cost_random_draw&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw a sample costs assuming a uniform distribution</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            seed (str): The randome</span>
+<span class="sd">            data (pd.DataFrame, optional): The input data. Defaults to None.</span>
+<span class="sd">            cost_col (str, optional): The name of the cost variable. Defaults to &#39;cost_random_draw&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.Series: The cost draw</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+        <span class="n">random</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="n">df_costs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cost_col</span><span class="p">]</span>
+        <span class="n">df_costs_low</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost_uniform_perc</span><span class="p">)</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cost_col</span><span class="p">]</span>
+        <span class="n">df_costs_high</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost_uniform_perc</span><span class="p">)</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cost_col</span><span class="p">]</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df_costs</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+            <span class="n">cost_random_draw</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">df_costs_low</span><span class="p">,</span> <span class="n">df_costs_high</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">cost_col</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_drop_nan_benefits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">benefit_sd_col</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">_merge_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benefit_callable</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">cost_callable</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>  
+                       <span class="n">cost_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">benefit_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms the cost and benefit data and merges them together.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            benefit_callable (Callable): The function for transforming benefits</span>
+<span class="sd">            cost_callable (Callable): The function for transforming costs</span>
+<span class="sd">            cost_kwargs (dict): extra arguments for `cost_callable`</span>
+<span class="sd">            benefit_kwargs (dict): extra arguments for `benefit_callable`</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: The merged dataset of benefits and costs</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+
+        <span class="n">benefit_sample</span> <span class="o">=</span> <span class="n">benefit_callable</span><span class="p">(</span><span class="o">**</span><span class="n">benefit_kwargs</span><span class="p">)</span>
+        <span class="n">cost_sample</span> <span class="o">=</span> <span class="n">cost_callable</span><span class="p">(</span><span class="o">**</span><span class="n">cost_kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">benefit_sample</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">cost_sample</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fit_one_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                       <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                       <span class="n">all_space</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                       <span class="n">all_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                       <span class="n">space_subset</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                       <span class="n">time_subset</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                       <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                       <span class="n">benefit_callable</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                       <span class="n">cost_callable</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                       <span class="n">cost_kwargs</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span>
+                       <span class="n">benefit_kwargs</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span>
+                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw one MonteCarlo sample and optimize. To be used with `fit_all_samples`. </span>
+
+<span class="sd">        `benefit_callable` and `cost_callable` must be functions with arguments `(seed, benefit_col, data)`. `cost_kwargs` and `benefit_kwargs` can be input to override defaults, such as if you want to use a different seed or change the name of a column.</span>
+
+<span class="sd">        Note: `benefit_col` and `cost_col` for these callables denote the name of the resulting columns of the draw, not the original variable names.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            seed (int): random seed</span>
+<span class="sd">            all_space (Union[List, None]): spatial constraints (as in `Minimod`)</span>
+<span class="sd">            all_time (Union[List, None]): time constraints (as in `Minimod`)</span>
+<span class="sd">            space_subset (List[str]): subset for space constraints (as in `Minimod`)</span>
+<span class="sd">            time_subset (List[int]): subset for time constraints (as in `Minimod`)</span>
+<span class="sd">            strict (bool): whether to treat list of intervention names input *strictly* or using regex</span>
+<span class="sd">            benefit_callable (Union[Callable, None]): The function for benefits transformation</span>
+<span class="sd">            cost_callable (Union[Callable, None]): The function for cost transformation</span>
+<span class="sd">            cost_kwargs (dict): extra arguments for the cost_callabe</span>
+<span class="sd">            benefit_kwargs (dict): extra arguments for benefits callable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: A dictionary of fitted results</span>
+<span class="sd">        &quot;&quot;&quot;</span>    
+
+        <span class="k">if</span> <span class="n">benefit_callable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">benefit_callable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_benefit_sample</span>
+        <span class="k">if</span> <span class="n">cost_callable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cost_callable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_cost_sample</span>
+
+        <span class="n">cost_kwargs_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;seed&#39;</span> <span class="p">:</span> <span class="n">seed</span><span class="p">,</span> <span class="s1">&#39;cost_col&#39;</span> <span class="p">:</span> <span class="s1">&#39;cost_random_draw&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
+        <span class="n">benefit_kwargs_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;seed&#39;</span> <span class="p">:</span> <span class="n">seed</span><span class="p">,</span> <span class="s1">&#39;benefit_col&#39;</span> <span class="p">:</span> <span class="s1">&#39;benefit_random_draw&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">cost_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cost_kwargs_default</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cost_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">benefit_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">benefit_kwargs_default</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">benefit_kwargs</span><span class="p">)</span>
+
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_samples</span><span class="p">(</span><span class="n">benefit_callable</span><span class="o">=</span><span class="n">benefit_callable</span><span class="p">,</span>
+                                 <span class="n">cost_callable</span><span class="o">=</span><span class="n">cost_callable</span><span class="p">,</span>
+                                 <span class="n">benefit_kwargs</span><span class="o">=</span><span class="n">benefit_kwargs_default</span><span class="p">,</span>
+                                 <span class="n">cost_kwargs</span><span class="o">=</span><span class="n">cost_kwargs_default</span><span class="p">)</span> 
+
+        <span class="n">minimod</span> <span class="o">=</span> <span class="n">Minimod</span><span class="p">(</span><span class="n">solver_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">)(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">intervention_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span><span class="p">,</span>
+            <span class="n">space_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space_col</span><span class="p">,</span>
+            <span class="n">time_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_col</span><span class="p">,</span>
+            <span class="n">benefit_col</span><span class="o">=</span><span class="n">benefit_kwargs_default</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;benefit_col&#39;</span><span class="p">),</span>
+            <span class="n">cost_col</span><span class="o">=</span><span class="n">cost_kwargs_default</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cost_col&#39;</span><span class="p">),</span>
+            <span class="n">all_space</span><span class="o">=</span><span class="n">all_space</span><span class="p">,</span>
+            <span class="n">all_time</span><span class="o">=</span><span class="n">all_time</span><span class="p">,</span>
+            <span class="n">space_subset</span><span class="o">=</span><span class="n">space_subset</span><span class="p">,</span>
+            <span class="n">time_subset</span><span class="o">=</span><span class="n">time_subset</span><span class="p">,</span>
+            <span class="n">show_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
+            <span class="n">benefit_title</span><span class="o">=</span><span class="s2">&quot;Effective Coverage&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">minimod_opt</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+        <span class="c1"># Run `minimod_opt.report` to get opt_df for iteration</span>
+        <span class="c1"># Also save the opt_chosen dataframes in case there are multiple solutions</span>
+
+        <span class="n">opt_df_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_solutions</span><span class="p">):</span>
+            <span class="n">minimod_opt</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">sol_num</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">opt_df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">minimod_opt</span><span class="o">.</span><span class="n">opt_df</span><span class="p">)</span>
+
+        <span class="c1">#TODO: add lowest cost per life saved index into iteration dict</span>
+
+        <span class="n">iteration_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="s2">&quot;opt_objective&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;opt_costs_discounted&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">opt_df_list</span><span class="p">],</span>
+            <span class="s2">&quot;opt_constraint&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;opt_benefit_discounted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">opt_df_list</span><span class="p">],</span>
+            <span class="s2">&quot;num_vars&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_cols</span><span class="p">,</span>
+            <span class="s2">&quot;constraints&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_rows</span><span class="p">,</span>
+            <span class="s2">&quot;solutions&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_solutions</span><span class="p">,</span>
+            <span class="s2">&quot;num_int&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_int</span><span class="p">,</span>
+            <span class="s2">&quot;num_nz&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_nz</span><span class="p">,</span>
+            <span class="s2">&quot;opt_df&quot;</span><span class="p">:</span> <span class="n">opt_df_list</span><span class="p">,</span>
+            <span class="s2">&quot;sense&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">sense</span><span class="p">,</span>
+            <span class="s2">&quot;solver_name&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">solver_name</span><span class="p">,</span>
+            <span class="s2">&quot;minimum_benefit&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">minimum_benefit</span><span class="p">,</span>
+            <span class="s2">&quot;benefit_title&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">benefit_title</span><span class="p">,</span>
+            <span class="s2">&quot;bau_draw&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">bau_df</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">iteration_dict</span>
+
+    <span class="k">def</span> <span class="nf">fit_all_samples</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_jobs</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">N</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">all_space</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">all_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">space_subset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">time_subset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">exception_behavior</span> <span class="o">=</span> <span class="s1">&#39;immediate&#39;</span><span class="p">,</span>
+        <span class="n">only_optimal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">benefit_callable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cost_callable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">benefit_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cost_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">random_seeds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">N</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="n">sim_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;Running with </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2"> Samples&quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">partial_fit_sample</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_one_sample</span><span class="p">,</span> 
+                                     <span class="n">all_space</span><span class="o">=</span><span class="n">all_space</span><span class="p">,</span>
+                                     <span class="n">all_time</span><span class="o">=</span><span class="n">all_time</span><span class="p">,</span>
+                                     <span class="n">space_subset</span><span class="o">=</span><span class="n">space_subset</span><span class="p">,</span>
+                                     <span class="n">time_subset</span> <span class="o">=</span> <span class="n">time_subset</span><span class="p">,</span>
+                                     <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
+                                     <span class="n">benefit_callable</span><span class="o">=</span><span class="n">benefit_callable</span><span class="p">,</span>
+                                     <span class="n">cost_callable</span><span class="o">=</span><span class="n">cost_callable</span><span class="p">,</span>
+                                     <span class="n">benefit_kwargs</span><span class="o">=</span><span class="n">benefit_kwargs</span><span class="p">,</span>
+                                     <span class="n">cost_kwargs</span><span class="o">=</span><span class="n">cost_kwargs</span><span class="p">,</span>
+                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">random_seeds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">random_seeds</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="n">sim_dict</span> <span class="o">=</span> <span class="n">pqdm</span><span class="p">(</span><span class="n">random_seeds</span><span class="p">,</span> <span class="n">partial_fit_sample</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">exception_behaviour</span><span class="o">=</span><span class="n">exception_behavior</span><span class="p">)</span>
+
+        <span class="n">sim_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sim_dict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">perc_opt</span> <span class="o">=</span> <span class="n">sim_df</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="k">if</span> <span class="n">only_optimal</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span> <span class="o">=</span> <span class="n">sim_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">OptimizationStatus</span><span class="o">.</span><span class="n">OPTIMAL</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span> <span class="o">=</span> <span class="n">sim_df</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span>
+
+    <span class="k">def</span> <span class="nf">_all_opt_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sol_filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Appends the dataframe from all simulation iterations together</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#TODO: #28 Allow for concatenation of a combination of solutions, or all</span>
+
+        <span class="c1"># First get sim_results so that `opt_df` is a series of dataframes</span>
+        <span class="c1"># Turn list into numpy since it has a `take` method</span>
+
+        <span class="k">if</span> <span class="n">sol_filter</span><span class="o">==</span><span class="s1">&#39;min_cb&#39;</span><span class="p">:</span>
+            <span class="c1"># Find the solution with the highest benefit/cost ratio</span>
+            <span class="n">sol_num_all_opt_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">best_solution</span>  <span class="o">=</span> <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;opt_objective&#39;</span><span class="p">])</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;opt_constraint&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">argmin</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                                       <span class="n">new_opt_df</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;opt_df&#39;</span><span class="p">][</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;best_solution&#39;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sol_num_all_opt_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">new_opt_df</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;opt_df&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+
+        <span class="n">all_opt_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">sol_num_all_opt_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;new_opt_df&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">iteration</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">all_opt_df</span>
+
+    <span class="k">def</span> <span class="nf">_get_intervention_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">intervention</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+
+        <span class="k">if</span> <span class="n">strict</span><span class="p">:</span>
+
+            <span class="n">int_group</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">data</span>
+                <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span>
+                    <span class="n">get_level_values</span><span class="p">(</span><span class="n">level</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">intervention</span><span class="p">)]</span>
+            <span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">int_group</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">data</span>
+                <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span>
+                    <span class="n">get_level_values</span><span class="p">(</span><span class="n">level</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">intervention</span><span class="p">)]</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">int_group</span>
+
+    <span class="k">def</span> <span class="nf">_get_indicator_if_in_intervention</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">indicator_spec</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">indicator_spec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indicator_spec</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_intervention_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_opt_df</span><span class="p">(),</span> <span class="n">name</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+                <span class="p">[[</span><span class="s1">&#39;opt_vals&#39;</span><span class="p">,</span> <span class="s1">&#39;iteration&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">space_col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_col</span><span class="p">]]</span>
+                <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;iteration&#39;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">indicator_spec</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">avg_time</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">avg_space</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">intervention_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">indicator_spec</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+
+        <span class="n">avg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="o">.</span><span class="n">convert_dtypes</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">OptimizationSummary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;MiniMod Solver Results&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Method:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;sense&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())),</span>
+            <span class="p">(</span><span class="s2">&quot;Solver:&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;solver_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())),</span>
+            <span class="p">(</span><span class="s2">&quot;Percentage Optimized:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">perc_opt</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Average Number Solutions Found:&quot;</span><span class="p">,</span> <span class="n">avg</span><span class="p">[</span><span class="s2">&quot;solutions&quot;</span><span class="p">]),</span>
+        <span class="p">]</span>
+
+        <span class="n">features</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;No. of Variables:&quot;</span><span class="p">,</span> <span class="n">avg</span><span class="p">[</span><span class="s2">&quot;num_vars&quot;</span><span class="p">]),</span>
+            <span class="p">(</span><span class="s2">&quot;No. of Integer Variables:&quot;</span><span class="p">,</span> <span class="n">avg</span><span class="p">[</span><span class="s2">&quot;num_int&quot;</span><span class="p">]),</span>
+            <span class="p">(</span><span class="s2">&quot;No. of Constraints&quot;</span><span class="p">,</span> <span class="n">avg</span><span class="p">[</span><span class="s2">&quot;constraints&quot;</span><span class="p">]),</span>
+            <span class="p">(</span><span class="s2">&quot;No. of Non-zeros in Constr.&quot;</span><span class="p">,</span> <span class="n">avg</span><span class="p">[</span><span class="s2">&quot;num_nz&quot;</span><span class="p">]),</span>
+        <span class="p">]</span>
+
+        <span class="n">results_benefits</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;Minimum Benefit&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="o">.</span><span class="n">minimum_benefit</span><span class="o">.</span><span class="n">mean</span><span class="p">())]</span>
+
+        <span class="n">stats</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;Statistics for Benefits and Costs&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="n">s</span><span class="o">.</span><span class="n">print_generic</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">results_benefits</span><span class="p">,</span> <span class="n">stats</span><span class="p">)</span>
+
+        <span class="n">stats_df</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[[</span><span class="s2">&quot;opt_objective&quot;</span><span class="p">,</span> <span class="s2">&quot;opt_constraint&quot;</span><span class="p">]]</span>
+            <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">to_markdown</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">stats_df</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">intervention_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="n">s</span><span class="o">.</span><span class="n">print_generic</span><span class="p">([(</span><span class="sa">f</span><span class="s2">&quot;% Appearance of:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)])</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intervention_group</span><span class="p">:</span>
+
+                <span class="n">int_group</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_indicator_if_in_intervention</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> 
+                                                                    <span class="n">indicator_spec</span><span class="o">=</span><span class="n">indicator_spec</span><span class="p">,</span>
+                                                                    <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="o">*</span><span class="mi">100</span><span class="p">)[</span><span class="s1">&#39;opt_vals&#39;</span><span class="p">]</span>
+
+                <span class="n">s</span><span class="o">.</span><span class="n">print_generic</span><span class="p">([(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">int_group</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)])</span>
+
+        <span class="k">if</span> <span class="n">avg_time</span><span class="p">:</span>
+
+            <span class="n">time_df</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_all_opt_df</span><span class="p">()</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">time_col</span><span class="p">,</span> <span class="s2">&quot;iteration&quot;</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_col</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">mean</span><span class="p">()[[</span><span class="s2">&quot;opt_benefit&quot;</span><span class="p">,</span> <span class="s2">&quot;opt_costs&quot;</span><span class="p">]]</span>
+            <span class="p">)</span>
+
+            <span class="n">s</span><span class="o">.</span><span class="n">print_generic</span><span class="p">([(</span><span class="s2">&quot;Mean Benefits and Costs across time&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">time_df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">avg_space</span><span class="p">:</span>
+
+            <span class="n">space_df</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_all_opt_df</span><span class="p">()</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">space_col</span><span class="p">,</span> <span class="s2">&quot;iteration&quot;</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space_col</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">mean</span><span class="p">()[[</span><span class="s2">&quot;opt_benefit&quot;</span><span class="p">,</span> <span class="s2">&quot;opt_costs&quot;</span><span class="p">]]</span>
+            <span class="p">)</span>
+
+            <span class="n">s</span><span class="o">.</span><span class="n">print_generic</span><span class="p">([(</span><span class="s2">&quot;Mean Benefits and Costs across Regions&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">space_df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">plot_opt_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">costs</span> <span class="o">=</span> <span class="s2">&quot;Optimal Costs&quot;</span>
+        <span class="n">benefits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;benefit_title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">==</span> <span class="s2">&quot;costmin&quot;</span><span class="p">:</span>
+
+            <span class="n">objective_title</span> <span class="o">=</span> <span class="n">costs</span>
+            <span class="n">constraint_title</span> <span class="o">=</span> <span class="n">benefits</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">==</span> <span class="s2">&quot;benmax&quot;</span><span class="p">:</span>
+
+            <span class="n">objective_title</span> <span class="o">=</span> <span class="n">benefits</span>
+            <span class="n">constraint_title</span> <span class="o">=</span> <span class="n">costs</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;opt_constraint2&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;opt_constraint&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;opt_objective2&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;opt_objective&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">benefit_plot</span><span class="p">,</span> <span class="n">cost_plot</span><span class="p">)</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">_plot_sim_hist</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">,</span>
+            <span class="n">benefit_col</span><span class="o">=</span><span class="s2">&quot;opt_constraint2&quot;</span><span class="p">,</span>
+            <span class="n">cost_col</span><span class="o">=</span><span class="s2">&quot;opt_objective2&quot;</span><span class="p">,</span>
+            <span class="c1">#benefit_col=&quot;opt_constraint&quot;,</span>
+            <span class="c1">#cost_col=&quot;opt_objective&quot;,</span>
+            <span class="n">cost_title</span><span class="o">=</span><span class="n">objective_title</span><span class="p">,</span>
+            <span class="n">benefit_title</span><span class="o">=</span><span class="n">constraint_title</span><span class="p">,</span>
+            <span class="n">save</span><span class="o">=</span><span class="n">save</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">benefit_plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mtick</span><span class="o">.</span><span class="n">StrMethodFormatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{x:,.0f}</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">cost_plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mtick</span><span class="o">.</span><span class="n">StrMethodFormatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{x:,.0f}</span><span class="s1">&#39;</span><span class="p">))</span>
+
+        <span class="n">benefit_plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Thousands of Individuals&quot;</span><span class="p">)</span>
+        <span class="n">cost_plot</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Thousands of 2019 USD&quot;</span><span class="p">)</span>
+
+        <span class="n">benefit_xlims</span> <span class="o">=</span> <span class="n">benefit_plot</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
+        <span class="n">benefit_ylims</span> <span class="o">=</span> <span class="n">benefit_plot</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+
+        <span class="c1"># Put text at midpoint of y</span>
+        <span class="n">text_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">benefit_ylims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">benefit_ylims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="c1"># offset by 10% of length of x-axis</span>
+        <span class="n">text_x</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;minimum_benefit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">/</span><span class="mi">1000</span> <span class="o">+</span> <span class="p">(</span><span class="n">benefit_xlims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">benefit_xlims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">0.1</span>
+        <span class="p">)</span>
+
+        <span class="n">benefit_plot</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;minimum_benefit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+        <span class="n">benefit_plot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">text_x</span><span class="p">,</span> <span class="n">text_y</span><span class="p">,</span> <span class="s2">&quot;Mean</span><span class="se">\n</span><span class="s2">Minimum</span><span class="se">\n</span><span class="s2">Benefit</span><span class="se">\n</span><span class="s2">Constraint&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get total cost for a draw </span>
+        <span class="n">cost_xlims</span> <span class="o">=</span> <span class="n">cost_plot</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
+        <span class="n">cost_ylims</span> <span class="o">=</span> <span class="n">cost_plot</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+
+        <span class="c1"># Put text at midpoint of y</span>
+        <span class="n">cost_plot</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;bau_draw&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;discounted_costs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+
+        <span class="n">text_y2</span> <span class="o">=</span> <span class="p">(</span><span class="n">cost_ylims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost_ylims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="c1"># offset by 10% of length of x-axis</span>
+        <span class="n">text_x2</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;bau_draw&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;discounted_costs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">/</span><span class="mi">1000</span> <span class="o">+</span> <span class="p">(</span><span class="n">cost_xlims</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost_xlims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">0.1</span>
+        <span class="p">)</span>
+        <span class="n">cost_plot</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">text_x2</span><span class="p">,</span> <span class="n">text_y2</span><span class="p">,</span> <span class="s2">&quot;Mean</span><span class="se">\n</span><span class="s2">BAU</span><span class="se">\n</span><span class="s2">Cost&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">benefit_plot</span><span class="p">,</span> <span class="n">cost_plot</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">plot_sim_trajectories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_of_interest</span><span class="o">=</span><span class="s2">&quot;benefits&quot;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">data_of_interest</span> <span class="o">==</span> <span class="s2">&quot;benefits&quot;</span><span class="p">:</span>
+            <span class="n">col_of_interest</span> <span class="o">=</span> <span class="s2">&quot;opt_benefit&quot;</span>
+            <span class="n">ylabel_interest</span> <span class="o">=</span> <span class="s2">&quot;Individuals&quot;</span>
+        <span class="k">elif</span> <span class="n">data_of_interest</span> <span class="o">==</span> <span class="s2">&quot;costs&quot;</span><span class="p">:</span>
+            <span class="n">col_of_interest</span> <span class="o">=</span> <span class="s2">&quot;opt_costs&quot;</span>
+            <span class="n">ylabel_interest</span> <span class="o">=</span> <span class="s2">&quot;2019 USD&quot;</span>
+
+        <span class="n">df_all</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_results</span><span class="p">[</span><span class="s1">&#39;opt_df&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">col_of_interest</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_col</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># Now get mean trajectory</span>
+
+        <span class="n">df_all</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">df_all</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+        <span class="c1"># plt.figtext(0, 0, &quot;Bold line represents mean trajectory.&quot;)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Trajectories of all Simulations&quot;</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">mtick</span><span class="o">.</span><span class="n">StrMethodFormatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{x:,.0f}</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel_interest</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">save</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">160</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ax</span>
+
+    <span class="k">def</span> <span class="nf">plot_intervention_stacked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intervention_group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intervention_names</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">indicator_spec</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+        <span class="n">all_opt_df</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_opt_df</span><span class="p">()</span>
+                      <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;intervention&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;iteration&#39;</span><span class="p">])</span>
+                      <span class="p">[</span><span class="s1">&#39;opt_vals&#39;</span><span class="p">]</span>
+                      <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                      <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+                      <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">opt_vals</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;opt_vals&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">indicator_spec</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+                      <span class="p">)</span>
+
+        <span class="n">int_group</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">all_opt_df</span><span class="p">[</span><span class="n">all_opt_df</span><span class="p">[</span><span class="s1">&#39;opt_vals&#39;</span><span class="p">]</span><span class="o">&gt;</span><span class="n">indicator_spec</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span><span class="p">)</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;(?P&lt;</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&gt;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">intervention_group</span><span class="p">,</span> <span class="n">intervention_names</span><span class="p">)]))</span>
+         <span class="p">)</span>             
+
+        <span class="n">int_group</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_col</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">/</span><span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="s1">&#39;lower left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">% o</span><span class="s2">f Occurrences&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ax</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">solver_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">intervention_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">space_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">benefit_mean_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">benefit_sd_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cost_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cost_uniform_perc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pop_weight_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>MonteCarloMinimod uses the <code>Minimod</code> optimization classes and conducts Monte Carlo simulations of benefits and cost data through distribution assumptions on the data. Currently the simulations assume a normal distribution about benefits and a uniform distribution around costs.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>solver_type</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>Whether to minimize costs or maximize benfits. Currently only the former is implemented. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="pandas">pd</span>.<span title="pandas.DataFrame">DataFrame</span></code>
+          </td>
+          <td><p>The input data. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>intervention_col</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>the name of the intervention variable. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>time_col</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>the name of the time variable. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>space_col</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>the name of region/spatial variable. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>benefit_mean_col</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>the name of the variable that gives the mean of benefits for the intervention. Usually just the name of the benefits variable. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>benefit_sd_col</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>The name of the variable for the standard deviation of benefits. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>cost_col</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>The name of the cost variable. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>cost_uniform_perc</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td><p>If using the default of a uniform distribution for costs, the amount of the endpoint of the uniform distribution ([cost<em>(1+cost_uniform_perc), cost</em>(1- cost_uniform_perc)]). Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>pop_weight_col</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td><p>The name name of the variable that specific population weights. Defaults to None.</p></td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+<p><strong>Examples:</strong></p>
+    <p>Below is an example of how you would run the simulations as well as the visualizations.</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data/processed/example1.csv&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">benefit_sd</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;benefit&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">costs_sd</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;costs&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="p">)</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">cube</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;cube&quot;</span><span class="p">,</span> <span class="s2">&quot;vascube&quot;</span><span class="p">,</span> <span class="s2">&quot;oilcube&quot;</span><span class="p">,</span> <span class="s2">&quot;cubemaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vascubemaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vasoilcube&quot;</span><span class="p">,</span> <span class="s2">&quot;oilcubemaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vasoilcubemaize&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">oil</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;oil&quot;</span><span class="p">,</span> <span class="s2">&quot;vasoil&quot;</span><span class="p">,</span> <span class="s2">&quot;oilcube&quot;</span><span class="p">,</span> <span class="s2">&quot;oilmaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vasoilmaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vasoilcube&quot;</span><span class="p">,</span> <span class="s2">&quot;oilcubemaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vasoilcubemaize&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">maize</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;maize&quot;</span><span class="p">,</span> <span class="s2">&quot;vasmaize&quot;</span><span class="p">,</span> <span class="s2">&quot;oilmaize&quot;</span><span class="p">,</span> <span class="s2">&quot;cubemaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vascubemaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vasoilmaize&quot;</span><span class="p">,</span> <span class="s2">&quot;oilcubemaize&quot;</span><span class="p">,</span> <span class="s2">&quot;vasoilcubemaize&quot;</span> <span class="p">]</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">MonteCarloMinimod</span><span class="p">(</span><span class="n">solver_type</span> <span class="o">=</span> <span class="s1">&#39;costmin&#39;</span><span class="p">,</span> 
+<span class="gp">... </span>                       <span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="p">,</span> 
+<span class="gp">... </span>                       <span class="n">intervention_col</span><span class="o">=</span><span class="s1">&#39;intervention&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">space_col</span><span class="o">=</span><span class="s1">&#39;space&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">time_col</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">benefit_mean_col</span> <span class="o">=</span> <span class="s1">&#39;benefit&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">benefit_sd_col</span><span class="o">=</span> <span class="s1">&#39;benefit_sd&#39;</span><span class="p">,</span>
+<span class="gp">... </span>                       <span class="n">cost_col</span><span class="o">=</span><span class="s1">&#39;costs&#39;</span><span class="p">)</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">benefit_no_change</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">benefit_col</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">benefit_col</span><span class="p">]</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">sim</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">fit_all_samples</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> 
+<span class="gp">... </span>                        <span class="n">all_space</span><span class="o">=</span><span class="n">oil</span><span class="p">,</span> 
+<span class="gp">... </span>                        <span class="n">all_time</span><span class="o">=</span><span class="n">cube</span><span class="p">,</span> 
+<span class="gp">... </span>                        <span class="n">time_subset</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> 
+<span class="gp">... </span>                        <span class="n">minimum_benefit</span><span class="o">=</span><span class="s1">&#39;vasoilold&#39;</span><span class="p">,</span> 
+<span class="gp">... </span>                        <span class="n">benefit_callable</span><span class="o">=</span><span class="n">benefit_no_change</span><span class="p">,</span> 
+<span class="gp">... </span>                        <span class="n">benefit_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;benefit_col&#39;</span> <span class="p">:</span> <span class="s1">&#39;benefit&#39;</span><span class="p">}</span>
+<span class="gp">... </span>                        <span class="p">)</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">plot_opt_hist</span><span class="p">(</span><span class="n">save</span> <span class="o">=</span> <span class="s2">&quot;sim_results.png&quot;</span><span class="p">)</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">perc_intervention_appeared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">plot_sim_trajectories</span><span class="p">(</span><span class="n">save</span> <span class="o">=</span> <span class="s1">&#39;sim_traj.png&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+      <details class="quote">
+        <summary>Source code in <code>minimod_opt/monte_carlo/monte_carlo.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">solver_type</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">intervention_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">space_col</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">benefit_mean_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">benefit_sd_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cost_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cost_uniform_perc</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">pop_weight_col</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MonteCarloMinimod uses the `Minimod` optimization classes and conducts Monte Carlo simulations of benefits and cost data through distribution assumptions on the data. Currently the simulations assume a normal distribution about benefits and a uniform distribution around costs.</span>
+
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        solver_type (str, optional): Whether to minimize costs or maximize benfits. Currently only the former is implemented. Defaults to None.</span>
+<span class="sd">        data (pd.DataFrame, optional): The input data. Defaults to None.</span>
+<span class="sd">        intervention_col (str, optional): the name of the intervention variable. Defaults to None.</span>
+<span class="sd">        time_col (str, optional): the name of the time variable. Defaults to None.</span>
+<span class="sd">        space_col (str, optional): the name of region/spatial variable. Defaults to None.</span>
+<span class="sd">        benefit_mean_col (str, optional): the name of the variable that gives the mean of benefits for the intervention. Usually just the name of the benefits variable. Defaults to None.</span>
+<span class="sd">        benefit_sd_col (str, optional): The name of the variable for the standard deviation of benefits. Defaults to None.</span>
+<span class="sd">        cost_col (str, optional): The name of the cost variable. Defaults to None.</span>
+<span class="sd">        cost_uniform_perc (float, optional): If using the default of a uniform distribution for costs, the amount of the endpoint of the uniform distribution ([cost*(1+cost_uniform_perc), cost*(1- cost_uniform_perc)]). Defaults to None.</span>
+<span class="sd">        pop_weight_col (str, optional): The name name of the variable that specific population weights. Defaults to None.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">        Below is an example of how you would run the simulations as well as the visualizations.</span>
+
+<span class="sd">        &gt;&gt;&gt; import os; print(os.getcwd())</span>
+<span class="sd">        &gt;&gt;&gt; df = (</span>
+<span class="sd">        ...     pd.read_csv(&quot;data/processed/example1.csv&quot;)</span>
+<span class="sd">        ...     .assign(benefit_sd = lambda df: df[&#39;benefit&#39;]/2,</span>
+<span class="sd">        ...             costs_sd = lambda df: df[&#39;costs&#39;]/2)</span>
+<span class="sd">        ...     )</span>
+
+<span class="sd">        &gt;&gt;&gt; cube = [&quot;cube&quot;, &quot;vascube&quot;, &quot;oilcube&quot;, &quot;cubemaize&quot;, &quot;vascubemaize&quot;, &quot;vasoilcube&quot;, &quot;oilcubemaize&quot;, &quot;vasoilcubemaize&quot;]</span>
+<span class="sd">        &gt;&gt;&gt; oil = [&quot;oil&quot;, &quot;vasoil&quot;, &quot;oilcube&quot;, &quot;oilmaize&quot;, &quot;vasoilmaize&quot;, &quot;vasoilcube&quot;, &quot;oilcubemaize&quot;, &quot;vasoilcubemaize&quot;]</span>
+<span class="sd">        &gt;&gt;&gt; maize = [&quot;maize&quot;, &quot;vasmaize&quot;, &quot;oilmaize&quot;, &quot;cubemaize&quot;, &quot;vascubemaize&quot;, &quot;vasoilmaize&quot;, &quot;oilcubemaize&quot;, &quot;vasoilcubemaize&quot; ]</span>
+
+<span class="sd">        &gt;&gt;&gt; a = mm.MonteCarloMinimod(solver_type = &#39;costmin&#39;, </span>
+<span class="sd">        ...                        data = df, </span>
+<span class="sd">        ...                        intervention_col=&#39;intervention&#39;,</span>
+<span class="sd">        ...                        space_col=&#39;space&#39;,</span>
+<span class="sd">        ...                        time_col=&#39;time&#39;,</span>
+<span class="sd">        ...                        benefit_mean_col = &#39;benefit&#39;,</span>
+<span class="sd">        ...                        benefit_sd_col= &#39;benefit_sd&#39;,</span>
+<span class="sd">        ...                        cost_col=&#39;costs&#39;)</span>
+
+<span class="sd">        &gt;&gt;&gt; def benefit_no_change(seed, benefit_col, data):</span>
+<span class="sd">        ...    return data[benefit_col]</span>
+
+<span class="sd">        &gt;&gt;&gt; sim = a.fit_all_samples(N = 100, </span>
+<span class="sd">        ...                         all_space=oil, </span>
+<span class="sd">        ...                         all_time=cube, </span>
+<span class="sd">        ...                         time_subset=[1,2,3], </span>
+<span class="sd">        ...                         minimum_benefit=&#39;vasoilold&#39;, </span>
+<span class="sd">        ...                         benefit_callable=benefit_no_change, </span>
+<span class="sd">        ...                         benefit_kwargs={&#39;benefit_col&#39; : &#39;benefit&#39;}</span>
+<span class="sd">        ...                         )</span>
+
+<span class="sd">        &gt;&gt;&gt; a.plot_opt_hist(save = &quot;sim_results.png&quot;)</span>
+
+<span class="sd">        &gt;&gt;&gt; a.report(perc_intervention_appeared=True)</span>
+
+<span class="sd">        &gt;&gt;&gt; a.plot_sim_trajectories(save = &#39;sim_traj.png&#39;)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>        
+
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;Monte Carlo Simulator&quot;&quot;&quot;</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span> <span class="o">=</span> <span class="n">solver_type</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">intervention_col</span><span class="p">,</span> <span class="n">space_col</span><span class="p">,</span> <span class="n">time_col</span><span class="p">])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span> <span class="o">=</span> <span class="n">intervention_col</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">space_col</span> <span class="o">=</span> <span class="n">space_col</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_col</span> <span class="o">=</span> <span class="n">time_col</span>
+
+    <span class="k">if</span> <span class="n">pop_weight_col</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">pop_weight_col</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop_weight_col</span> <span class="o">=</span> <span class="s2">&quot;pop_weight_col&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop_weight_col</span> <span class="o">=</span> <span class="n">pop_weight_col</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">benefit_mean_col</span> <span class="o">=</span> <span class="n">benefit_mean_col</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">benefit_sd_col</span> <span class="o">=</span> <span class="n">benefit_sd_col</span>
+
+    <span class="k">if</span> <span class="n">cost_uniform_perc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost_uniform_perc</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost_uniform_perc</span> <span class="o">=</span> <span class="n">cost_uniform_perc</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">cost_col</span> <span class="o">=</span> <span class="n">cost_col</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="minimod_opt.monte_carlo.monte_carlo.MonteCarloMinimod.fit_one_sample" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">fit_one_sample</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">all_space</span><span class="p">,</span> <span class="n">all_time</span><span class="p">,</span> <span class="n">space_subset</span><span class="p">,</span> <span class="n">time_subset</span><span class="p">,</span> <span class="n">strict</span><span class="p">,</span> <span class="n">benefit_callable</span><span class="p">,</span> <span class="n">cost_callable</span><span class="p">,</span> <span class="n">cost_kwargs</span><span class="p">,</span> <span class="n">benefit_kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Draw one MonteCarlo sample and optimize. To be used with <code>fit_all_samples</code>. </p>
+<p><code>benefit_callable</code> and <code>cost_callable</code> must be functions with arguments <code>(seed, benefit_col, data)</code>. <code>cost_kwargs</code> and <code>benefit_kwargs</code> can be input to override defaults, such as if you want to use a different seed or change the name of a column.</p>
+<p>Note: <code>benefit_col</code> and <code>cost_col</code> for these callables denote the name of the resulting columns of the draw, not the original variable names.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>seed</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td><p>random seed</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>all_space</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>, None]</code>
+          </td>
+          <td><p>spatial constraints (as in <code>Minimod</code>)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>all_time</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>, None]</code>
+          </td>
+          <td><p>time constraints (as in <code>Minimod</code>)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>space_subset</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[str]</code>
+          </td>
+          <td><p>subset for space constraints (as in <code>Minimod</code>)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>time_subset</code></td>
+          <td>
+                <code><span title="typing.List">List</span>[int]</code>
+          </td>
+          <td><p>subset for time constraints (as in <code>Minimod</code>)</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>strict</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td><p>whether to treat list of intervention names input <em>strictly</em> or using regex</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>benefit_callable</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[<span title="typing.Callable">Callable</span>, None]</code>
+          </td>
+          <td><p>The function for benefits transformation</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>cost_callable</code></td>
+          <td>
+                <code><span title="typing.Union">Union</span>[<span title="typing.Callable">Callable</span>, None]</code>
+          </td>
+          <td><p>The function for cost transformation</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>cost_kwargs</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td><p>extra arguments for the cost_callabe</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>benefit_kwargs</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td><p>extra arguments for benefits callable</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>dict</code></td>          <td>
+                <code>dict</code>
+          </td>
+          <td><p>A dictionary of fitted results</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+      <details class="quote">
+        <summary>Source code in <code>minimod_opt/monte_carlo/monte_carlo.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_one_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                   <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                   <span class="n">all_space</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                   <span class="n">all_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                   <span class="n">space_subset</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                   <span class="n">time_subset</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                   <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                   <span class="n">benefit_callable</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                   <span class="n">cost_callable</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                   <span class="n">cost_kwargs</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span>
+                   <span class="n">benefit_kwargs</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw one MonteCarlo sample and optimize. To be used with `fit_all_samples`. </span>
+
+<span class="sd">    `benefit_callable` and `cost_callable` must be functions with arguments `(seed, benefit_col, data)`. `cost_kwargs` and `benefit_kwargs` can be input to override defaults, such as if you want to use a different seed or change the name of a column.</span>
+
+<span class="sd">    Note: `benefit_col` and `cost_col` for these callables denote the name of the resulting columns of the draw, not the original variable names.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        seed (int): random seed</span>
+<span class="sd">        all_space (Union[List, None]): spatial constraints (as in `Minimod`)</span>
+<span class="sd">        all_time (Union[List, None]): time constraints (as in `Minimod`)</span>
+<span class="sd">        space_subset (List[str]): subset for space constraints (as in `Minimod`)</span>
+<span class="sd">        time_subset (List[int]): subset for time constraints (as in `Minimod`)</span>
+<span class="sd">        strict (bool): whether to treat list of intervention names input *strictly* or using regex</span>
+<span class="sd">        benefit_callable (Union[Callable, None]): The function for benefits transformation</span>
+<span class="sd">        cost_callable (Union[Callable, None]): The function for cost transformation</span>
+<span class="sd">        cost_kwargs (dict): extra arguments for the cost_callabe</span>
+<span class="sd">        benefit_kwargs (dict): extra arguments for benefits callable</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary of fitted results</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+
+    <span class="k">if</span> <span class="n">benefit_callable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">benefit_callable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_benefit_sample</span>
+    <span class="k">if</span> <span class="n">cost_callable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cost_callable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_construct_cost_sample</span>
+
+    <span class="n">cost_kwargs_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;seed&#39;</span> <span class="p">:</span> <span class="n">seed</span><span class="p">,</span> <span class="s1">&#39;cost_col&#39;</span> <span class="p">:</span> <span class="s1">&#39;cost_random_draw&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
+    <span class="n">benefit_kwargs_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;seed&#39;</span> <span class="p">:</span> <span class="n">seed</span><span class="p">,</span> <span class="s1">&#39;benefit_col&#39;</span> <span class="p">:</span> <span class="s1">&#39;benefit_random_draw&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">cost_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cost_kwargs_default</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cost_kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">benefit_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">benefit_kwargs_default</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">benefit_kwargs</span><span class="p">)</span>
+
+
+    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_samples</span><span class="p">(</span><span class="n">benefit_callable</span><span class="o">=</span><span class="n">benefit_callable</span><span class="p">,</span>
+                             <span class="n">cost_callable</span><span class="o">=</span><span class="n">cost_callable</span><span class="p">,</span>
+                             <span class="n">benefit_kwargs</span><span class="o">=</span><span class="n">benefit_kwargs_default</span><span class="p">,</span>
+                             <span class="n">cost_kwargs</span><span class="o">=</span><span class="n">cost_kwargs_default</span><span class="p">)</span> 
+
+    <span class="n">minimod</span> <span class="o">=</span> <span class="n">Minimod</span><span class="p">(</span><span class="n">solver_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_type</span><span class="p">)(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">intervention_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">intervention_col</span><span class="p">,</span>
+        <span class="n">space_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">space_col</span><span class="p">,</span>
+        <span class="n">time_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_col</span><span class="p">,</span>
+        <span class="n">benefit_col</span><span class="o">=</span><span class="n">benefit_kwargs_default</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;benefit_col&#39;</span><span class="p">),</span>
+        <span class="n">cost_col</span><span class="o">=</span><span class="n">cost_kwargs_default</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cost_col&#39;</span><span class="p">),</span>
+        <span class="n">all_space</span><span class="o">=</span><span class="n">all_space</span><span class="p">,</span>
+        <span class="n">all_time</span><span class="o">=</span><span class="n">all_time</span><span class="p">,</span>
+        <span class="n">space_subset</span><span class="o">=</span><span class="n">space_subset</span><span class="p">,</span>
+        <span class="n">time_subset</span><span class="o">=</span><span class="n">time_subset</span><span class="p">,</span>
+        <span class="n">show_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">,</span>
+        <span class="n">benefit_title</span><span class="o">=</span><span class="s2">&quot;Effective Coverage&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">minimod_opt</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+    <span class="c1"># Run `minimod_opt.report` to get opt_df for iteration</span>
+    <span class="c1"># Also save the opt_chosen dataframes in case there are multiple solutions</span>
+
+    <span class="n">opt_df_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_solutions</span><span class="p">):</span>
+        <span class="n">minimod_opt</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="n">sol_num</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">opt_df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">minimod_opt</span><span class="o">.</span><span class="n">opt_df</span><span class="p">)</span>
+
+    <span class="c1">#TODO: add lowest cost per life saved index into iteration dict</span>
+
+    <span class="n">iteration_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+        <span class="s2">&quot;opt_objective&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;opt_costs_discounted&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">opt_df_list</span><span class="p">],</span>
+        <span class="s2">&quot;opt_constraint&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;opt_benefit_discounted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">opt_df_list</span><span class="p">],</span>
+        <span class="s2">&quot;num_vars&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_cols</span><span class="p">,</span>
+        <span class="s2">&quot;constraints&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_rows</span><span class="p">,</span>
+        <span class="s2">&quot;solutions&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_solutions</span><span class="p">,</span>
+        <span class="s2">&quot;num_int&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_int</span><span class="p">,</span>
+        <span class="s2">&quot;num_nz&quot;</span><span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">num_nz</span><span class="p">,</span>
+        <span class="s2">&quot;opt_df&quot;</span><span class="p">:</span> <span class="n">opt_df_list</span><span class="p">,</span>
+        <span class="s2">&quot;sense&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">sense</span><span class="p">,</span>
+        <span class="s2">&quot;solver_name&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">solver_name</span><span class="p">,</span>
+        <span class="s2">&quot;minimum_benefit&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">minimum_benefit</span><span class="p">,</span>
+        <span class="s2">&quot;benefit_title&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">benefit_title</span><span class="p">,</span>
+        <span class="s2">&quot;bau_draw&quot;</span> <span class="p">:</span> <span class="n">minimod_opt</span><span class="o">.</span><span class="n">bau_df</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">iteration_dict</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+  <hr>
+<div class="md-source-file">
+  <small>
+    
+      Last update:
+      <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">February 21, 2023</span>
+      
+    
+  </small>
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tabs", "content.code.annotate"], "search": "../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.2a6f1dda.min.js"></script>
+      
+    
+  </body>
+</html>
