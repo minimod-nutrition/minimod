@@ -975,6 +975,7 @@ class BaseSolver:
                     time_col='time',
                     ec_range=None,
                     above_ul = False,
+                    above_ul_col = None,
                     ec_thousands = 1_000,
                     ul_thousands = 1_000,
                     save=None,
@@ -996,6 +997,7 @@ class BaseSolver:
                         time_col=time_col,
                         ec_range=ec_range,
                         above_ul = above_ul,
+                        above_ul_col=above_ul_col
                         **kwargs
                         )
         
@@ -1071,6 +1073,11 @@ class BaseSolver:
                 if data is None:
                     raise Exception("If `bau` is specified, `data` must also be specified")
                 
+                if len(data.index.names) == 1:
+                    data = data.set_index([supply_curve.intervention_col,
+                                           supply_curve.space_col,
+                                           supply_curve.time_col])
+                
                 bau_ec, bau_costs = BAUConstraintCreator().bau_df(data, bau, [supply_curve.benefit_col,
                                                                               supply_curve.cost_col]).sum()
 
@@ -1085,6 +1092,10 @@ class BaseSolver:
             ax0.scatter(opt_b/full_population, opt_c,  color='tab:orange', marker="s")
             
             if above_ul:
+                try:
+                    sc[above_ul_col]
+                except KeyError:
+                    raise Exception(f"No above ul in the data")
                 # Now get above_ul
                 sc['opt_above_ul'].plot(ax=ax1, color='tab:red')
                 ax1.yaxis.set_major_formatter(tick.FuncFormatter(lambda y, _: f"{y/ul_thousands:,.0f}"))
